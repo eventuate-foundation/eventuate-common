@@ -1,0 +1,8 @@
+apply plugin: PublicModulePlugin
+
+dependencies {
+    compile project(":eventuate-common-messaging")
+    compile project(":eventuate-common-broker")
+    compile project(":eventuate-common-redis")
+}
+
