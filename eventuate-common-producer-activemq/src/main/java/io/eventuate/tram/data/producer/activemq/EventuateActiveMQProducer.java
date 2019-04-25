@@ -1,7 +1,7 @@
 package io.eventuate.tram.data.producer.activemq;
 
 import io.eventuate.common.broker.DataProducer;
-import io.eventuate.tram.messaging.common.ChannelType;
+import io.eventuate.common.ChannelType;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
