@@ -16,14 +16,16 @@ public class EventuateCommonJdbcOperations {
                                     String entityId,
                                     String eventData,
                                     String eventType,
+                                    String entityType,
                                     EventuateSchema eventuateSchema) {
-    insertIntoEventsTable(eventId, entityId, eventData, eventType, Optional.empty(), Optional.empty(), eventuateSchema);
+    insertIntoEventsTable(eventId, entityId, eventData, eventType, entityType, Optional.empty(), Optional.empty(), eventuateSchema);
   }
 
   public void insertIntoEventsTable(String eventId,
                                     String entityId,
                                     String eventData,
                                     String eventType,
+                                    String entityType,
                                     Optional<String> triggeringEvent,
                                     Optional<String> metadata,
                                     EventuateSchema eventuateSchema) {
@@ -33,7 +35,7 @@ public class EventuateCommonJdbcOperations {
             eventId,
             eventType,
             eventData,
-            eventType,
+            entityType,
             entityId,
             triggeringEvent.orElse(null),
             metadata.orElse(null));
