@@ -1,0 +1,7 @@
+dependencies {
+    compile project(":eventuate-common-coordination-leadership")
+}
+
+test {
+    forkEvery 1
+}
