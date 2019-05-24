@@ -1,15 +1,6 @@
-include 'eventuate-common'
+include 'eventuate-common-eventuate-local'
 include 'eventuate-common-jdbc'
-include 'eventuate-common-broker'
-include 'eventuate-common-kafka'
-
-include 'eventuate-common-producer-activemq'
-include 'eventuate-common-producer-rabbitmq'
-include 'eventuate-common-producer-redis'
-include 'eventuate-common-redis'
-
 include 'eventuate-common-coordination-leadership'
 include 'eventuate-common-coordination-leadership-zookeeper'
-include 'eventuate-common-coordination-leadership-redis'
 
 rootProject.name = 'eventuate-common'
