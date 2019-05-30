@@ -45,3 +45,4 @@ docker images
 tagAndPush "kafka" "kafka"
 tagAndPush "rabbitmq" "rabbitmq"
 tagAndPush "zookeeper" "zookeeper"
+tagAndPush "activemq" "activemq"
