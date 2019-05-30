@@ -1,7 +1,10 @@
 dependencies {
     compile "org.springframework.boot:spring-boot-starter-jdbc:$springBootVersion"
-    compile "io.eventuate.client.java:eventuate-client-java-jdbc-common:$eventuateClientVersion"
+    compile "com.fasterxml.jackson.core:jackson-databind:2.8.8"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.8"
+    compile 'mysql:mysql-connector-java:5.1.39'
 
+    testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
 }
 
 test {

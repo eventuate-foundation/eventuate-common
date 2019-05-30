@@ -1,0 +1,5 @@
+apply plugin: PrivateModulePlugin
+
+dependencies {
+    compile 'commons-lang:commons-lang:2.6'
+}

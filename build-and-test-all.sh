@@ -17,6 +17,7 @@ fi
 
 docker-compose up --build -d
 
-#./gradlew $* eventuate-common-jdbc:cleanTest eventuate-common-jdbc:test eventuate-common-kafka:cleanTest eventuate-common-kafka:test
-./gradlew $* cleanTest test
+./wait-for-mysql.sh
+
+./gradlew $* cleanTest build
 docker-compose down

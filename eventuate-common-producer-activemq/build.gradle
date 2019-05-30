@@ -1,9 +1,0 @@
-apply plugin: PublicModulePlugin
-
-dependencies {
-    compile project(":eventuate-common-broker")
-    compile project(":eventuate-common")
-
-    compile "org.apache.activemq:activemq-core:5.7.0"
-}
-

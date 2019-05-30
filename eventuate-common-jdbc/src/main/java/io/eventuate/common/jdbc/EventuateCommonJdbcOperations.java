@@ -1,24 +1,19 @@
 package io.eventuate.common.jdbc;
 
-import io.eventuate.javaclient.spring.jdbc.EventuateSchema;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.util.Map;
 import java.util.Optional;
 
 public class EventuateCommonJdbcOperations {
   private JdbcTemplate jdbcTemplate;
 
+  private ObjectMapper objectMapper = new ObjectMapper();
+
   public EventuateCommonJdbcOperations(JdbcTemplate jdbcTemplate) {
     this.jdbcTemplate = jdbcTemplate;
-  }
-
-  public void insertIntoEventsTable(String eventId,
-                                    String entityId,
-                                    String eventData,
-                                    String eventType,
-                                    String entityType,
-                                    EventuateSchema eventuateSchema) {
-    insertIntoEventsTable(eventId, entityId, eventData, eventType, entityType, Optional.empty(), Optional.empty(), eventuateSchema);
   }
 
   public void insertIntoEventsTable(String eventId,
@@ -45,14 +40,22 @@ public class EventuateCommonJdbcOperations {
                                       String payload,
                                       String destination,
                                       String currentTimeInMillisecondsSql,
+                                      Map<String, String> headers,
                                       EventuateSchema eventuateSchema) {
     String table = eventuateSchema.qualifyTable("message");
+
+    String serializedHeaders;
+    try {
+      serializedHeaders = objectMapper.writeValueAsString(headers);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
 
     jdbcTemplate.update(String.format("insert into %s(id, destination, headers, payload, creation_time) values(?, ?, ?, ?, %s)",
             table, currentTimeInMillisecondsSql),
             messageId,
             destination,
-            String.format("{\"ID\" : \"%s\"}", messageId),
+            serializedHeaders,
             payload);
   }
 }
