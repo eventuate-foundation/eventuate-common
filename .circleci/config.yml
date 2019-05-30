@@ -6,12 +6,12 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: eventuate-common-{{ checksum "build.gradle" }}
+          key: eventuate-common-{{ checksum "gradle.properties" }}
       - run: TERM=dumb ./gradlew testClasses
       - save_cache:
           paths:
             - ~/.gradle
-          key: eventuate-common-{{ checksum "build.gradle" }}
+          key: eventuate-common-{{ checksum "gradle.properties" }}
       - run: TERM=dumb ./build-and-test-all.sh
       - run:
           name: Save test results
