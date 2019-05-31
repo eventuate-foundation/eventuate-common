@@ -2,5 +2,7 @@ include 'eventuate-common-eventuate-local'
 include 'eventuate-common-jdbc'
 include 'eventuate-common-coordination-leadership'
 include 'eventuate-common-coordination-leadership-zookeeper'
+include 'eventuate-common-id-generator'
+include 'eventuate-common-json-mapper'
 
 rootProject.name = 'eventuate-common'
