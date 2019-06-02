@@ -54,4 +54,12 @@ postgres:
   environment:
     POSTGRES_USER: eventuate
     POSTGRES_PASSWORD: eventuate
-    
+
+mariadb:
+  build: ./mariadb
+  ports:
+    - 3307:3306
+  environment:
+    - MYSQL_ROOT_PASSWORD=rootpassword
+    - MYSQL_USER=mysqluser
+    - MYSQL_PASSWORD=mysqlpw
