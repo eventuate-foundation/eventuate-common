@@ -5,81 +5,82 @@ import io.eventuate.util.test.async.Eventually;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractLeadershipTest <SELECTOR extends EventuateLeaderSelector> {
+
   @Test
-  public void testThatCallbackInvokedOnce() throws Exception {
-    AtomicInteger callbackInvocationCounter = new AtomicInteger(0);
+  public void testThatCallbackInvokedOnce1() {
+    LeaderSelectorTestingWrap<SELECTOR> leaderSelectorTestingWrap = createAndStartLeaderSelector();
 
-    EventuateLeaderSelector eventuateLeaderSelector = createLeaderSelector(callbackInvocationCounter);
-
-    Thread.sleep(1000);
-
-    Assert.assertEquals(1, callbackInvocationCounter.get());
-
-    eventuateLeaderSelector.stop();
+    leaderSelectorTestingWrap.eventuallyAssertIsLeaderAndCallbackIsInvokedOnce();
+    leaderSelectorTestingWrap.stop();
+    leaderSelectorTestingWrap.eventuallyAssertIsNotLeaderAndCallbackIsInvokedOnce();
   }
 
   @Test
-  public void testThatLeaderChangedWhenStopped() throws Exception {
-    AtomicInteger callbackInvocationCounterForLeader1 = new AtomicInteger(0);
-    AtomicInteger callbackInvocationCounterForLeader2 = new AtomicInteger(0);
+  public void testThatLeaderIsChangedWhenStopped() {
+    LeaderSelectorTestingWrap<SELECTOR> leaderSelectorTestingWrap1 = createAndStartLeaderSelector();
+    LeaderSelectorTestingWrap<SELECTOR> leaderSelectorTestingWrap2 = createAndStartLeaderSelector();
 
-    EventuateLeaderSelector eventuateLeaderSelector1 = createLeaderSelector(callbackInvocationCounterForLeader1);
-    EventuateLeaderSelector eventuateLeaderSelector2 = createLeaderSelector(callbackInvocationCounterForLeader2);
+    eventuallyAssertLeadershipIsAssignedOnlyForOneSelector(leaderSelectorTestingWrap1, leaderSelectorTestingWrap2);
 
-    assertLeadershipWasAssignedForOneSelector(callbackInvocationCounterForLeader1, callbackInvocationCounterForLeader2);
+    LeaderSelectorTestingWrap<SELECTOR> instanceWhichBecameLeaderFirst =
+            leaderSelectorTestingWrap1.isLeader() ? leaderSelectorTestingWrap1 : leaderSelectorTestingWrap2;
 
-    boolean leader1 = callbackInvocationCounterForLeader1.get() == 1;
+    LeaderSelectorTestingWrap<SELECTOR> instanceWhichBecameLeaderLast =
+            leaderSelectorTestingWrap2.isLeader() ? leaderSelectorTestingWrap1 : leaderSelectorTestingWrap2;
 
-    if (leader1) {
-      eventuateLeaderSelector1.stop();
-    } else {
-      eventuateLeaderSelector2.stop();
-    }
+    instanceWhichBecameLeaderFirst.stop();
 
-    assertLeadershipWasAssignedForBothSelectors(callbackInvocationCounterForLeader1, callbackInvocationCounterForLeader2);
+    instanceWhichBecameLeaderLast.eventuallyAssertIsLeaderAndCallbackIsInvokedOnce();
 
-    if (leader1) {
-      eventuateLeaderSelector2.stop();
-    } else {
-      eventuateLeaderSelector1.stop();
-    }
+    instanceWhichBecameLeaderLast.stop();
   }
 
   @Test
-  public void testThatOnlyOneLeaderWorkInTheSameTime() throws Exception {
-    AtomicInteger callbackInvocationCounterForLeader1 = new AtomicInteger(0);
-    AtomicInteger callbackInvocationCounterForLeader2 = new AtomicInteger(0);
+  public void testThatOnlyOneLeaderIsWorkingInTheSameTime() throws Exception {
+    LeaderSelectorTestingWrap<SELECTOR> leaderSelectorTestingWrap1 = createAndStartLeaderSelector();
+    LeaderSelectorTestingWrap<SELECTOR> leaderSelectorTestingWrap2 = createAndStartLeaderSelector();
 
-    createLeaderSelector(callbackInvocationCounterForLeader1, true);
-    createLeaderSelector(callbackInvocationCounterForLeader2, true);
+    eventuallyAssertLeadershipIsAssignedOnlyForOneSelector(leaderSelectorTestingWrap1, leaderSelectorTestingWrap2);
 
     Thread.sleep(3000);
 
-    assertLeadershipWasAssignedForOneSelector(callbackInvocationCounterForLeader1, callbackInvocationCounterForLeader2);
+    eventuallyAssertLeadershipIsAssignedOnlyForOneSelector(leaderSelectorTestingWrap1, leaderSelectorTestingWrap2);
+
+    leaderSelectorTestingWrap1.stop();
+    leaderSelectorTestingWrap2.stop();
   }
 
-
-  protected void assertLeadershipWasAssignedForOneSelector(AtomicInteger invocationCounter1, AtomicInteger invocationCounter2) {
+  protected void eventuallyAssertLeadershipIsAssignedOnlyForOneSelector(LeaderSelectorTestingWrap<SELECTOR> selectorLeaderSelectorTestingWrap1,
+                                                                        LeaderSelectorTestingWrap<SELECTOR> selectorLeaderSelectorTestingWrap2) {
     Eventually.eventually(() -> {
-      boolean leader1Condition = invocationCounter1.get() == 1 && invocationCounter2.get() == 0;
-      boolean leader2Condition = invocationCounter2.get() == 1 && invocationCounter1.get() == 0;
+      boolean leader1Condition = selectorLeaderSelectorTestingWrap1.isLeader() && !selectorLeaderSelectorTestingWrap2.isLeader();
+      boolean leader2Condition = selectorLeaderSelectorTestingWrap2.isLeader() && !selectorLeaderSelectorTestingWrap1.isLeader();
       Assert.assertTrue(leader1Condition || leader2Condition);
     });
   }
 
-  protected void assertLeadershipWasAssignedForBothSelectors(AtomicInteger invocationCounter1, AtomicInteger invocationCounter2) {
-    Eventually.eventually(() -> {
-      Assert.assertEquals(1, invocationCounter1.get());
-      Assert.assertEquals(1, invocationCounter2.get());
-    });
+  protected LeaderSelectorTestingWrap<SELECTOR> createAndStartLeaderSelector() {
+    AtomicInteger invocationCounter = new AtomicInteger(0);
+    AtomicBoolean leaderFlag = new AtomicBoolean(false);
+
+    SELECTOR selector = createLeaderSelector(() -> {
+      leaderFlag.set(true);
+      invocationCounter.incrementAndGet();
+      try {
+        Thread.sleep(Long.MAX_VALUE);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+    }, () -> leaderFlag.set(false));
+
+    selector.start();
+
+    return new LeaderSelectorTestingWrap<>(selector, invocationCounter, leaderFlag);
   }
 
-  protected SELECTOR createLeaderSelector(AtomicInteger invocationCounter) {
-    return createLeaderSelector(invocationCounter, false);
-  }
-
-  protected abstract SELECTOR createLeaderSelector(AtomicInteger invocationCounter, boolean infinite);
+  protected abstract SELECTOR createLeaderSelector(Runnable leaderSelectedCallback, Runnable leaderRemovedCallback);
 }

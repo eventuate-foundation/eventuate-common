@@ -2,8 +2,6 @@ zookeeper:
   build: ./zookeeper
   ports:
     - 2181:2181
-    - 2888:2888
-    - 3888:3888
 
 mysql:
   build: ./mariadb

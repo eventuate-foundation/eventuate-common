@@ -12,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = LeadershipTest.Config.class)
@@ -33,27 +32,14 @@ public class LeadershipTest extends AbstractLeadershipTest<ZkLeaderSelector> {
   }
 
   @Override
-  protected ZkLeaderSelector createLeaderSelector(AtomicInteger invocationCounter, boolean infinite) {
+  protected ZkLeaderSelector createLeaderSelector(Runnable leaderSelectedCallback, Runnable leaderRemovedCallback) {
     CuratorFramework curatorFramework = CuratorFrameworkFactory.newClient(zkUrl,
             new ExponentialBackoffRetry(1000, 5));
     curatorFramework.start();
 
-    ZkLeaderSelector zkLeaderSelector = new ZkLeaderSelector(curatorFramework,
+    return new ZkLeaderSelector(curatorFramework,
             lockId,
-            () -> {
-              invocationCounter.incrementAndGet();
-                if (infinite) {
-                  try {
-                    Thread.sleep(Long.MAX_VALUE);
-                  } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                  }
-                }
-            },
-            () -> {});
-
-    zkLeaderSelector.start();
-
-    return zkLeaderSelector;
+            leaderSelectedCallback,
+            leaderRemovedCallback);
   }
 }
