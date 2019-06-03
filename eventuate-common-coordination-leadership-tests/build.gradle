@@ -1,0 +1,10 @@
+dependencies {
+    compile project(":eventuate-common-coordination-leadership")
+
+    compile "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
+    compile "junit:junit:4.11"
+}
+
+test {
+    forkEvery 1
+}

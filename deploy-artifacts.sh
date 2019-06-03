@@ -44,10 +44,7 @@ $PREFIX docker login -u ${DOCKER_USER_ID?} -p ${DOCKER_PASSWORD?}
 
 docker images
 
-tagAndPush "kafka" "kafka"
-tagAndPush "rabbitmq" "rabbitmq"
 tagAndPush "zookeeper" "zookeeper"
-tagAndPush "activemq" "activemq"
 tagAndPush "postgres" "postgres"
 tagAndPush "mysql" "mysql"
 tagAndPush "mariadb" "mariadb"
