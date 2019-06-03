@@ -27,15 +27,17 @@ $PREFIX ./gradlew -P version=${VERSION} \
 
 DOCKER_REPO=eventuateio
 DOCKER_COMPOSE_PREFIX=eventuatecommon_
+DOCKER_REMOTE_PREFIX=eventuate-
 
 function tagAndPush() {
   LOCAL=$1
   REMOTE=$2
-  $PREFIX docker tag ${DOCKER_COMPOSE_PREFIX?}$LOCAL $DOCKER_REPO/$REMOTE:$VERSION
-  $PREFIX docker tag ${DOCKER_COMPOSE_PREFIX?}$LOCAL $DOCKER_REPO/$REMOTE:latest
-  echo Pushing $DOCKER_REPO/$REMOTE:$VERSION
-  $PREFIX docker push $DOCKER_REPO/$REMOTE:$VERSION
-  $PREFIX docker push $DOCKER_REPO/$REMOTE:latest
+  FULL_REMOTE=${DOCKER_REMOTE_PREFIX}${REMOTE}
+  $PREFIX docker tag ${DOCKER_COMPOSE_PREFIX?}$LOCAL $DOCKER_REPO/${FULL_REMOTE}:$VERSION
+  $PREFIX docker tag ${DOCKER_COMPOSE_PREFIX?}$LOCAL $DOCKER_REPO/${FULL_REMOTE}:latest
+  echo Pushing $DOCKER_REPO/${FULL_REMOTE}:$VERSION
+  $PREFIX docker push $DOCKER_REPO/${FULL_REMOTE}:$VERSION
+  $PREFIX docker push $DOCKER_REPO/${FULL_REMOTE}:latest
 }
 
 $PREFIX docker login -u ${DOCKER_USER_ID?} -p ${DOCKER_PASSWORD?}
@@ -46,7 +48,7 @@ tagAndPush "kafka" "kafka"
 tagAndPush "rabbitmq" "rabbitmq"
 tagAndPush "zookeeper" "zookeeper"
 tagAndPush "activemq" "activemq"
-tagAndPush "mysql" "mysql"
-tagAndPush "mssql" "mssql"
-tagAndPush "mariadb" "mariadb"
 tagAndPush "postgres" "postgres"
+tagAndPush "mysql" "mysql"
+tagAndPush "mariadb" "mariadb"
+tagAndPush "mssql" "mssql"
