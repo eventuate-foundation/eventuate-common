@@ -4,7 +4,7 @@ export TERM=dumb
 
 set -e
 
-. ./set-env.sh
+. ./set-env-${DATABASE}.sh
 
 GRADLE_OPTS=""
 
@@ -15,9 +15,9 @@ fi
 
 ./gradlew ${GRADLE_OPTS} testClasses
 
-docker-compose up --build -d
+docker-compose -f docker-compose-${DATABASE}.yml up --build -d
 
-./wait-for-mysql.sh
+./wait-for-${DATABASE}.sh
 
 ./gradlew $* cleanTest build
-docker-compose down
+docker-compose -f docker-compose-${DATABASE}.yml down
