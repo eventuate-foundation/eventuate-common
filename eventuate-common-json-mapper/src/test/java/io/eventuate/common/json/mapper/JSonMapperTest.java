@@ -1,6 +1,6 @@
 package io.eventuate.common.json.mapper;
 
-import io.eventuate.common.id.generator.Int128;
+import io.eventuate.common.id.Int128;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.junit.Test;
 

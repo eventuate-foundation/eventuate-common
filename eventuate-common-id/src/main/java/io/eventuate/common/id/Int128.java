@@ -1,4 +1,4 @@
-package io.eventuate.common.id.generator;
+package io.eventuate.common.id;
 
 public class Int128 {
 
