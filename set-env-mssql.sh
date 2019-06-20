@@ -5,4 +5,8 @@ export SPRING_DATASOURCE_USERNAME=sa
 export SPRING_DATASOURCE_PASSWORD=Eventuate123!
 export SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.microsoft.sqlserver.jdbc.SQLServerDriver
 
+export MICRONAUT_DATASOURCE_URL="jdbc:sqlserver://${DOCKER_HOST_IP}:1433;databaseName=eventuate"
+export MICRONAUT_DATASOURCE_USERNAME=sa
+export MICRONAUT_DATASOURCE_PASSWORD=Eventuate123!
+export MICRONAUT_DATASOURCE_DRIVER_CLASS_NAME=com.microsoft.sqlserver.jdbc.SQLServerDriver
 

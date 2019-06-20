@@ -1,14 +1,13 @@
 package io.eventuate.common.jdbc.sqldialect;
 
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import java.util.Optional;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = SqlDialectConfiguration.class,
-        properties= {"spring.datasource.driver-class-name=org.postgresql.Driver"})
 public class PostgreSqlDialectTest extends AbstractDialectTest {
+
   public PostgreSqlDialectTest() {
-    super(PostgresDialect.class, "(ROUND(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) * 1000))");
+    super("org.postgresql.Driver",
+            PostgresDialect.class,
+            "(ROUND(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) * 1000))",
+            Optional.empty());
   }
 }

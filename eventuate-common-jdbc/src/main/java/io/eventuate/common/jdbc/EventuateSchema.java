@@ -1,6 +1,6 @@
 package io.eventuate.common.jdbc;
 
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 public class EventuateSchema {
   public static final String DEFAULT_SCHEMA = "eventuate";

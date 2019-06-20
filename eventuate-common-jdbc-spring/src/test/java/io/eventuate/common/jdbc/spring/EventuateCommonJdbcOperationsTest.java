@@ -1,43 +1,31 @@
-package io.eventuate.common.jdbc;
+package io.eventuate.common.jdbc.spring;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
+import io.eventuate.common.jdbc.EventuateSchema;
+import io.eventuate.common.json.mapper.JSonMapper;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.sql.SQLException;
 import java.util.*;
 
-@SpringBootTest(classes = EventuateCommonJdbcOperationsTest.Config.class)
+@SpringBootTest(classes = EventuateCommonJdbcOperationsConfiguration.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class EventuateCommonJdbcOperationsTest {
 
-  @Configuration
-  @EnableAutoConfiguration
-  public static class Config {
-    @Bean
-    public EventuateCommonJdbcOperations eventuateCommonJdbcOperations(JdbcTemplate jdbcTemplate) {
-      return new EventuateCommonJdbcOperations(jdbcTemplate);
-    }
-  }
-
   @Autowired
   private EventuateCommonJdbcOperations eventuateCommonJdbcOperations;
-
-  private ObjectMapper objectMapper = new ObjectMapper();
 
   @Autowired
   private JdbcTemplate jdbcTemplate;
 
   @Test
-  public void testInsertIntoEventsTable() {
+  public void testInsertIntoEventsTable() throws SQLException {
     String eventId = generateId();
     String entityId = generateId();
     String eventData = generateId();
@@ -67,7 +55,7 @@ public class EventuateCommonJdbcOperationsTest {
   }
 
   @Test
-  public void testInsertIntoMessageTable() throws JsonProcessingException {
+  public void testInsertIntoMessageTable() throws SQLException {
     String messageId = generateId();
     String payload = generateId();
     String destination = generateId();
@@ -96,7 +84,7 @@ public class EventuateCommonJdbcOperationsTest {
     Assert.assertEquals(destination, event.get("destination"));
     Assert.assertEquals(payload, event.get("payload"));
     Assert.assertEquals(time, event.get("creation_time"));
-    Assert.assertEquals(objectMapper.writeValueAsString(headers), event.get("headers"));
+    Assert.assertEquals(JSonMapper.toJson(headers), event.get("headers"));
   }
 
   private String generateId() {
