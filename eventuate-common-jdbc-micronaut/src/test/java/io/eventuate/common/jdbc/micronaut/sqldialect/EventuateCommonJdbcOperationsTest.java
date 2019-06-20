@@ -1,11 +1,14 @@
-package io.eventuate.common.jdbc;
+package io.eventuate.common.jdbc.micronaut.sqldialect;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.zaxxer.hikari.HikariDataSource;
+import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
+import io.eventuate.common.jdbc.EventuateSchema;
 import io.eventuate.common.json.mapper.JSonMapper;
+import io.micronaut.context.annotation.Property;
+import io.micronaut.test.annotation.MicronautTest;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,20 +16,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+
+@MicronautTest
+@Property(name = "micronaut.eventuate.common.jdbc.operations.factory", value = "true")
 public class EventuateCommonJdbcOperationsTest {
 
+  @Inject
   private EventuateCommonJdbcOperations eventuateCommonJdbcOperations;
+
+  @Inject
   private DataSource dataSource;
+
   private EventuateSchema eventuateSchema = new EventuateSchema();
 
-  public EventuateCommonJdbcOperationsTest() {
-    dataSource = createDataSource();
-
-    this.eventuateCommonJdbcOperations = new EventuateCommonJdbcOperations(dataSource);
-  }
-
   @Test
-  public void testInsertIntoEventsTable() {
+  public void testInsertIntoEventsTable() throws SQLException {
     String eventId = generateId();
     String entityId = generateId();
     String eventData = generateId();
@@ -34,7 +38,6 @@ public class EventuateCommonJdbcOperationsTest {
     String entityType = generateId();
     String triggeringEvent = generateId();
     String metadata = generateId();
-    EventuateSchema eventuateSchema = new EventuateSchema();
 
     eventuateCommonJdbcOperations.insertIntoEventsTable(eventId,
             entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
@@ -54,7 +57,7 @@ public class EventuateCommonJdbcOperationsTest {
   }
 
   @Test
-  public void testInsertIntoMessageTable() throws JsonProcessingException {
+  public void testInsertIntoMessageTable() throws SQLException {
     String messageId = generateId();
     String payload = generateId();
     String destination = generateId();
@@ -62,8 +65,6 @@ public class EventuateCommonJdbcOperationsTest {
     Map<String, String> headers = new LinkedHashMap<>();
     headers.put("header1k", "header1v");
     headers.put("header2k", "header2v");
-
-    EventuateSchema eventuateSchema = new EventuateSchema();
 
     eventuateCommonJdbcOperations.insertIntoMessageTable(messageId,
             payload,
@@ -86,18 +87,6 @@ public class EventuateCommonJdbcOperationsTest {
 
   private String generateId() {
     return UUID.randomUUID().toString();
-  }
-
-  private DataSource createDataSource() {
-    HikariDataSource hikariDataSource = new HikariDataSource();
-    hikariDataSource.setUsername(System.getenv("DATASOURCE_USERNAME"));
-    hikariDataSource.setPassword(System.getenv("DATASOURCE_PASSWORD"));
-    hikariDataSource.setJdbcUrl(System.getenv("DATASOURCE_URL"));
-    hikariDataSource.setDriverClassName(System.getenv("DATASOURCE_DRIVER_CLASS_NAME"));
-
-    hikariDataSource.setConnectionTestQuery("select 1");
-
-    return hikariDataSource;
   }
 
   private List<Map<String, Object>> getEvents(String eventId) {

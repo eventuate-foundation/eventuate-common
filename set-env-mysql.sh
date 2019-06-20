@@ -1,6 +1,11 @@
 . ./_set-env.sh
 
-export DATASOURCE_URL=jdbc:mysql://${DOCKER_HOST_IP}/eventuate
-export DATASOURCE_USERNAME=mysqluser
-export DATASOURCE_PASSWORD=mysqlpw
-export DATASOURCE_DRIVER_CLASS_NAME=com.mysql.jdbc.Driver
+export SPRING_DATASOURCE_URL=jdbc:mysql://${DOCKER_HOST_IP}/eventuate
+export SPRING_DATASOURCE_USERNAME=mysqluser
+export SPRING_DATASOURCE_PASSWORD=mysqlpw
+export SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.jdbc.Driver
+
+export MICRONAUT_DATASOURCE_URL=jdbc:mysql://${DOCKER_HOST_IP}/eventuate
+export MICRONAUT_DATASOURCE_USERNAME=mysqluser
+export MICRONAUT_DATASOURCE_PASSWORD=mysqlpw
+export MICRONAUT_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.jdbc.Driver

@@ -1,8 +1,13 @@
 . ./_set-env.sh
 
-export DATASOURCE_URL=jdbc:postgresql://${DOCKER_HOST_IP}/eventuate
-export DATASOURCE_USERNAME=eventuate
-export DATASOURCE_PASSWORD=eventuate
-export DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+export SPRING_DATASOURCE_URL=jdbc:postgresql://${DOCKER_HOST_IP}/eventuate
+export SPRING_DATASOURCE_USERNAME=eventuate
+export SPRING_DATASOURCE_PASSWORD=eventuate
+export SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+
+export MICRONAUT_DATASOURCE_URL=jdbc:postgresql://${DOCKER_HOST_IP}/eventuate
+export MICRONAUT_DATASOURCE_USERNAME=eventuate
+export MICRONAUT_DATASOURCE_PASSWORD=eventuate
+export MICRONAUT_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
 
 
