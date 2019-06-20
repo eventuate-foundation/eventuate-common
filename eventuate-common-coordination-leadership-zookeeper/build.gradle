@@ -3,7 +3,6 @@ dependencies {
     compile project(":eventuate-common-coordination-leadership-tests")
 
     testCompile "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
-    testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
 }
 
 test {

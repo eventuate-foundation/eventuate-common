@@ -1,40 +1,29 @@
 package io.eventuate.common.jdbc;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zaxxer.hikari.HikariDataSource;
+import io.eventuate.common.json.mapper.JSonMapper;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
-@SpringBootTest(classes = EventuateCommonJdbcOperationsTest.Config.class)
-@RunWith(SpringJUnit4ClassRunner.class)
 public class EventuateCommonJdbcOperationsTest {
 
-  @Configuration
-  @EnableAutoConfiguration
-  public static class Config {
-    @Bean
-    public EventuateCommonJdbcOperations eventuateCommonJdbcOperations(JdbcTemplate jdbcTemplate) {
-      return new EventuateCommonJdbcOperations(jdbcTemplate);
-    }
-  }
-
-  @Autowired
   private EventuateCommonJdbcOperations eventuateCommonJdbcOperations;
+  private DataSource dataSource;
+  private EventuateSchema eventuateSchema = new EventuateSchema();
 
-  private ObjectMapper objectMapper = new ObjectMapper();
+  public EventuateCommonJdbcOperationsTest() {
+    dataSource = createDataSource();
 
-  @Autowired
-  private JdbcTemplate jdbcTemplate;
+    this.eventuateCommonJdbcOperations = new EventuateCommonJdbcOperations(dataSource);
+  }
 
   @Test
   public void testInsertIntoEventsTable() {
@@ -50,9 +39,7 @@ public class EventuateCommonJdbcOperationsTest {
     eventuateCommonJdbcOperations.insertIntoEventsTable(eventId,
             entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
 
-    List<Map<String, Object>> events = jdbcTemplate.queryForList(String.format("select event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata from %s " +
-                    "where event_id = ?",
-            eventuateSchema.qualifyTable("events")), eventId);
+    List<Map<String, Object>> events = getEvents(eventId);
 
     Assert.assertEquals(1, events.size());
 
@@ -85,21 +72,99 @@ public class EventuateCommonJdbcOperationsTest {
             headers,
             eventuateSchema);
 
-    List<Map<String, Object>> events = jdbcTemplate.queryForList(String.format("select id, destination, headers, payload, creation_time from %s " +
-                    "where id = ?",
-            eventuateSchema.qualifyTable("message")), messageId);
+    List<Map<String, Object>> messages = getMessages(messageId);
 
-    Assert.assertEquals(1, events.size());
+    Assert.assertEquals(1, messages.size());
 
-    Map<String, Object> event = events.get(0);
+    Map<String, Object> event = messages.get(0);
 
     Assert.assertEquals(destination, event.get("destination"));
     Assert.assertEquals(payload, event.get("payload"));
     Assert.assertEquals(time, event.get("creation_time"));
-    Assert.assertEquals(objectMapper.writeValueAsString(headers), event.get("headers"));
+    Assert.assertEquals(JSonMapper.toJson(headers), event.get("headers"));
   }
 
   private String generateId() {
     return UUID.randomUUID().toString();
+  }
+
+  private DataSource createDataSource() {
+    HikariDataSource hikariDataSource = new HikariDataSource();
+    hikariDataSource.setUsername(System.getenv("DATASOURCE_USERNAME"));
+    hikariDataSource.setPassword(System.getenv("DATASOURCE_PASSWORD"));
+    hikariDataSource.setJdbcUrl(System.getenv("DATASOURCE_URL"));
+    hikariDataSource.setDriverClassName(System.getenv("DATASOURCE_DRIVER_CLASS_NAME"));
+
+    hikariDataSource.setConnectionTestQuery("select 1");
+
+    return hikariDataSource;
+  }
+
+  private List<Map<String, Object>> getEvents(String eventId) {
+    String table = eventuateSchema.qualifyTable("events");
+    String sql = String.format("select event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata from %s where event_id = ?", table);
+
+    try (Connection connection = dataSource.getConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+
+      preparedStatement.setString(1, eventId);
+
+      List<Map<String, Object>> events = new ArrayList<>();
+
+      try(ResultSet rs = preparedStatement.executeQuery()) {
+        while (rs.next()) {
+          Map<String, Object> event = new HashMap<>();
+
+          event.put("event_id", rs.getString("event_id"));
+          event.put("event_type", rs.getString("event_type"));
+          event.put("event_data", rs.getString("event_data"));
+          event.put("entity_type", rs.getString("entity_type"));
+          event.put("entity_id", rs.getString("entity_id"));
+          event.put("triggering_event", rs.getString("triggering_event"));
+          event.put("metadata", rs.getString("metadata"));
+
+          events.add(event);
+        }
+      }
+
+      return events;
+
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private List<Map<String, Object>> getMessages(String messageId) {
+    String table = eventuateSchema.qualifyTable("message");
+    String sql = String.format("select id, destination, headers, payload, creation_time from %s where id = ?", table);
+
+    try (Connection connection = dataSource.getConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+
+      preparedStatement.setString(1, messageId);
+
+      List<Map<String, Object>> messages = new ArrayList<>();
+
+      try(ResultSet rs = preparedStatement.executeQuery()) {
+        while (rs.next()) {
+          Map<String, Object> message = new HashMap<>();
+
+          message.put("id", rs.getString("id"));
+          message.put("destination", rs.getString("destination"));
+          message.put("headers", rs.getString("headers"));
+          message.put("payload", rs.getString("payload"));
+          message.put("creation_time", rs.getLong("creation_time"));
+
+          messages.add(message);
+        }
+      }
+
+      return messages;
+
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

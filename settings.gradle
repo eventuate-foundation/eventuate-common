@@ -1,5 +1,6 @@
 include 'eventuate-common-eventuate-local'
 include 'eventuate-common-jdbc'
+include 'eventuate-common-jdbc-spring'
 include 'eventuate-common-coordination-leadership'
 include 'eventuate-common-coordination-leadership-tests'
 include 'eventuate-common-coordination-leadership-zookeeper'

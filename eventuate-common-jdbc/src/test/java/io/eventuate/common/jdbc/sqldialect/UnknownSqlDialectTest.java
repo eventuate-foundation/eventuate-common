@@ -2,12 +2,9 @@ package io.eventuate.common.jdbc.sqldialect;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collections;
 
-@RunWith(SpringRunner.class)
 public class UnknownSqlDialectTest {
 
   @Test
@@ -15,7 +12,7 @@ public class UnknownSqlDialectTest {
     IllegalStateException exception = null;
 
     try {
-      new SqlDialectSelector().selectDialect(Collections.emptySet(), "unknown.UnknownDriver");
+      new SqlDialectSelector(Collections.emptySet()).getDialect("unknown.UnknownDriver");
     } catch (IllegalStateException e) {
       exception = e;
     }
