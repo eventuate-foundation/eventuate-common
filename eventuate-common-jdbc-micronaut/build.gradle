@@ -28,3 +28,8 @@ dependencies {
     testRuntime "org.junit.jupiter:junit-jupiter-engine"
     testCompile 'com.zaxxer:HikariCP:3.2.0'
 }
+
+// use JUnit 5 platform
+test {
+    useJUnitPlatform()
+}
