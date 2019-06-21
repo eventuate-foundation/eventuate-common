@@ -1,4 +1,4 @@
-package io.eventuate.common.jdbc.micronaut.sqldialect;
+package io.eventuate.common.jdbc.micronaut;
 
 import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
 import io.eventuate.common.jdbc.EventuateSchema;
