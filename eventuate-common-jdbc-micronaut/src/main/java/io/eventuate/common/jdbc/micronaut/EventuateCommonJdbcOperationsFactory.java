@@ -6,15 +6,14 @@ import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Requires;
 
 import javax.inject.Singleton;
-import javax.sql.DataSource;
 
 @Factory
-@Requires(property = "micronaut.eventuate.common.jdbc.operations.factory", value = "true")
+//@Requires(property = "micronaut.eventuate.common.jdbc.operations.factory", value = "true")
 public class EventuateCommonJdbcOperationsFactory {
 
   @Singleton
-  public EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor(DataSource dataSource) {
-    return new EventuateMicronautJdbcStatementExecutor(dataSource);
+  public EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor(EventuateMicronautTransactionManagement eventuateMicronautTransactionManagement) {
+    return new EventuateMicronautJdbcStatementExecutor(eventuateMicronautTransactionManagement);
   }
 
   @Singleton

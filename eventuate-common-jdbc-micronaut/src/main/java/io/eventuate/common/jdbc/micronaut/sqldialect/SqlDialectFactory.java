@@ -9,7 +9,7 @@ import javax.inject.Singleton;
 import java.util.Collection;
 
 @Factory
-@Requires(property = "micronaut.eventuate.sql.dialect.factory", value = "true")
+//@Requires(property = "micronaut.eventuate.sql.dialect.factory", value = "true")
 public class SqlDialectFactory {
 
   @Singleton
