@@ -12,6 +12,6 @@ public class EventuateNoOpMicronautTransactionManagementFactory {
   @Singleton
   @Requires(missingBeans = EventuateMicronautTransactionManagement.class)
   public EventuateMicronautTransactionManagement eventuateMicronautTransactionManagement(DataSource dataSource) {
-    return new EventuateNoOpMicronautTransactionManagement(dataSource);
+    return new EventuateMicronautAutoCommitTransactionManagement(dataSource);
   }
 }

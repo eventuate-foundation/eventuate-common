@@ -14,9 +14,9 @@ public class EventuateMicronautJdbcStatementExecutor implements EventuateJdbcSta
   }
 
   @Override
-  public void update(String sql, Object... params) throws SQLException {
+  public void update(String sql, Object... params)  {
 
-    eventuateMicronautTransactionManagement.doWithConnection(connection -> {
+    eventuateMicronautTransactionManagement.doWithTransaction(connection -> {
       try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
         for (int i = 0; i < params.length; i++) {
@@ -24,6 +24,9 @@ public class EventuateMicronautJdbcStatementExecutor implements EventuateJdbcSta
         }
 
         preparedStatement.executeUpdate();
+      }
+      catch (SQLException sqlException) {
+        throw new EventuateMicronautSqlException(sqlException);
       }
     });
   }
