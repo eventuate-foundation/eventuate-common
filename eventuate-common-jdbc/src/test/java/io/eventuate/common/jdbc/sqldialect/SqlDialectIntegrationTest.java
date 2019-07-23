@@ -15,10 +15,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @SpringBootTest(classes = SqlDialectIntegrationTest.Config.class)
 @RunWith(SpringRunner.class)
@@ -53,8 +50,7 @@ public class SqlDialectIntegrationTest {
   public void testAddLimitToSimpleSelect() {
     final int LIMIT = 3;
 
-    jdbcTemplate.execute(String.format("truncate table %s", DEFAULT_EVENTUATE_SCHEMA.qualifyTable("events")));
-
+    clearEventsTable();
     prepareRandomData();
 
     String sqlWithoutLimit = String.format("select * from %s", DEFAULT_EVENTUATE_SCHEMA.qualifyTable("events"));
@@ -72,8 +68,7 @@ public class SqlDialectIntegrationTest {
     final int LIMIT = 2;
     final int SELECTABLE_RECORDS = 3;
 
-    jdbcTemplate.execute(String.format("truncate table %s", DEFAULT_EVENTUATE_SCHEMA.qualifyTable("events")));
-
+    clearEventsTable();
     prepareRandomData();
 
     String eventType = generateId();
@@ -98,6 +93,9 @@ public class SqlDialectIntegrationTest {
 
     Assert.assertEquals(SELECTABLE_RECORDS, resultWithoutLimit.size());
     Assert.assertEquals(LIMIT, resultWithLimit.size());
+
+    assertAllRowsHaveTheSameEventType(resultWithoutLimit, eventType);
+    assertAllRowsHaveTheSameEventType(resultWithLimit, eventType);
   }
 
   @Test
@@ -110,6 +108,14 @@ public class SqlDialectIntegrationTest {
 
     Assert.assertTrue(dbTime > javaTime1);
     Assert.assertTrue(dbTime < javaTime2);
+  }
+
+  private void assertAllRowsHaveTheSameEventType(List<Map<String, Object>> rows, String eventType) {
+    Assert.assertTrue(rows.stream().allMatch(row -> row.get("event_type").equals(eventType)));
+  }
+
+  private void clearEventsTable() {
+    jdbcTemplate.execute(String.format("truncate table %s", DEFAULT_EVENTUATE_SCHEMA.qualifyTable("events")));
   }
 
   private void prepareRandomData() {
