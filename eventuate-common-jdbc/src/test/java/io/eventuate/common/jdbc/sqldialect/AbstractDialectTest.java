@@ -24,9 +24,13 @@ public abstract class AbstractDialectTest {
 
   @Test
   public void testDialect() {
-    Assert.assertEquals(expectedDialectClass, sqlDialectSelector.getDialect(driver).getClass());
+    Assert.assertEquals(expectedDialectClass, getDialect().getClass());
 
     Assert.assertEquals(expectedCurrentTimeInMillisecondsExpression,
-            sqlDialectSelector.getDialect(driver).getCurrentTimeInMillisecondsExpression());
+            getDialect().getCurrentTimeInMillisecondsExpression());
+  }
+
+  protected EventuateSqlDialect getDialect() {
+    return sqlDialectSelector.getDialect(driver);
   }
 }
