@@ -3,7 +3,6 @@ package io.eventuate.common.jdbc.micronaut;
 import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
 import io.eventuate.common.jdbc.EventuateSchema;
 import io.eventuate.common.json.mapper.JSonMapper;
-import io.micronaut.context.annotation.Property;
 import io.micronaut.test.annotation.MicronautTest;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,6 @@ import java.util.*;
 
 
 @MicronautTest
-@Property(name = "micronaut.eventuate.common.jdbc.operations.factory", value = "true")
 public class EventuateCommonJdbcOperationsTest {
 
   @Inject
@@ -41,7 +39,6 @@ public class EventuateCommonJdbcOperationsTest {
 
     eventuateCommonJdbcOperations.insertIntoEventsTable(eventId,
             entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
-
     List<Map<String, Object>> events = getEvents(eventId);
 
     Assert.assertEquals(1, events.size());

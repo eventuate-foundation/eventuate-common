@@ -10,12 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class EventuateCommonJdbcOperationsConfiguration {
 
   @Bean
-  public EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor(JdbcTemplate jdbcTemplate) {
-    return new EventuateSpringJdbcStatementExecutor(jdbcTemplate);
-  }
-
-  @Bean
-  public EventuateCommonJdbcOperations eventuateCommonJdbcOperations(EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor) {
-    return new EventuateCommonJdbcOperations(eventuateJdbcStatementExecutor);
+  public EventuateCommonJdbcOperations eventuateCommonJdbcOperations(JdbcTemplate jdbcTemplate) {
+    return new EventuateCommonJdbcOperations(jdbcTemplate);
   }
 }
