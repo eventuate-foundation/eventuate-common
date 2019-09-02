@@ -1,14 +1,21 @@
 package io.eventuate.coordination.leadership.tests;
 
 import io.eventuate.coordination.leadership.EventuateLeaderSelector;
+import io.eventuate.coordination.leadership.LeaderSelectedCallback;
+import io.eventuate.coordination.leadership.LeadershipController;
 import io.eventuate.util.test.async.Eventually;
+import org.apache.curator.framework.recipes.leader.LeaderSelector;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 
 public abstract class AbstractLeadershipTest <SELECTOR extends EventuateLeaderSelector> {
+
+  private LeadershipController leadershipController;
 
   @Test
   public void testThatCallbackInvokedOnce1() {
@@ -54,6 +61,31 @@ public abstract class AbstractLeadershipTest <SELECTOR extends EventuateLeaderSe
     leaderSelectorTestingWrap2.stop();
   }
 
+  @Test
+  public void testRestart() {
+    LeaderSelectedCallback leaderSelectedCallback = Mockito.mock(LeaderSelectedCallback.class);
+    Runnable leaderRemovedCallback = Mockito.mock(Runnable.class);
+
+    Mockito.doAnswer(invocation -> {
+      leadershipController = (LeadershipController)invocation.getArguments()[0];
+      return null;
+    }).when(leaderSelectedCallback).run(Mockito.any());
+
+    SELECTOR leaderSelector = createLeaderSelector(leaderSelectedCallback, leaderRemovedCallback);
+
+    leaderSelector.start();
+
+    Eventually.eventually(() -> Mockito.verify(leaderSelectedCallback).run(Mockito.any()));
+
+    Mockito.verifyZeroInteractions(leaderRemovedCallback);
+    leadershipController.stop();
+
+    Eventually.eventually(() -> {
+      Mockito.verify(leaderRemovedCallback).run();
+      Mockito.verify(leaderSelectedCallback, Mockito.times(2)).run(Mockito.any());
+    });
+  }
+
   protected void eventuallyAssertLeadershipIsAssignedOnlyForOneSelector(LeaderSelectorTestingWrap<SELECTOR> selectorLeaderSelectorTestingWrap1,
                                                                         LeaderSelectorTestingWrap<SELECTOR> selectorLeaderSelectorTestingWrap2) {
     Eventually.eventually(() -> {
@@ -67,7 +99,7 @@ public abstract class AbstractLeadershipTest <SELECTOR extends EventuateLeaderSe
     AtomicInteger invocationCounter = new AtomicInteger(0);
     AtomicBoolean leaderFlag = new AtomicBoolean(false);
 
-    SELECTOR selector = createLeaderSelector(() -> {
+    SELECTOR selector = createLeaderSelector((leadershipController) -> {
       leaderFlag.set(true);
       invocationCounter.incrementAndGet();
       try {
@@ -82,5 +114,5 @@ public abstract class AbstractLeadershipTest <SELECTOR extends EventuateLeaderSe
     return new LeaderSelectorTestingWrap<>(selector, invocationCounter, leaderFlag);
   }
 
-  protected abstract SELECTOR createLeaderSelector(Runnable leaderSelectedCallback, Runnable leaderRemovedCallback);
+  protected abstract SELECTOR createLeaderSelector(LeaderSelectedCallback leaderSelectedCallback, Runnable leaderRemovedCallback);
 }
