@@ -1,7 +1,10 @@
-package io.eventuate.common.jdbc.sqldialect;
+package io.eventuate.common.jdbc.spring;
 
 import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
 import io.eventuate.common.jdbc.EventuateSchema;
+import io.eventuate.common.jdbc.spring.sqldialect.SqlDialectConfiguration;
+import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
+import io.eventuate.common.jdbc.sqldialect.SqlDialectSelector;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
