@@ -3,7 +3,10 @@ package io.eventuate.common.jdbc.sqldialect;
 public class MsSqlDialect implements EventuateSqlDialect {
   @Override
   public String addLimitToSql(String sql, String limitExpression) {
-    return sql.replaceFirst("select", String.format("select top %s", limitExpression));
+    String newSql = sql.replaceFirst("(?i:select)", String.format("select top (%s)", limitExpression));
+    if (newSql.equals(sql))
+      throw new IllegalArgumentException("Didn't replace in " + newSql);
+    return newSql;
   }
 
   @Override

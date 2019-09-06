@@ -13,6 +13,8 @@ if [ "$1" = "--clean" ] ; then
   shift
 fi
 
+docker-compose -f docker-compose-${DATABASE}.yml down
+
 ./gradlew ${GRADLE_OPTS} testClasses
 
 docker-compose -f docker-compose-${DATABASE}.yml up --build -d
