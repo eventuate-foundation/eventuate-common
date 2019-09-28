@@ -1,6 +1,7 @@
 package io.eventuate.coordination.leadership.zookeeper;
 
 import io.eventuate.coordination.leadership.EventuateLeaderSelector;
+import io.eventuate.coordination.leadership.LeaderSelectedCallback;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.CancelLeadershipException;
 import org.apache.curator.framework.recipes.leader.LeaderSelector;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 
 public class ZkLeaderSelector implements EventuateLeaderSelector {
   private Logger logger = LoggerFactory.getLogger(getClass());
@@ -17,13 +19,13 @@ public class ZkLeaderSelector implements EventuateLeaderSelector {
   private CuratorFramework curatorFramework;
   private String lockId;
   private String leaderId;
-  private Runnable leaderSelectedCallback;
+  private LeaderSelectedCallback leaderSelectedCallback;
   private Runnable leaderRemovedCallback;
   private LeaderSelector leaderSelector;
 
   public ZkLeaderSelector(CuratorFramework curatorFramework,
                           String lockId,
-                          Runnable leaderSelectedCallback,
+                          LeaderSelectedCallback leaderSelectedCallback,
                           Runnable leaderRemovedCallback) {
 
     this(curatorFramework, lockId, UUID.randomUUID().toString(), leaderSelectedCallback, leaderRemovedCallback);
@@ -32,7 +34,7 @@ public class ZkLeaderSelector implements EventuateLeaderSelector {
   public ZkLeaderSelector(CuratorFramework curatorFramework,
                           String lockId,
                           String leaderId,
-                          Runnable leaderSelectedCallback,
+                          LeaderSelectedCallback leaderSelectedCallback,
                           Runnable leaderRemovedCallback) {
     this.curatorFramework = curatorFramework;
     this.lockId = lockId;
@@ -46,9 +48,11 @@ public class ZkLeaderSelector implements EventuateLeaderSelector {
     leaderSelector = new LeaderSelector(curatorFramework, lockId, new LeaderSelectorListener() {
       @Override
       public void takeLeadership(CuratorFramework client) {
+        CountDownLatch stopCountDownLatch = new CountDownLatch(1);
+
         try {
           logger.info("Calling leaderSelectedCallback, leaderId : {}", leaderId);
-          leaderSelectedCallback.run();
+          leaderSelectedCallback.run(new ZkLeadershipController(stopCountDownLatch));
           logger.info("Called leaderSelectedCallback, leaderId : {}", leaderId);
         } catch (Exception e) {
           logger.error(e.getMessage(), e);
@@ -57,12 +61,10 @@ public class ZkLeaderSelector implements EventuateLeaderSelector {
           logger.info("Called leaderRemovedCallback, leaderId : {}", leaderId);
           return;
         }
-        while (true) {
-          try {
-            Thread.sleep(Long.MAX_VALUE);
-          } catch (InterruptedException e) {
-            break;
-          }
+        try {
+          stopCountDownLatch.await();
+        } catch (InterruptedException e) {
+          logger.error("Leadership interrupted", e);
         }
         try {
           logger.info("Calling leaderRemovedCallback, leaderId : {}", leaderId);
