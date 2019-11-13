@@ -1,7 +1,8 @@
-package io.eventuate.common.jdbc.micronaut;
+package io.eventuate.common.jdbc.micronaut.spring;
 
 import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
 import io.eventuate.common.jdbc.EventuateSchema;
+import io.eventuate.common.jdbc.EventuateTransactionTemplate;
 import io.eventuate.common.json.mapper.JSonMapper;
 import io.micronaut.test.annotation.MicronautTest;
 import org.junit.Assert;
@@ -16,11 +17,14 @@ import java.sql.SQLException;
 import java.util.*;
 
 
-@MicronautTest
+@MicronautTest(transactional = false)
 public class EventuateCommonJdbcOperationsTest {
 
   @Inject
   private EventuateCommonJdbcOperations eventuateCommonJdbcOperations;
+
+  @Inject
+  private EventuateTransactionTemplate eventuateTransactionTemplate;
 
   @Inject
   private DataSource dataSource;
@@ -37,8 +41,11 @@ public class EventuateCommonJdbcOperationsTest {
     String triggeringEvent = generateId();
     String metadata = generateId();
 
-    eventuateCommonJdbcOperations.insertIntoEventsTable(eventId,
-            entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
+    eventuateTransactionTemplate.executeInTransaction(() -> {
+      eventuateCommonJdbcOperations.insertIntoEventsTable(eventId,
+              entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
+    });
+
     List<Map<String, Object>> events = getEvents(eventId);
 
     Assert.assertEquals(1, events.size());
@@ -63,12 +70,14 @@ public class EventuateCommonJdbcOperationsTest {
     headers.put("header1k", "header1v");
     headers.put("header2k", "header2v");
 
-    eventuateCommonJdbcOperations.insertIntoMessageTable(messageId,
-            payload,
-            destination,
-            time.toString(),
-            headers,
-            eventuateSchema);
+    eventuateTransactionTemplate.executeInTransaction(() -> {
+      eventuateCommonJdbcOperations.insertIntoMessageTable(messageId,
+              payload,
+              destination,
+              time.toString(),
+              headers,
+              eventuateSchema);
+    });
 
     List<Map<String, Object>> messages = getMessages(messageId);
 

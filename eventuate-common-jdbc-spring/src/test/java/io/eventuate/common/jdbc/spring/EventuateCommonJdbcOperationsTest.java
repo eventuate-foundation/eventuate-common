@@ -2,6 +2,7 @@ package io.eventuate.common.jdbc.spring;
 
 import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
 import io.eventuate.common.jdbc.EventuateSchema;
+import io.eventuate.common.jdbc.EventuateTransactionTemplate;
 import io.eventuate.common.json.mapper.JSonMapper;
 import org.junit.Assert;
 import org.junit.Test;
@@ -31,6 +32,9 @@ public class EventuateCommonJdbcOperationsTest {
   private EventuateCommonJdbcOperations eventuateCommonJdbcOperations;
 
   @Autowired
+  private EventuateTransactionTemplate eventuateTransactionTemplate;
+
+  @Autowired
   private JdbcTemplate jdbcTemplate;
 
   @Test
@@ -44,8 +48,10 @@ public class EventuateCommonJdbcOperationsTest {
     String metadata = generateId();
     EventuateSchema eventuateSchema = new EventuateSchema();
 
-    eventuateCommonJdbcOperations.insertIntoEventsTable(eventId,
-            entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
+    eventuateTransactionTemplate.executeInTransaction(() -> {
+      eventuateCommonJdbcOperations.insertIntoEventsTable(eventId,
+              entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
+    });
 
     List<Map<String, Object>> events = jdbcTemplate.queryForList(String.format("select event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata from %s " +
                     "where event_id = ?",
@@ -75,12 +81,14 @@ public class EventuateCommonJdbcOperationsTest {
 
     EventuateSchema eventuateSchema = new EventuateSchema();
 
-    eventuateCommonJdbcOperations.insertIntoMessageTable(messageId,
-            payload,
-            destination,
-            time.toString(),
-            headers,
-            eventuateSchema);
+    eventuateTransactionTemplate.executeInTransaction(() -> {
+      eventuateCommonJdbcOperations.insertIntoMessageTable(messageId,
+              payload,
+              destination,
+              time.toString(),
+              headers,
+              eventuateSchema);
+    });
 
     List<Map<String, Object>> events = jdbcTemplate.queryForList(String.format("select id, destination, headers, payload, creation_time from %s " +
                     "where id = ?",
