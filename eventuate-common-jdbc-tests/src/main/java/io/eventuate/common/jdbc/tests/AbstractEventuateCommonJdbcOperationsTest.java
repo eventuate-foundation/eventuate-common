@@ -1,13 +1,11 @@
-package io.eventuate.common.jdbc.micronaut;
+package io.eventuate.common.jdbc.tests;
 
 import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
 import io.eventuate.common.jdbc.EventuateSchema;
+import io.eventuate.common.jdbc.EventuateTransactionTemplate;
 import io.eventuate.common.json.mapper.JSonMapper;
-import io.micronaut.test.annotation.MicronautTest;
 import org.junit.Assert;
-import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,18 +14,13 @@ import java.sql.SQLException;
 import java.util.*;
 
 
-@MicronautTest
-public class EventuateCommonJdbcOperationsTest {
-
-  @Inject
-  private EventuateCommonJdbcOperations eventuateCommonJdbcOperations;
-
-  @Inject
-  private DataSource dataSource;
-
+public abstract class AbstractEventuateCommonJdbcOperationsTest {
   private EventuateSchema eventuateSchema = new EventuateSchema();
 
-  @Test
+  protected abstract EventuateCommonJdbcOperations getEventuateCommonJdbcOperations();
+  protected abstract EventuateTransactionTemplate getEventuateTransactionTemplate();
+  protected abstract DataSource getDataSource();
+
   public void testInsertIntoEventsTable() throws SQLException {
     String eventId = generateId();
     String entityId = generateId();
@@ -37,8 +30,11 @@ public class EventuateCommonJdbcOperationsTest {
     String triggeringEvent = generateId();
     String metadata = generateId();
 
-    eventuateCommonJdbcOperations.insertIntoEventsTable(eventId,
-            entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
+    getEventuateTransactionTemplate().executeInTransaction(() -> {
+      getEventuateCommonJdbcOperations().insertIntoEventsTable(eventId,
+              entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
+    });
+
     List<Map<String, Object>> events = getEvents(eventId);
 
     Assert.assertEquals(1, events.size());
@@ -53,7 +49,6 @@ public class EventuateCommonJdbcOperationsTest {
     Assert.assertEquals(metadata, event.get("metadata"));
   }
 
-  @Test
   public void testInsertIntoMessageTable() throws SQLException {
     String messageId = generateId();
     String payload = generateId();
@@ -63,12 +58,14 @@ public class EventuateCommonJdbcOperationsTest {
     headers.put("header1k", "header1v");
     headers.put("header2k", "header2v");
 
-    eventuateCommonJdbcOperations.insertIntoMessageTable(messageId,
-            payload,
-            destination,
-            time.toString(),
-            headers,
-            eventuateSchema);
+    getEventuateTransactionTemplate().executeInTransaction(() -> {
+      getEventuateCommonJdbcOperations().insertIntoMessageTable(messageId,
+              payload,
+              destination,
+              time.toString(),
+              headers,
+              eventuateSchema);
+    });
 
     List<Map<String, Object>> messages = getMessages(messageId);
 
@@ -90,7 +87,7 @@ public class EventuateCommonJdbcOperationsTest {
     String table = eventuateSchema.qualifyTable("events");
     String sql = String.format("select event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata from %s where event_id = ?", table);
 
-    try (Connection connection = dataSource.getConnection();
+    try (Connection connection = getDataSource().getConnection();
          PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
 
@@ -125,7 +122,7 @@ public class EventuateCommonJdbcOperationsTest {
     String table = eventuateSchema.qualifyTable("message");
     String sql = String.format("select id, destination, headers, payload, creation_time from %s where id = ?", table);
 
-    try (Connection connection = dataSource.getConnection();
+    try (Connection connection = getDataSource().getConnection();
          PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
 

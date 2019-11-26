@@ -1,5 +1,6 @@
 dependencies {
     compile project (":eventuate-common-jdbc")
+    testCompile project (":eventuate-common-jdbc-tests")
 
     compile "org.springframework.boot:spring-boot-starter:$springBootVersion"
     compile "org.springframework.boot:spring-boot-starter-jdbc:$springBootVersion"

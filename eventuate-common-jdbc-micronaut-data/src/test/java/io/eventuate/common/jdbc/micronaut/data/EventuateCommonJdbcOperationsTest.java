@@ -1,47 +1,34 @@
-package io.eventuate.common.jdbc.spring;
+package io.eventuate.common.jdbc.micronaut.data;
 
 import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
 import io.eventuate.common.jdbc.EventuateTransactionTemplate;
 import io.eventuate.common.jdbc.tests.AbstractEventuateCommonJdbcOperationsTest;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import io.micronaut.test.annotation.MicronautTest;
+import org.junit.jupiter.api.Test;
 
+import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 
-@SpringBootTest(classes = EventuateCommonJdbcOperationsTest.Config.class)
-@RunWith(SpringJUnit4ClassRunner.class)
+
+@MicronautTest(transactional = false)
 public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJdbcOperationsTest {
 
-  @Configuration
-  @EnableAutoConfiguration
-  @Import(EventuateCommonJdbcOperationsConfiguration.class)
-  public static class Config {
-  }
-
-  @Autowired
+  @Inject
   private EventuateCommonJdbcOperations eventuateCommonJdbcOperations;
 
-  @Autowired
+  @Inject
   private EventuateTransactionTemplate eventuateTransactionTemplate;
 
-  @Autowired
+  @Inject
   private DataSource dataSource;
 
   @Test
-  @Override
   public void testInsertIntoEventsTable() throws SQLException {
     super.testInsertIntoEventsTable();
   }
 
   @Test
-  @Override
   public void testInsertIntoMessageTable() throws SQLException {
     super.testInsertIntoMessageTable();
   }

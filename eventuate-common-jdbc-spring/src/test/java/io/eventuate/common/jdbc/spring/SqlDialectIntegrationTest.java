@@ -29,7 +29,7 @@ public class SqlDialectIntegrationTest {
   public static class Config {
     @Bean
     public EventuateCommonJdbcOperations eventuateCommonJdbcOperations(JdbcTemplate jdbcTemplate) {
-      return new EventuateCommonJdbcOperations(jdbcTemplate);
+      return new EventuateCommonJdbcOperations(jdbcTemplate::update);
     }
   }
 

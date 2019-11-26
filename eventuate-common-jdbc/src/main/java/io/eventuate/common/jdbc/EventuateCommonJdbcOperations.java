@@ -1,17 +1,16 @@
 package io.eventuate.common.jdbc;
 
 import io.eventuate.common.json.mapper.JSonMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.Map;
 import java.util.Optional;
 
 public class EventuateCommonJdbcOperations {
 
-  private JdbcTemplate jdbcTemplate;
+  private EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor;
 
-  public EventuateCommonJdbcOperations(JdbcTemplate jdbcTemplate) {
-    this.jdbcTemplate = jdbcTemplate;
+  public EventuateCommonJdbcOperations(EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor) {
+    this.eventuateJdbcStatementExecutor = eventuateJdbcStatementExecutor;
   }
 
   public void insertIntoEventsTable(String eventId,
@@ -26,7 +25,7 @@ public class EventuateCommonJdbcOperations {
     String table = eventuateSchema.qualifyTable("events");
     String sql = String.format("INSERT INTO %s (event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata) VALUES (?, ?, ?, ?, ?, ?, ?);", table);
 
-    jdbcTemplate.update(sql, eventId, eventType, eventData, entityType, entityId, triggeringEvent.orElse(null), metadata.orElse(null));
+    eventuateJdbcStatementExecutor.update(sql, eventId, eventType, eventData, entityType, entityId, triggeringEvent.orElse(null), metadata.orElse(null));
   }
 
 
@@ -41,6 +40,6 @@ public class EventuateCommonJdbcOperations {
     String sql = String.format("insert into %s(id, destination, headers, payload, creation_time) values(?, ?, ?, ?, %s)", table, currentTimeInMillisecondsSql);
     String serializedHeaders = JSonMapper.toJson(headers);
 
-    jdbcTemplate.update(sql, messageId, destination, serializedHeaders, payload);
+    eventuateJdbcStatementExecutor.update(sql, messageId, destination, serializedHeaders, payload);
   }
 }

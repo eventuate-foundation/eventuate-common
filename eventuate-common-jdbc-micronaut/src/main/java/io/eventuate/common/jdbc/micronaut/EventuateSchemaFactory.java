@@ -2,7 +2,7 @@ package io.eventuate.common.jdbc.micronaut;
 
 import io.eventuate.common.jdbc.EventuateSchema;
 import io.micronaut.context.annotation.Factory;
-import org.springframework.beans.factory.annotation.Value;
+import io.micronaut.context.annotation.Value;
 
 import javax.annotation.Nullable;
 import javax.inject.Singleton;
