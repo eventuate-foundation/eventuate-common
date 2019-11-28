@@ -21,6 +21,27 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
   protected abstract EventuateTransactionTemplate getEventuateTransactionTemplate();
   protected abstract DataSource getDataSource();
 
+  public void testEventuateDuplicateKeyException() {
+    String eventId = generateId();
+    String entityId = generateId();
+    String eventData = generateId();
+    String eventType = generateId();
+    String entityType = generateId();
+    String triggeringEvent = generateId();
+    String metadata = generateId();
+
+    getEventuateTransactionTemplate().executeInTransaction(() -> {
+
+      getEventuateCommonJdbcOperations().insertIntoEventsTable(eventId,
+              entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
+
+      getEventuateCommonJdbcOperations().insertIntoEventsTable(eventId,
+              entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
+
+      return null;
+    });
+  }
+
   public void testInsertIntoEventsTable() throws SQLException {
     String eventId = generateId();
     String entityId = generateId();
@@ -33,6 +54,8 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     getEventuateTransactionTemplate().executeInTransaction(() -> {
       getEventuateCommonJdbcOperations().insertIntoEventsTable(eventId,
               entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
+
+      return null;
     });
 
     List<Map<String, Object>> events = getEvents(eventId);
@@ -65,6 +88,8 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
               time.toString(),
               headers,
               eventuateSchema);
+
+      return null;
     });
 
     List<Map<String, Object>> messages = getMessages(messageId);

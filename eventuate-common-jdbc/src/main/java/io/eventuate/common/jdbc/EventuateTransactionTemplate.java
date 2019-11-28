@@ -1,5 +1,7 @@
 package io.eventuate.common.jdbc;
 
+import java.util.function.Supplier;
+
 public interface EventuateTransactionTemplate {
-  void executeInTransaction(Runnable callback);
+  <T> T executeInTransaction(Supplier<T> callback);
 }

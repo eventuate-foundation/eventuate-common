@@ -1,6 +1,7 @@
 package io.eventuate.common.jdbc.spring;
 
 import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
+import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
 import io.eventuate.common.jdbc.EventuateTransactionTemplate;
 import io.eventuate.common.jdbc.tests.AbstractEventuateCommonJdbcOperationsTest;
 import org.junit.Test;
@@ -33,6 +34,12 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
 
   @Autowired
   private DataSource dataSource;
+
+  @Test(expected = EventuateDuplicateKeyException.class)
+  @Override
+  public void testEventuateDuplicateKeyException() {
+    super.testEventuateDuplicateKeyException();
+  }
 
   @Test
   @Override

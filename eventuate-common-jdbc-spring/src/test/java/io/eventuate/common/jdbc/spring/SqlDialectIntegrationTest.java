@@ -25,13 +25,8 @@ import java.util.*;
 public class SqlDialectIntegrationTest {
   @Configuration
   @EnableAutoConfiguration
-  @Import(SqlDialectConfiguration.class)
-  public static class Config {
-    @Bean
-    public EventuateCommonJdbcOperations eventuateCommonJdbcOperations(JdbcTemplate jdbcTemplate) {
-      return new EventuateCommonJdbcOperations(jdbcTemplate::update);
-    }
-  }
+  @Import({SqlDialectConfiguration.class, EventuateCommonJdbcOperationsConfiguration.class})
+  public static class Config {}
 
   private static final int DEFAULT_DB_RECORDS = 10;
 
