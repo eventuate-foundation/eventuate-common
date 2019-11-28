@@ -1,9 +1,11 @@
 package io.eventuate.common.jdbc.micronaut.spring;
 
 import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
+import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
 import io.eventuate.common.jdbc.EventuateTransactionTemplate;
 import io.eventuate.common.jdbc.tests.AbstractEventuateCommonJdbcOperationsTest;
 import io.micronaut.test.annotation.MicronautTest;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
@@ -22,6 +24,12 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
 
   @Inject
   private DataSource dataSource;
+
+  @Test
+  @Override
+  public void testEventuateDuplicateKeyException() {
+    Assertions.assertThrows(EventuateDuplicateKeyException.class, super::testEventuateDuplicateKeyException);
+  }
 
   @Test
   @Override

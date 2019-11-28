@@ -7,6 +7,7 @@ import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Requires;
 
 import javax.inject.Singleton;
+import java.util.function.Supplier;
 
 @Factory
 public class EventuateCommonJdbcOperationsFactory {
@@ -19,6 +20,11 @@ public class EventuateCommonJdbcOperationsFactory {
   @Singleton
   @Requires(missingBeans = EventuateTransactionTemplate.class)
   public EventuateTransactionTemplate eventuateTransactionTemplate() {
-    return Runnable::run;
+    return new EventuateTransactionTemplate() {
+      @Override
+      public <T> T executeInTransaction(Supplier<T> callback) {
+        return callback.get();
+      }
+    };
   }
 }

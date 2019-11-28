@@ -15,6 +15,7 @@ dependencyManagement {
 
 dependencies {
     compile project (":eventuate-common-jdbc-micronaut")
+    compile project (":eventuate-common-jdbc-spring-common")
     testCompile project (":eventuate-common-jdbc-tests")
 
     compile "io.micronaut:micronaut-spring"

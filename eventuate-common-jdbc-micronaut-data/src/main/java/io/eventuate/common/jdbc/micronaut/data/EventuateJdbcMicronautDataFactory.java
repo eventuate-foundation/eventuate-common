@@ -16,7 +16,7 @@ public class EventuateJdbcMicronautDataFactory {
   }
 
   @Singleton
-  public EventuateTransactionTemplate eventuateTransactionTemplate(TransactionalExecutor transactionalExecutor) {
-    return transactionalExecutor::executeInTransaction;
+  public EventuateTransactionTemplate eventuateTransactionTemplate(EventuateMicronautDataTransactionTemplate eventuateMicronautDataTransactionTemplate) {
+    return eventuateMicronautDataTransactionTemplate;
   }
 }

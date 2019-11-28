@@ -2,6 +2,8 @@ package io.eventuate.common.jdbc.micronaut.spring;
 
 import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.EventuateTransactionTemplate;
+import io.eventuate.common.jdbc.spring.common.EventuateSpringJdbcStatementExecutor;
+import io.eventuate.common.jdbc.spring.common.EventuateSpringTransactionTemplate;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Requires;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,16 +17,13 @@ import javax.sql.DataSource;
 public class EventuateJdbcMicronautSpringFactory {
 
   @Singleton
-  public EventuateJdbcStatementExecutor eventuateCommonJdbcOperations(JdbcTemplate jdbcTemplate) {
-    return jdbcTemplate::update;
+  public EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor(JdbcTemplate jdbcTemplate) {
+    return new EventuateSpringJdbcStatementExecutor(jdbcTemplate);
   }
 
   @Singleton
   public EventuateTransactionTemplate eventuateTransactionTemplate(TransactionTemplate transactionTemplate) {
-    return callback -> transactionTemplate.execute(status -> {
-      callback.run();
-      return null;
-    });
+    return new EventuateSpringTransactionTemplate(transactionTemplate);
   }
 
   @Singleton
