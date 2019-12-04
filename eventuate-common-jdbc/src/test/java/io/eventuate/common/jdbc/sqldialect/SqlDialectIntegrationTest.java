@@ -1,5 +1,6 @@
 package io.eventuate.common.jdbc.sqldialect;
 
+import io.eventuate.common.jdbc.EventuateCommonJdbcConfiguration;
 import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
 import io.eventuate.common.jdbc.EventuateSchema;
 import org.junit.Assert;
@@ -22,12 +23,8 @@ import java.util.*;
 public class SqlDialectIntegrationTest {
   @Configuration
   @EnableAutoConfiguration
-  @Import(SqlDialectConfiguration.class)
+  @Import({SqlDialectConfiguration.class, EventuateCommonJdbcConfiguration.class})
   public static class Config {
-    @Bean
-    public EventuateCommonJdbcOperations eventuateCommonJdbcOperations(JdbcTemplate jdbcTemplate) {
-      return new EventuateCommonJdbcOperations(jdbcTemplate);
-    }
   }
 
   private static final int DEFAULT_DB_RECORDS = 10;
