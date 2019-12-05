@@ -4,14 +4,12 @@ import io.eventuate.coordination.leadership.EventuateLeaderSelector;
 import io.eventuate.coordination.leadership.LeaderSelectedCallback;
 import io.eventuate.coordination.leadership.LeadershipController;
 import io.eventuate.util.test.async.Eventually;
-import org.apache.curator.framework.recipes.leader.LeaderSelector;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
 
 public abstract class AbstractLeadershipTest <SELECTOR extends EventuateLeaderSelector> {
 
