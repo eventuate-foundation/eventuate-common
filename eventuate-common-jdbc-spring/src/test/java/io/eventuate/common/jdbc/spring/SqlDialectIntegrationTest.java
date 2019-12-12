@@ -28,6 +28,7 @@ public class SqlDialectIntegrationTest {
   @Import({SqlDialectConfiguration.class, EventuateCommonJdbcOperationsConfiguration.class})
   public static class Config {}
 
+
   private static final int DEFAULT_DB_RECORDS = 10;
 
   private static final EventuateSchema DEFAULT_EVENTUATE_SCHEMA = new EventuateSchema(EventuateSchema.DEFAULT_SCHEMA);
