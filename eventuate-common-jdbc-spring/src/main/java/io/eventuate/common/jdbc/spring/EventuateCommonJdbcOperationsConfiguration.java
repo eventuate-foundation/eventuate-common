@@ -7,10 +7,12 @@ import io.eventuate.common.jdbc.spring.common.EventuateSpringJdbcStatementExecut
 import io.eventuate.common.jdbc.spring.common.EventuateSpringTransactionTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.support.TransactionTemplate;
 
 @Configuration
+@Import(EventuateSchemaConfiguration.class)
 public class EventuateCommonJdbcOperationsConfiguration {
 
   @Bean
