@@ -12,5 +12,7 @@ include 'eventuate-common-coordination-leadership-zookeeper'
 include 'eventuate-common-id'
 include 'eventuate-common-json-mapper'
 include 'eventuate-common-in-memory-database'
+include 'eventuate-common-in-memory-database-spring'
+include 'eventuate-common-in-memory-database-micronaut'
 
 rootProject.name = 'eventuate-common'
