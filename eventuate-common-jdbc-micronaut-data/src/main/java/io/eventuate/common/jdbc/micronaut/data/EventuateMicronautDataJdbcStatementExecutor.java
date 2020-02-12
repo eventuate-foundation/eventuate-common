@@ -1,9 +1,6 @@
 package io.eventuate.common.jdbc.micronaut.data;
 
-import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
-import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
-import io.eventuate.common.jdbc.EventuateRowMapper;
-import io.eventuate.common.jdbc.EventuateSqlException;
+import io.eventuate.common.jdbc.*;
 import io.micronaut.data.jdbc.runtime.JdbcOperations;
 
 import java.sql.Connection;
@@ -13,13 +10,6 @@ import java.sql.SQLException;
 import java.util.*;
 
 public class EventuateMicronautDataJdbcStatementExecutor implements EventuateJdbcStatementExecutor {
-
-  private static final Set DUPLICATE_KEY_ERROR_CODES = new HashSet<>(Arrays.asList(
-          1062, // MySQL
-          2601,2627, // MS-SQL
-          23505, // Postgres
-          23001 // H2
-  ));
 
   private JdbcOperations jdbcOperations;
 
@@ -40,19 +30,7 @@ public class EventuateMicronautDataJdbcStatementExecutor implements EventuateJdb
       return preparedStatement.executeUpdate();
     }
     catch (SQLException e) {
-
-      Optional<Integer> additionalErrorCode = Optional.empty();
-
-      // Workaround for postgres, where e.getErrorCode() is 0
-      try {
-        additionalErrorCode = Optional.of(Integer.parseInt(e.getSQLState()));
-      } catch (NumberFormatException nfe) {
-        // ignore
-      }
-
-      if (DUPLICATE_KEY_ERROR_CODES.contains(e.getErrorCode()) ||
-              additionalErrorCode.map(DUPLICATE_KEY_ERROR_CODES::contains).orElse(false)) {
-
+      if (EventuateJdbcUtils.isDuplicateKeyException(e.getSQLState(), e.getErrorCode())) {
         throw new EventuateDuplicateKeyException(e);
       }
 

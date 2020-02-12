@@ -1,7 +1,5 @@
 package io.eventuate.common.jdbc;
 
-import io.eventuate.common.json.mapper.JSonMapper;
-
 import java.util.Map;
 import java.util.Optional;
 
@@ -22,10 +20,16 @@ public class EventuateCommonJdbcOperations {
                                     Optional<String> metadata,
                                     EventuateSchema eventuateSchema) {
 
-    String table = eventuateSchema.qualifyTable("events");
-    String sql = String.format("INSERT INTO %s (event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata) VALUES (?, ?, ?, ?, ?, ?, ?);", table);
+   SqlWithParameters sqlWithParameters = EventuateJdbcUtils.createInsertIntoEventsTableSql(eventId,
+           entityId,
+           eventData,
+           eventType,
+           entityType,
+           triggeringEvent,
+           metadata,
+           eventuateSchema);
 
-    eventuateJdbcStatementExecutor.update(sql, eventId, eventType, eventData, entityType, entityId, triggeringEvent.orElse(null), metadata.orElse(null));
+    eventuateJdbcStatementExecutor.update(sqlWithParameters.getSql(), sqlWithParameters.getParameters());
   }
 
 
@@ -36,10 +40,13 @@ public class EventuateCommonJdbcOperations {
                                       Map<String, String> headers,
                                       EventuateSchema eventuateSchema) {
 
-    String table = eventuateSchema.qualifyTable("message");
-    String sql = String.format("insert into %s(id, destination, headers, payload, creation_time) values(?, ?, ?, ?, %s)", table, currentTimeInMillisecondsSql);
-    String serializedHeaders = JSonMapper.toJson(headers);
+    SqlWithParameters sqlWithParameters = EventuateJdbcUtils.createInsertIntoMessageTableSql(messageId,
+            payload,
+            destination,
+            currentTimeInMillisecondsSql,
+            headers,
+            eventuateSchema);
 
-    eventuateJdbcStatementExecutor.update(sql, messageId, destination, serializedHeaders, payload);
+    eventuateJdbcStatementExecutor.update(sqlWithParameters.getSql(), sqlWithParameters.getParameters());
   }
 }

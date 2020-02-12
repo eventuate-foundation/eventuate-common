@@ -1,13 +1,12 @@
 package io.eventuate.common.jdbc.spring.common;
 
-import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
-import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
-import io.eventuate.common.jdbc.EventuateRowMapper;
+import io.eventuate.common.jdbc.*;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.util.List;
-import java.util.Map;
+import java.sql.SQLException;
+import java.util.*;
 
 public class EventuateSpringJdbcStatementExecutor implements EventuateJdbcStatementExecutor  {
 
@@ -23,6 +22,15 @@ public class EventuateSpringJdbcStatementExecutor implements EventuateJdbcStatem
       return jdbcTemplate.update(sql, params);
     } catch (DuplicateKeyException e) {
       throw new EventuateDuplicateKeyException(e);
+    } catch (DataIntegrityViolationException e) {
+      if (e.getCause() instanceof SQLException) {
+        SQLException sqlException = (SQLException) e.getCause();
+        if (EventuateJdbcUtils.isDuplicateKeyException(sqlException.getSQLState(), sqlException.getErrorCode())) {
+          throw new EventuateDuplicateKeyException(e);
+        }
+      }
+
+      throw new EventuateSqlException(e);
     }
   }
 

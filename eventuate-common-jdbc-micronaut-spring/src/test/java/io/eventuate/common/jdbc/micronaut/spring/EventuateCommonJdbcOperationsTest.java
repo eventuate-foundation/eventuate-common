@@ -2,6 +2,7 @@ package io.eventuate.common.jdbc.micronaut.spring;
 
 import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
 import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
+import io.eventuate.common.jdbc.EventuateSchema;
 import io.eventuate.common.jdbc.EventuateTransactionTemplate;
 import io.eventuate.common.jdbc.tests.AbstractEventuateCommonJdbcOperationsTest;
 import io.micronaut.test.annotation.MicronautTest;
@@ -11,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.Map;
+import java.util.Optional;
 
 
 @MicronautTest(transactional = false)
@@ -44,13 +47,27 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
   }
 
   @Override
-  protected EventuateCommonJdbcOperations getEventuateCommonJdbcOperations() {
-    return eventuateCommonJdbcOperations;
+  protected void insertIntoMessageTable(String messageId, String payload, String destination, String currentTimeInMillisecondsSql, Map<String, String> headers, EventuateSchema eventuateSchema) {
+    eventuateTransactionTemplate.executeInTransaction(() -> {
+      eventuateCommonJdbcOperations.insertIntoMessageTable(messageId,
+              payload,
+              destination,
+              currentTimeInMillisecondsSql,
+              headers,
+              eventuateSchema);
+
+      return null;
+    });
   }
 
   @Override
-  protected EventuateTransactionTemplate getEventuateTransactionTemplate() {
-    return eventuateTransactionTemplate;
+  protected void insertIntoEventsTable(String eventId, String entityId, String eventData, String eventType, String entityType, Optional<String> triggeringEvent, Optional<String> metadata, EventuateSchema eventuateSchema) {
+    eventuateTransactionTemplate.executeInTransaction(() -> {
+      eventuateCommonJdbcOperations.insertIntoEventsTable(eventId,
+              entityId, eventData, eventType, entityType, triggeringEvent, metadata, eventuateSchema);
+
+      return null;
+    });
   }
 
   @Override

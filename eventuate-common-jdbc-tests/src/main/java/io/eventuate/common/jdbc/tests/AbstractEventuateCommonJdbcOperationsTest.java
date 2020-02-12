@@ -1,8 +1,6 @@
 package io.eventuate.common.jdbc.tests;
 
-import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
 import io.eventuate.common.jdbc.EventuateSchema;
-import io.eventuate.common.jdbc.EventuateTransactionTemplate;
 import io.eventuate.common.json.mapper.JSonMapper;
 import org.junit.Assert;
 
@@ -17,9 +15,23 @@ import java.util.*;
 public abstract class AbstractEventuateCommonJdbcOperationsTest {
   private EventuateSchema eventuateSchema = new EventuateSchema();
 
-  protected abstract EventuateCommonJdbcOperations getEventuateCommonJdbcOperations();
-  protected abstract EventuateTransactionTemplate getEventuateTransactionTemplate();
   protected abstract DataSource getDataSource();
+
+  protected abstract void insertIntoMessageTable(String messageId,
+                                                 String payload,
+                                                 String destination,
+                                                 String currentTimeInMillisecondsSql,
+                                                 Map<String, String> headers,
+                                                 EventuateSchema eventuateSchema);
+
+  protected abstract void insertIntoEventsTable(String eventId,
+                                                String entityId,
+                                                String eventData,
+                                                String eventType,
+                                                String entityType,
+                                                Optional<String> triggeringEvent,
+                                                Optional<String> metadata,
+                                                EventuateSchema eventuateSchema);
 
   public void testEventuateDuplicateKeyException() {
     String eventId = generateId();
@@ -30,16 +42,11 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     String triggeringEvent = generateId();
     String metadata = generateId();
 
-    getEventuateTransactionTemplate().executeInTransaction(() -> {
+    insertIntoEventsTable(eventId,
+            entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
 
-      getEventuateCommonJdbcOperations().insertIntoEventsTable(eventId,
-              entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
-
-      getEventuateCommonJdbcOperations().insertIntoEventsTable(eventId,
-              entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
-
-      return null;
-    });
+    insertIntoEventsTable(eventId,
+            entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
   }
 
   public void testInsertIntoEventsTable() throws SQLException {
@@ -51,12 +58,8 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     String triggeringEvent = generateId();
     String metadata = generateId();
 
-    getEventuateTransactionTemplate().executeInTransaction(() -> {
-      getEventuateCommonJdbcOperations().insertIntoEventsTable(eventId,
-              entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
-
-      return null;
-    });
+    insertIntoEventsTable(eventId,
+            entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
 
     List<Map<String, Object>> events = getEvents(eventId);
 
@@ -81,16 +84,12 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     headers.put("header1k", "header1v");
     headers.put("header2k", "header2v");
 
-    getEventuateTransactionTemplate().executeInTransaction(() -> {
-      getEventuateCommonJdbcOperations().insertIntoMessageTable(messageId,
+    insertIntoMessageTable(messageId,
               payload,
               destination,
               time.toString(),
               headers,
               eventuateSchema);
-
-      return null;
-    });
 
     List<Map<String, Object>> messages = getMessages(messageId);
 

@@ -1,4 +1,8 @@
 dependencies {
     compile project (":eventuate-common-jdbc")
+
+    compile "io.r2dbc:r2dbc-postgresql:0.8.0.RELEASE"
+    compile "io.r2dbc:r2dbc-mssql:0.8.0.RELEASE"
+    compile "org.springframework.data:spring-data-r2dbc:1.0.0.RELEASE"
     compile "org.springframework.boot:spring-boot-starter-jdbc:$springBootVersion"
 }
