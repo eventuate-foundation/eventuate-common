@@ -1,7 +1,7 @@
 dependencies {
     compile "org.springframework.boot:spring-boot-starter-jdbc:$springBootVersion"
-    compile "com.fasterxml.jackson.core:jackson-databind:2.8.8"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.8"
+    compile "com.fasterxml.jackson.core:jackson-databind:2.10.2"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.10.2"
     compile 'mysql:mysql-connector-java:5.1.39'
     compile ('org.postgresql:postgresql:42.1.4') {
         exclude group: "org.slf4j", module: "slf4j-simple"
