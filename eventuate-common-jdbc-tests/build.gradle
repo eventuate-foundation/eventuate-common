@@ -1,0 +1,4 @@
+dependencies {
+    compile project (":eventuate-common-jdbc")
+    compile "junit:junit:4.12"
+}

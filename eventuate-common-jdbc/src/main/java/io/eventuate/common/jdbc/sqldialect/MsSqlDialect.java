@@ -1,8 +1,6 @@
 package io.eventuate.common.jdbc.sqldialect;
 
-import org.springframework.core.Ordered;
-
-public class MsSqlDialect implements EventuateSqlDialect, Ordered {
+public class MsSqlDialect implements EventuateSqlDialect {
   @Override
   public String addLimitToSql(String sql, String limitExpression) {
     String newSql = sql.replaceFirst("(?i:select)", String.format("select top (%s)", limitExpression));
@@ -23,6 +21,6 @@ public class MsSqlDialect implements EventuateSqlDialect, Ordered {
 
   @Override
   public int getOrder() {
-    return HIGHEST_PRECEDENCE;
+    return Integer.MIN_VALUE;
   }
 }

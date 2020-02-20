@@ -5,4 +5,7 @@ export SPRING_DATASOURCE_USERNAME=mysqluser
 export SPRING_DATASOURCE_PASSWORD=mysqlpw
 export SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.jdbc.Driver
 
-
+export DATASOURCE_URL=jdbc:mysql://${DOCKER_HOST_IP}/eventuate
+export DATASOURCE_USERNAME=mysqluser
+export DATASOURCE_PASSWORD=mysqlpw
+export DATASOURCE_DRIVERCLASSNAME=com.mysql.jdbc.Driver

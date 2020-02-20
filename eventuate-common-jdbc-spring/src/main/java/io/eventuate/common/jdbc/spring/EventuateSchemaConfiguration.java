@@ -1,5 +1,6 @@
-package io.eventuate.common.jdbc;
+package io.eventuate.common.jdbc.spring;
 
+import io.eventuate.common.jdbc.EventuateSchema;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

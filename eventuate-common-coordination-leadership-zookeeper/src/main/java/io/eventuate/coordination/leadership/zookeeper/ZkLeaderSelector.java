@@ -45,6 +45,8 @@ public class ZkLeaderSelector implements EventuateLeaderSelector {
 
   @Override
   public void start() {
+    logger.info("Starting leader selector");
+
     leaderSelector = new LeaderSelector(curatorFramework, lockId, new LeaderSelectorListener() {
       @Override
       public void takeLeadership(CuratorFramework client) {
@@ -87,12 +89,14 @@ public class ZkLeaderSelector implements EventuateLeaderSelector {
     leaderSelector.autoRequeue();
 
     leaderSelector.start();
+
+    logger.info("Started leader selector");
   }
 
   @Override
   public void stop() {
-    logger.info("Closing leader, leaderId : {}", leaderId);
+    logger.info("Closing leader selector, leaderId : {}", leaderId);
     leaderSelector.close();
-    logger.info("Closed leader, leaderId : {}", leaderId);
+    logger.info("Closed leader selector, leaderId : {}", leaderId);
   }
 }

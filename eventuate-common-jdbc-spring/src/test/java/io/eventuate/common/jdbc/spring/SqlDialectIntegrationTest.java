@@ -1,8 +1,10 @@
-package io.eventuate.common.jdbc.sqldialect;
+package io.eventuate.common.jdbc.spring;
 
-import io.eventuate.common.jdbc.EventuateCommonJdbcConfiguration;
 import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
 import io.eventuate.common.jdbc.EventuateSchema;
+import io.eventuate.common.jdbc.spring.sqldialect.SqlDialectConfiguration;
+import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
+import io.eventuate.common.jdbc.sqldialect.SqlDialectSelector;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,9 +25,9 @@ import java.util.*;
 public class SqlDialectIntegrationTest {
   @Configuration
   @EnableAutoConfiguration
-  @Import({SqlDialectConfiguration.class, EventuateCommonJdbcConfiguration.class})
-  public static class Config {
-  }
+  @Import({SqlDialectConfiguration.class, EventuateCommonJdbcOperationsConfiguration.class})
+  public static class Config {}
+
 
   private static final int DEFAULT_DB_RECORDS = 10;
 

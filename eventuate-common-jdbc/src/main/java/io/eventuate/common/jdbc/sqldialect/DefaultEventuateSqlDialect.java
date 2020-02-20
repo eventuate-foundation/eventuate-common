@@ -1,11 +1,12 @@
 package io.eventuate.common.jdbc.sqldialect;
 
-import org.springframework.beans.factory.annotation.Value;
-
 public class DefaultEventuateSqlDialect implements EventuateSqlDialect {
 
-  @Value("${eventuate.current.time.in.milliseconds.sql:#{null}}")
-  private String customSql;
+  private String customCurrentTimeInMillisecondsExpression;
+
+  public DefaultEventuateSqlDialect(String customCurrentTimeInMillisecondsExpression) {
+    this.customCurrentTimeInMillisecondsExpression = customCurrentTimeInMillisecondsExpression;
+  }
 
   @Override
   public boolean supports(String driver) {
@@ -18,6 +19,11 @@ public class DefaultEventuateSqlDialect implements EventuateSqlDialect {
   }
 
   public String getCurrentTimeInMillisecondsExpression() {
-    return customSql;
+    return customCurrentTimeInMillisecondsExpression;
+  }
+
+  @Override
+  public int getOrder() {
+    return Integer.MAX_VALUE;
   }
 }
