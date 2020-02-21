@@ -1,10 +1,8 @@
 dependencies {
     compile project (":eventuate-common-json-mapper")
 
-    compile "com.fasterxml.jackson.core:jackson-databind:2.8.8"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.8"
-    runtime 'mysql:mysql-connector-java:5.1.39'
-    runtime ('org.postgresql:postgresql:42.2.4') {
+    compile 'mysql:mysql-connector-java:5.1.39'
+    compile ('org.postgresql:postgresql:42.1.4') {
         exclude group: "org.slf4j", module: "slf4j-simple"
     }
     runtime 'com.microsoft.sqlserver:mssql-jdbc:7.2.1.jre8'

@@ -2,8 +2,8 @@ dependencies {
     compile project (":eventuate-common-id")
 
     compile "commons-lang:commons-lang:2.6"
-    compile "com.fasterxml.jackson.core:jackson-databind:2.8.8"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.8"
+    compile "com.fasterxml.jackson.core:jackson-databind:2.10.2"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.10.2"
 }
 
 test {
