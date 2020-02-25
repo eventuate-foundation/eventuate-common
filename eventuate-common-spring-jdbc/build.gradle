@@ -1,0 +1,13 @@
+dependencies {
+    compile project (":eventuate-common-common-spring-jdbc")
+    testCompile project (":eventuate-common-jdbc-tests")
+
+    compile "org.springframework.boot:spring-boot-starter:$springBootVersion"
+    compile "org.springframework.boot:spring-boot-starter-jdbc:$springBootVersion"
+
+    testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+}
+
+test {
+    forkEvery 1
+}
