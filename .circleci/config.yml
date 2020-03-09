@@ -6,7 +6,9 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: eventuate-common-{{ checksum "gradle.properties" }}
+          keys:
+            - eventuate-common-{{ checksum "gradle.properties" }}
+            - eventuate-common-
       - run: TERM=dumb ./gradlew testClasses
       - save_cache:
           paths:
