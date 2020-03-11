@@ -13,6 +13,8 @@ dependencyManagement {
     }
 }
 
+apply plugin: PublicModulePlugin
+
 dependencies {
     compile project (":eventuate-common-micronaut-jdbc")
     compile project (":eventuate-common-common-spring-jdbc")

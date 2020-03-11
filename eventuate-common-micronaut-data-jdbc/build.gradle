@@ -13,6 +13,8 @@ dependencyManagement {
     }
 }
 
+apply plugin: PublicModulePlugin
+
 dependencies {
     compile project (":eventuate-common-micronaut-jdbc")
     testCompile project (":eventuate-common-jdbc-tests")
@@ -20,6 +22,9 @@ dependencies {
     compile "jakarta.persistence:jakarta.persistence-api:2.2.2"
     compile "io.micronaut.data:micronaut-data-jdbc:$micronautDataVersion"
     compile 'io.micronaut.configuration:micronaut-jdbc-tomcat'
+
+    // Javadoc error
+    compile 'javax.interceptor:javax.interceptor-api:1.2.2'
 
     annotationProcessor "io.micronaut.data:micronaut-data-processor:$micronautDataVersion"
     annotationProcessor "io.micronaut:micronaut-inject-java"
