@@ -8,9 +8,9 @@ GO
 
 CREATE TABLE eventuate.message (
   id VARCHAR(767) PRIMARY KEY,
-  destination VARCHAR(1000) NOT NULL,
-  headers VARCHAR(1000) NOT NULL,
-  payload VARCHAR(1000) NOT NULL,
+  destination NVARCHAR(MAX) NOT NULL,
+  headers NVARCHAR(MAX) NOT NULL,
+  payload NVARCHAR(MAX) NOT NULL,
   published SMALLINT DEFAULT 0,
   creation_time BIGINT
 );
