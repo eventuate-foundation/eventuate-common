@@ -5,9 +5,9 @@ DROP Table IF Exists received_messages;
 
 CREATE TABLE message (
   id VARCHAR(767) PRIMARY KEY,
-  destination VARCHAR(1000) NOT NULL,
-  headers VARCHAR(1000) NOT NULL,
-  payload VARCHAR(1000) NOT NULL,
+  destination LONGTEXT NOT NULL,
+  headers LONGTEXT NOT NULL,
+  payload LONGTEXT NOT NULL,
   published SMALLINT DEFAULT 0,
   creation_time BIGINT
 );

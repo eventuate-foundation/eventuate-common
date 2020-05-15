@@ -3,9 +3,9 @@ DROP TABLE IF EXISTS eventuate.received_messages CASCADE;
 
 CREATE TABLE eventuate.message (
   id VARCHAR(1000) PRIMARY KEY,
-  destination VARCHAR(1000) NOT NULL,
-  headers VARCHAR(1000) NOT NULL,
-  payload VARCHAR(1000) NOT NULL,
+  destination TEXT NOT NULL,
+  headers TEXT NOT NULL,
+  payload TEXT NOT NULL,
   published SMALLINT DEFAULT 0,
   creation_time BIGINT
 );
