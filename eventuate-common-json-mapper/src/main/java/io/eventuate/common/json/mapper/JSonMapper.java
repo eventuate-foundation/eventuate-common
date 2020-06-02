@@ -40,7 +40,7 @@ public class JSonMapper {
 
   public static <T> T fromJsonByName(String json, String targetType) {
     try {
-      return objectMapper.readValue(json, (Class<T>) JSonMapper.class.getClassLoader().loadClass(targetType));
+      return objectMapper.readValue(json, (Class<T>) Thread.currentThread().getContextClassLoader().loadClass(targetType));
     } catch (IOException | ClassNotFoundException e) {
       throw new RuntimeException(e);
     }
