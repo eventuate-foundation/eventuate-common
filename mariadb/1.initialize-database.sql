@@ -11,7 +11,7 @@ DROP table IF EXISTS cdc_monitoring;
 create table events (
   event_id varchar(1000) PRIMARY KEY,
   event_type varchar(1000),
-  event_data varchar(1000) NOT NULL,
+  event_data varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   entity_type VARCHAR(1000) NOT NULL,
   entity_id VARCHAR(1000) NOT NULL,
   triggering_event VARCHAR(1000),
