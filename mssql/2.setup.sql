@@ -16,6 +16,14 @@ CREATE TABLE eventuate.message (
 );
 GO
 
+ALTER TABLE eventuate.message
+    ADD CONSTRAINT [headers should be formatted as JSON] CHECK (ISJSON(headers)=1);
+GO
+
+ALTER TABLE eventuate.message
+    ADD CONSTRAINT CHECK [payload should be formatted as JSON] (ISJSON(payload)=1);
+GO
+
 CREATE INDEX message_published_idx ON eventuate.message(published, id);
 GO
 
