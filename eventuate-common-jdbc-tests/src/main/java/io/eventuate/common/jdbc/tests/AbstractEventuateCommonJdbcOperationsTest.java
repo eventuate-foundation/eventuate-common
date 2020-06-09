@@ -104,7 +104,7 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     Assert.assertEquals(headers, JSonMapper.fromJson(event.get("headers").toString(), Map.class));
   }
 
-  private String generateId() {
+  protected String generateId() {
     return UUID.randomUUID().toString();
   }
 

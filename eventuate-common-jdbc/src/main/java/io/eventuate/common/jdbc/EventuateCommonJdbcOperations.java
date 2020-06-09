@@ -43,7 +43,10 @@ public class EventuateCommonJdbcOperations {
     String table = eventuateSchema.qualifyTable("message");
 
     String sql = String.format("insert into %s(id, destination, headers, payload, creation_time) values(?, ?, %s, %s, %s)",
-            table, eventuateSqlDialect.castToJson("?"), eventuateSqlDialect.castToJson("?"), currentTimeInMillisecondsSql);
+            table,
+            eventuateSqlDialect.castToJson("?", eventuateSchema, "message", "headers", eventuateJdbcStatementExecutor),
+            eventuateSqlDialect.castToJson("?", eventuateSchema, "message","payload", eventuateJdbcStatementExecutor),
+            currentTimeInMillisecondsSql);
 
     String serializedHeaders = JSonMapper.toJson(headers);
 
