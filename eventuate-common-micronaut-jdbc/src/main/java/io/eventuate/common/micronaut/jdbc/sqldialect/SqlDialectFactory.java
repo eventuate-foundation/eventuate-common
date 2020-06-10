@@ -1,5 +1,6 @@
 package io.eventuate.common.micronaut.jdbc.sqldialect;
 
+import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.sqldialect.*;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Requires;
@@ -18,8 +19,8 @@ public class SqlDialectFactory {
   }
 
   @Singleton
-  public PostgresDialect postgreSQLDialect() {
-    return new PostgresDialect();
+  public PostgresDialect postgreSQLDialect(EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor) {
+    return new PostgresDialect(eventuateJdbcStatementExecutor);
   }
 
   @Singleton

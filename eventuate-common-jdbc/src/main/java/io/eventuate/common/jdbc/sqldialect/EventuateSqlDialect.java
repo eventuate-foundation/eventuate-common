@@ -1,6 +1,5 @@
 package io.eventuate.common.jdbc.sqldialect;
 
-import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.EventuateSchema;
 
 public interface EventuateSqlDialect extends EventuateSqlDialectOrder {
@@ -13,16 +12,14 @@ public interface EventuateSqlDialect extends EventuateSqlDialectOrder {
   default String castToJson(String sqlPart,
                             EventuateSchema eventuateSchema,
                             String unqualifiedTable,
-                            String column,
-                            EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor) {
+                            String column) {
     return sqlPart;
   }
 
-  default String objectToString(Object object,
-                                EventuateSchema eventuateSchema,
-                                String unqualifiedTable,
-                                String column,
-                                EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor) {
+  default String jsonColumnToString(Object object,
+                                    EventuateSchema eventuateSchema,
+                                    String unqualifiedTable,
+                                    String column) {
     return object.toString();
   }
 }

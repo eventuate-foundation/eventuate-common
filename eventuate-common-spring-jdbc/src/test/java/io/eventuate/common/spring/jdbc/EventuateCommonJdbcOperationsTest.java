@@ -19,7 +19,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.Collections;
 
 @SpringBootTest(classes = EventuateCommonJdbcOperationsTest.Config.class)
@@ -46,9 +45,6 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
 
   @Autowired
   private JdbcTemplate jdbcTemplate;
-
-  @Autowired
-  private EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor;
 
   @Autowired
   private SqlDialectSelector sqlDialectSelector;
@@ -89,8 +85,8 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
 
     EventuateSqlDialect eventuateSqlDialect = sqlDialectSelector.getDialect(driver);
 
-    String payloadString = eventuateSqlDialect.objectToString(payload,
-            eventuateSchema, "message", "payload", eventuateJdbcStatementExecutor);
+    String payloadString = eventuateSqlDialect.jsonColumnToString(payload,
+            eventuateSchema, "message", "payload");
 
     Assert.assertTrue(payloadString.contains(payloadData));
   }

@@ -9,10 +9,13 @@ import java.util.concurrent.ConcurrentMap;
 
 public class PostgresDialect extends DefaultEventuateSqlDialect {
 
+  private EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor;
   private ConcurrentMap<ColumnCacheKey, String> columnTypeCache = new ConcurrentHashMap<>();
 
-  public PostgresDialect() {
+  public PostgresDialect(EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor) {
     super("(ROUND(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) * 1000))");
+
+    this.eventuateJdbcStatementExecutor = eventuateJdbcStatementExecutor;
   }
 
   @Override
@@ -29,8 +32,7 @@ public class PostgresDialect extends DefaultEventuateSqlDialect {
   public String castToJson(String sqlPart,
                            EventuateSchema eventuateSchema,
                            String unqualifiedTable,
-                           String column,
-                           EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor) {
+                           String column) {
 
     String columnType = getColumnType(eventuateSchema, unqualifiedTable, column, eventuateJdbcStatementExecutor);
 
@@ -38,11 +40,12 @@ public class PostgresDialect extends DefaultEventuateSqlDialect {
   }
 
   @Override
-  public String objectToString(Object object,
-                               EventuateSchema eventuateSchema,
-                               String unqualifiedTable,
-                               String column,
-                               EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor) {
+  public String jsonColumnToString(Object object,
+                                   EventuateSchema eventuateSchema,
+                                   String unqualifiedTable,
+                                   String column) {
+
+    if (object instanceof String) return (String) object;
 
     if (object instanceof PGobject) {
       PGobject pGobject = (PGobject) object;
@@ -53,8 +56,6 @@ public class PostgresDialect extends DefaultEventuateSqlDialect {
 
       throw new IllegalArgumentException(String.format("Unsupported postgres type %s of column %s", pGobject.getType(), column));
     }
-
-    if (object instanceof String) return (String) object;
 
     throw new IllegalArgumentException(String.format("Unsupported java type %s for column %s", object.getClass(), column));
   }
