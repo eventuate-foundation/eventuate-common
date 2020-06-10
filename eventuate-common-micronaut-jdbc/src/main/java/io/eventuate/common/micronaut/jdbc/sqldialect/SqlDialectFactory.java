@@ -19,8 +19,8 @@ public class SqlDialectFactory {
   }
 
   @Singleton
-  public PostgresDialect postgreSQLDialect(EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor) {
-    return new PostgresDialect(eventuateJdbcStatementExecutor);
+  public PostgresDialect postgreSQLDialect() {
+    return new PostgresDialect();
   }
 
   @Singleton

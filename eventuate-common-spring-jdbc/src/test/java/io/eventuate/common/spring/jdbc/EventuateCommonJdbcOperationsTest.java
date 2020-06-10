@@ -38,6 +38,9 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
   private EventuateCommonJdbcOperations eventuateCommonJdbcOperations;
 
   @Autowired
+  private EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor;
+
+  @Autowired
   private EventuateTransactionTemplate eventuateTransactionTemplate;
 
   @Autowired
@@ -86,7 +89,7 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
     EventuateSqlDialect eventuateSqlDialect = sqlDialectSelector.getDialect(driver);
 
     String payloadString = eventuateSqlDialect.jsonColumnToString(payload,
-            eventuateSchema, "message", "payload");
+            eventuateSchema, "message", "payload", eventuateJdbcStatementExecutor);
 
     Assert.assertTrue(payloadString.contains(payloadData));
   }

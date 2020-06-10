@@ -26,7 +26,7 @@ public abstract class AbstractDialectTest {
     List<EventuateSqlDialect> dialects = new ArrayList<>();
 
     dialects.add(new MySqlDialect());
-    dialects.add(new PostgresDialect(null));
+    dialects.add(new PostgresDialect());
     dialects.add(new MsSqlDialect());
     dialects.add(new DefaultEventuateSqlDialect(customCurrentTimeInMillisecondsExpression.orElse(null)));
 

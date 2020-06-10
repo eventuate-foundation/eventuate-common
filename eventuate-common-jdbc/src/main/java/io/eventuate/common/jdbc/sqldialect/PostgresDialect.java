@@ -9,13 +9,10 @@ import java.util.concurrent.ConcurrentMap;
 
 public class PostgresDialect extends DefaultEventuateSqlDialect {
 
-  private EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor;
   private ConcurrentMap<ColumnCacheKey, String> columnTypeCache = new ConcurrentHashMap<>();
 
-  public PostgresDialect(EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor) {
+  public PostgresDialect() {
     super("(ROUND(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) * 1000))");
-
-    this.eventuateJdbcStatementExecutor = eventuateJdbcStatementExecutor;
   }
 
   @Override
@@ -32,7 +29,8 @@ public class PostgresDialect extends DefaultEventuateSqlDialect {
   public String castToJson(String sqlPart,
                            EventuateSchema eventuateSchema,
                            String unqualifiedTable,
-                           String column) {
+                           String column,
+                           EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor) {
 
     String columnType = getColumnType(eventuateSchema, unqualifiedTable, column, eventuateJdbcStatementExecutor);
 
@@ -43,7 +41,8 @@ public class PostgresDialect extends DefaultEventuateSqlDialect {
   public String jsonColumnToString(Object object,
                                    EventuateSchema eventuateSchema,
                                    String unqualifiedTable,
-                                   String column) {
+                                   String column,
+                                   EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor) {
 
     if (object instanceof String) return (String) object;
 

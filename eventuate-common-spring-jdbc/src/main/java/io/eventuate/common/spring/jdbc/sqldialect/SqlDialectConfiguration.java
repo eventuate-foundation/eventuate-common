@@ -1,6 +1,5 @@
 package io.eventuate.common.spring.jdbc.sqldialect;
 
-import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.sqldialect.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +16,8 @@ public class SqlDialectConfiguration {
   }
 
   @Bean
-  public PostgresDialect postgreSQLDialect(EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor) {
-    return new PostgresDialect(eventuateJdbcStatementExecutor);
+  public PostgresDialect postgreSQLDialect() {
+    return new PostgresDialect();
   }
 
   @Bean
