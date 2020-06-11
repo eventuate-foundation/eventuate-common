@@ -1,5 +1,6 @@
 package io.eventuate.common.jdbc;
 
+import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
 import io.eventuate.common.json.mapper.JSonMapper;
 
 import java.util.Map;
@@ -8,9 +9,12 @@ import java.util.Optional;
 public class EventuateCommonJdbcOperations {
 
   private EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor;
+  private EventuateSqlDialect eventuateSqlDialect;
 
-  public EventuateCommonJdbcOperations(EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor) {
+  public EventuateCommonJdbcOperations(EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor,
+                                       EventuateSqlDialect eventuateSqlDialect) {
     this.eventuateJdbcStatementExecutor = eventuateJdbcStatementExecutor;
+    this.eventuateSqlDialect = eventuateSqlDialect;
   }
 
   public void insertIntoEventsTable(String eventId,
@@ -37,7 +41,13 @@ public class EventuateCommonJdbcOperations {
                                       EventuateSchema eventuateSchema) {
 
     String table = eventuateSchema.qualifyTable("message");
-    String sql = String.format("insert into %s(id, destination, headers, payload, creation_time) values(?, ?, ?, ?, %s)", table, currentTimeInMillisecondsSql);
+
+    String sql = String.format("insert into %s(id, destination, headers, payload, creation_time) values(?, ?, %s, %s, %s)",
+            table,
+            eventuateSqlDialect.castToJson("?", eventuateSchema, "message", "headers", eventuateJdbcStatementExecutor),
+            eventuateSqlDialect.castToJson("?", eventuateSchema, "message","payload", eventuateJdbcStatementExecutor),
+            currentTimeInMillisecondsSql);
+
     String serializedHeaders = JSonMapper.toJson(headers);
 
     eventuateJdbcStatementExecutor.update(sql, messageId, destination, serializedHeaders, payload);

@@ -74,10 +74,10 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
 
   public void testInsertIntoMessageTable() throws SQLException {
     String messageId = generateId();
-    String payload = generateId();
+    String payload = "\"" + generateId() + "\"";
     String destination = generateId();
     Long time = System.nanoTime();
-    Map<String, String> headers = new LinkedHashMap<>();
+    Map<String, String> headers = new HashMap<>();
     headers.put("header1k", "header1v");
     headers.put("header2k", "header2v");
 
@@ -101,10 +101,10 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     Assert.assertEquals(destination, event.get("destination"));
     Assert.assertEquals(payload, event.get("payload"));
     Assert.assertEquals(time, event.get("creation_time"));
-    Assert.assertEquals(JSonMapper.toJson(headers), event.get("headers"));
+    Assert.assertEquals(headers, JSonMapper.fromJson(event.get("headers").toString(), Map.class));
   }
 
-  private String generateId() {
+  protected String generateId() {
     return UUID.randomUUID().toString();
   }
 
