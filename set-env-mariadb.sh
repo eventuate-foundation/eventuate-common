@@ -1,3 +1,0 @@
-. ./set-env-mysql.sh
-
-

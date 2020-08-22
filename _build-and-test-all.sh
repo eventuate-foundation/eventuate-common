@@ -4,8 +4,6 @@ export TERM=dumb
 
 set -e
 
-. ./set-env-${DATABASE}.sh
-
 GRADLE_OPTS=""
 
 if [ "$1" = "--clean" ] ; then
@@ -13,30 +11,28 @@ if [ "$1" = "--clean" ] ; then
   shift
 fi
 
-docker-compose -f docker-compose-${DATABASE}.yml down
-docker-compose -f docker-compose-${DATABASE}-json.yml down
+docker="./gradlew ${DATABASE?}Compose"
+dockerjson="./gradlew ${DATABASE?}jsonCompose"
+
+${docker}Down
+${dockerjson}Down
 
 ./gradlew ${GRADLE_OPTS} testClasses
 
-docker-compose -f docker-compose-${DATABASE}.yml up --build -d
-
-./wait-for-${DATABASE}.sh
+${docker}UP
 
 ./gradlew $* cleanTest build
 
-docker-compose -f docker-compose-${DATABASE}.yml down
-
+${docker}Down
 
 cd ${DATABASE}
 sh ./build-docker.sh
 cd ..
 
-docker-compose -f docker-compose-${DATABASE}-json.yml up --build -d
-
-./wait-for-${DATABASE}.sh
+${dockerjson}Up
 
 ./gradlew $* :eventuate-common-micronaut-data-jdbc:cleanTest :eventuate-common-micronaut-data-jdbc:test \
 :eventuate-common-micronaut-spring-jdbc:cleanTest :eventuate-common-micronaut-spring-jdbc:test \
 :eventuate-common-spring-jdbc:cleanTest :eventuate-common-spring-jdbc:test
 
-docker-compose -f docker-compose-${DATABASE}-json.yml down
+${dockerjson}Down
