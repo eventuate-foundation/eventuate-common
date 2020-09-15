@@ -4,7 +4,7 @@ DROP Table IF Exists message;
 DROP Table IF Exists received_messages;
 
 CREATE TABLE message (
-  id VARCHAR(767) PRIMARY KEY,
+  id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   destination LONGTEXT NOT NULL,
   headers LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   payload LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,

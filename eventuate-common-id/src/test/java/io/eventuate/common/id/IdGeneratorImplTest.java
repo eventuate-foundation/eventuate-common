@@ -1,35 +1,35 @@
 package io.eventuate.common.id;
 
+import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.concurrent.TimeUnit;
-import java.util.stream.IntStream;
-
-import static org.junit.Assert.*;
 
 public class IdGeneratorImplTest {
 
-  @Test
-  public void shouldGenerateId() {
-    IdGeneratorImpl idGen = new IdGeneratorImpl();
-    Int128 id = idGen.genId();
-    assertNotNull(id);
+  @Test(expected = IllegalArgumentException.class)
+  public void shouldThrowAnExceptionOnNegativeInstanceId() {
+    new IdGeneratorImpl(-1L);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void shouldThrowAnExceptionOnTooBigInstanceId() {
+    new IdGeneratorImpl(IdGeneratorImpl.SERVICE_ID_MAX_VALUE + 1);
   }
 
   @Test
-  public void shouldGenerateMonotonicId() {
-    IdGeneratorImpl idGen = new IdGeneratorImpl();
-    Int128 id1 = idGen.genId();
-    Int128 id2 = idGen.genId();
-    assertTrue(id1.compareTo(id2) < 0);
+  public void shouldGenerateAnId() {
+    IdGenerator idGenerator = new IdGeneratorImpl(IdGeneratorImpl.SERVICE_ID_MAX_VALUE / 2);
+
+    Int128 id = idGenerator.genId(Long.MAX_VALUE);
+
+    Assert.assertEquals(IdGeneratorImpl.SERVICE_ID_MAX_VALUE / 2, id.getLo());
+    Assert.assertEquals(Long.MAX_VALUE, id.getHi());
   }
 
   @Test
-  public void shouldGenerateLotsOfIds() throws InterruptedException {
-    IdGeneratorImpl idGen = new IdGeneratorImpl();
-    IntStream.range(1, 1000000).forEach(x -> idGen.genId());
-    TimeUnit.SECONDS.sleep(1);
-    IntStream.range(1, 1000000).forEach(x -> idGen.genId());
-  }
+  public void assertThatServiceIdMaxValueIs48BitsSize() {
+    String binaryString = Long.toBinaryString(IdGeneratorImpl.SERVICE_ID_MAX_VALUE);
 
+    Assert.assertEquals(48, binaryString.length());
+    Assert.assertTrue(binaryString.chars().allMatch(value -> value == '1'));
+  }
 }

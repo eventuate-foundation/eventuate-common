@@ -74,11 +74,11 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
   public void testJsonColumnToStringConversion() {
     EventuateSchema eventuateSchema = new EventuateSchema();
 
-    String messageId = generateId();
     String payloadData = generateId();
     String rawPayload = "\"" + payloadData + "\"";
 
-    eventuateCommonJdbcOperations.insertIntoMessageTable(messageId, rawPayload, "", "0", Collections.emptyMap(), eventuateSchema);
+    Long messageId = eventuateCommonJdbcOperations
+            .insertIntoMessageTable(rawPayload, "", "0", Collections.emptyMap(), eventuateSchema);
 
     SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(String.format("select payload from %s where id = ?", eventuateSchema.qualifyTable("message")), messageId);
 

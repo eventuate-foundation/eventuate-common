@@ -5,11 +5,13 @@ import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.EventuateRowMapper;
 import io.eventuate.common.jdbc.EventuateSqlException;
 import io.micronaut.data.jdbc.runtime.JdbcOperations;
+import org.apache.commons.lang.NotImplementedException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 
 public class EventuateMicronautDataJdbcStatementExecutor implements EventuateJdbcStatementExecutor {
@@ -28,6 +30,33 @@ public class EventuateMicronautDataJdbcStatementExecutor implements EventuateJdb
   }
 
   @Override
+  public Long insertAndReturnGeneratedId(String sql, Object... parameters) {
+    Connection connection = jdbcOperations.getConnection();
+
+    try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+      for (int i = 1; i <= parameters.length; i++) {
+        preparedStatement.setObject(i, parameters[i - 1]);
+      }
+
+      preparedStatement.executeUpdate();
+
+      try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+        if (generatedKeys.next()) {
+          return generatedKeys.getLong(1);
+        }
+        else {
+          throw new EventuateSqlException("Id was not generated");
+        }
+      }
+    } catch (SQLException e) {
+      handleSqlUpdateException(e);
+
+      return null; //should not be here
+    }
+  }
+
+  @Override
   public int update(String sql, Object... parameters) {
     Connection connection = jdbcOperations.getConnection();
 
@@ -40,23 +69,9 @@ public class EventuateMicronautDataJdbcStatementExecutor implements EventuateJdb
       return preparedStatement.executeUpdate();
     }
     catch (SQLException e) {
+      handleSqlUpdateException(e);
 
-      Optional<Integer> additionalErrorCode = Optional.empty();
-
-      // Workaround for postgres, where e.getErrorCode() is 0
-      try {
-        additionalErrorCode = Optional.of(Integer.parseInt(e.getSQLState()));
-      } catch (NumberFormatException nfe) {
-        // ignore
-      }
-
-      if (DUPLICATE_KEY_ERROR_CODES.contains(e.getErrorCode()) ||
-              additionalErrorCode.map(DUPLICATE_KEY_ERROR_CODES::contains).orElse(false)) {
-
-        throw new EventuateDuplicateKeyException(e);
-      }
-
-      throw new EventuateSqlException(e);
+      return 0; //should not be here
     }
   }
 
@@ -113,5 +128,24 @@ public class EventuateMicronautDataJdbcStatementExecutor implements EventuateJdb
     catch (SQLException e) {
       throw new EventuateSqlException(e);
     }
+  }
+
+  private void handleSqlUpdateException(SQLException e) {
+    Optional<Integer> additionalErrorCode = Optional.empty();
+
+    // Workaround for postgres, where e.getErrorCode() is 0
+    try {
+      additionalErrorCode = Optional.of(Integer.parseInt(e.getSQLState()));
+    } catch (NumberFormatException nfe) {
+      // ignore
+    }
+
+    if (DUPLICATE_KEY_ERROR_CODES.contains(e.getErrorCode()) ||
+            additionalErrorCode.map(DUPLICATE_KEY_ERROR_CODES::contains).orElse(false)) {
+
+      throw new EventuateDuplicateKeyException(e);
+    }
+
+    throw new EventuateSqlException(e);
   }
 }

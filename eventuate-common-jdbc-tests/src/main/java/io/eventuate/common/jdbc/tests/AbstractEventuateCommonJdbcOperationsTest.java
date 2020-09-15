@@ -73,7 +73,6 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
   }
 
   public void testInsertIntoMessageTable() throws SQLException {
-    String messageId = generateId();
     String payload = "\"" + generateId() + "\"";
     String destination = generateId();
     Long time = System.nanoTime();
@@ -81,16 +80,12 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     headers.put("header1k", "header1v");
     headers.put("header2k", "header2v");
 
-    getEventuateTransactionTemplate().executeInTransaction(() -> {
-      getEventuateCommonJdbcOperations().insertIntoMessageTable(messageId,
-              payload,
+    Long messageId = getEventuateTransactionTemplate().executeInTransaction(() ->
+      getEventuateCommonJdbcOperations().insertIntoMessageTable(payload,
               destination,
               time.toString(),
               headers,
-              eventuateSchema);
-
-      return null;
-    });
+              eventuateSchema));
 
     List<Map<String, Object>> messages = getMessages(messageId);
 
@@ -143,7 +138,7 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     }
   }
 
-  private List<Map<String, Object>> getMessages(String messageId) {
+  private List<Map<String, Object>> getMessages(Long messageId) {
     String table = eventuateSchema.qualifyTable("message");
     String sql = String.format("select id, destination, headers, payload, creation_time from %s where id = ?", table);
 
@@ -151,7 +146,7 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
          PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
 
-      preparedStatement.setString(1, messageId);
+      preparedStatement.setLong(1, messageId);
 
       List<Map<String, Object>> messages = new ArrayList<>();
 

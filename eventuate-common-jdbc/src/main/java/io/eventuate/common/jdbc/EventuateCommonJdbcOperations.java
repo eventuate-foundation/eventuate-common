@@ -33,8 +33,7 @@ public class EventuateCommonJdbcOperations {
   }
 
 
-  public void insertIntoMessageTable(String messageId,
-                                      String payload,
+  public Long insertIntoMessageTable(String payload,
                                       String destination,
                                       String currentTimeInMillisecondsSql,
                                       Map<String, String> headers,
@@ -42,7 +41,7 @@ public class EventuateCommonJdbcOperations {
 
     String table = eventuateSchema.qualifyTable("message");
 
-    String sql = String.format("insert into %s(id, destination, headers, payload, creation_time) values(?, ?, %s, %s, %s)",
+    String sql = String.format("insert into %s(destination, headers, payload, creation_time) values(?, %s, %s, %s)",
             table,
             eventuateSqlDialect.castToJson("?", eventuateSchema, "message", "headers", eventuateJdbcStatementExecutor),
             eventuateSqlDialect.castToJson("?", eventuateSchema, "message","payload", eventuateJdbcStatementExecutor),
@@ -50,6 +49,6 @@ public class EventuateCommonJdbcOperations {
 
     String serializedHeaders = JSonMapper.toJson(headers);
 
-    eventuateJdbcStatementExecutor.update(sql, messageId, destination, serializedHeaders, payload);
+    return eventuateJdbcStatementExecutor.insertAndReturnGeneratedId(sql, destination, serializedHeaders, payload);
   }
 }
