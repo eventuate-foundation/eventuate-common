@@ -5,7 +5,6 @@ import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.EventuateRowMapper;
 import io.eventuate.common.jdbc.EventuateSqlException;
 import io.micronaut.data.jdbc.runtime.JdbcOperations;
-import org.apache.commons.lang.NotImplementedException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -30,7 +29,7 @@ public class EventuateMicronautDataJdbcStatementExecutor implements EventuateJdb
   }
 
   @Override
-  public Long insertAndReturnGeneratedId(String sql, Object... parameters) {
+  public long insertAndReturnGeneratedId(String sql, Object... parameters) {
     Connection connection = jdbcOperations.getConnection();
 
     try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -52,7 +51,7 @@ public class EventuateMicronautDataJdbcStatementExecutor implements EventuateJdb
     } catch (SQLException e) {
       handleSqlUpdateException(e);
 
-      return null; //should not be here
+      return -1; //should not be here
     }
   }
 

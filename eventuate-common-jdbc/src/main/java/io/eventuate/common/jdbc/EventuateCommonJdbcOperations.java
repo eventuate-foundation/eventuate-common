@@ -33,7 +33,7 @@ public class EventuateCommonJdbcOperations {
   }
 
 
-  public Long insertIntoMessageTable(String payload,
+  public long insertIntoMessageTable(String payload,
                                       String destination,
                                       String currentTimeInMillisecondsSql,
                                       Map<String, String> headers,

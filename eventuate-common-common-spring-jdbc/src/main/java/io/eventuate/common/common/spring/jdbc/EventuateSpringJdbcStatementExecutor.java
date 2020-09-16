@@ -22,7 +22,7 @@ public class EventuateSpringJdbcStatementExecutor implements EventuateJdbcStatem
   }
 
   @Override
-  public Long insertAndReturnGeneratedId(String sql, Object... params) {
+  public long insertAndReturnGeneratedId(String sql, Object... params) {
     try {
       KeyHolder holder = new GeneratedKeyHolder();
       jdbcTemplate.update(connection -> {

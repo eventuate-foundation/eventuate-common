@@ -4,9 +4,9 @@ public class IdGeneratorImpl implements IdGenerator {
 
   public static final long SERVICE_ID_MAX_VALUE = 0x0000ffffffffffffL;
 
-  private Long serviceId;
+  private final long serviceId;
 
-  public IdGeneratorImpl(Long serviceId) {
+  public IdGeneratorImpl(long serviceId) {
     this.serviceId = serviceId;
 
     if (serviceId < 0 || serviceId > SERVICE_ID_MAX_VALUE) {
@@ -15,7 +15,7 @@ public class IdGeneratorImpl implements IdGenerator {
   }
 
   @Override
-  public synchronized Int128 genId(Long databaseId) {
+  public Int128 genId(long databaseId) {
     return new Int128(databaseId, serviceId);
   }
 }
