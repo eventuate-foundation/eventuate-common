@@ -1,8 +1,10 @@
-mysql:
-  build: ./mysql-json
-  ports:
-    - 3306:3306
-  environment:
-    - MYSQL_ROOT_PASSWORD=rootpassword
-    - MYSQL_USER=mysqluser
-    - MYSQL_PASSWORD=mysqlpw
+version: '3'
+services:
+  mysql:
+    build: ./mysql-json
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_USER=mysqluser
+      - MYSQL_PASSWORD=mysqlpw
