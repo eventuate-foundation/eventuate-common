@@ -1,5 +1,6 @@
 package io.eventuate.common.micronaut.spring.jdbc;
 
+import io.eventuate.common.id.IdGenerator;
 import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
 import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
 import io.eventuate.common.jdbc.EventuateTransactionTemplate;
@@ -24,6 +25,9 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
 
   @Inject
   private DataSource dataSource;
+
+  @Inject
+  private IdGenerator idGenerator;
 
   @Test
   @Override
@@ -56,5 +60,10 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
   @Override
   protected DataSource getDataSource() {
     return dataSource;
+  }
+
+  @Override
+  protected IdGenerator getIdGenerator() {
+    return idGenerator;
   }
 }

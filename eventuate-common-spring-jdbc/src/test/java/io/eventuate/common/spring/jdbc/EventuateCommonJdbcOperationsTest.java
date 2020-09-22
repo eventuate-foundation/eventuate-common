@@ -1,9 +1,11 @@
 package io.eventuate.common.spring.jdbc;
 
+import io.eventuate.common.id.IdGenerator;
 import io.eventuate.common.jdbc.*;
 import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
 import io.eventuate.common.jdbc.sqldialect.SqlDialectSelector;
 import io.eventuate.common.jdbc.tests.AbstractEventuateCommonJdbcOperationsTest;
+import io.eventuate.common.spring.id.IdGeneratorConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +29,7 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
 
   @Configuration
   @EnableAutoConfiguration
-  @Import(EventuateCommonJdbcOperationsConfiguration.class)
+  @Import({EventuateCommonJdbcOperationsConfiguration.class, IdGeneratorConfiguration.class})
   public static class Config {
   }
 
@@ -51,6 +53,9 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
 
   @Autowired
   private SqlDialectSelector sqlDialectSelector;
+
+  @Autowired
+  private IdGenerator idGenerator;
 
   @Test(expected = EventuateDuplicateKeyException.class)
   @Override
@@ -77,10 +82,10 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
     String payloadData = generateId();
     String rawPayload = "\"" + payloadData + "\"";
 
-    long messageId = eventuateCommonJdbcOperations
-            .insertIntoMessageTable(rawPayload, "", "0", Collections.emptyMap(), eventuateSchema);
+    String messageId = eventuateCommonJdbcOperations
+            .insertIntoMessageTable(idGenerator, rawPayload, "", "0", Collections.emptyMap(), eventuateSchema);
 
-    SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(String.format("select payload from %s where id = ?", eventuateSchema.qualifyTable("message")), messageId);
+    SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(String.format("select payload from %s where id = ?", eventuateSchema.qualifyTable("message")), messageIdToRowId(messageId));
 
     sqlRowSet.next();
 
@@ -102,6 +107,11 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
   @Override
   protected EventuateTransactionTemplate getEventuateTransactionTemplate() {
     return eventuateTransactionTemplate;
+  }
+
+  @Override
+  protected IdGenerator getIdGenerator() {
+    return idGenerator;
   }
 
   @Override

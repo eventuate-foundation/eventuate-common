@@ -1,0 +1,4 @@
+eventuatelocal:
+  cdc:
+    reader:
+      id: 1

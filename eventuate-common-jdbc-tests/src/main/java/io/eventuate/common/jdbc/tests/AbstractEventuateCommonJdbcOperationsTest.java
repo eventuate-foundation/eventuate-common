@@ -1,5 +1,7 @@
 package io.eventuate.common.jdbc.tests;
 
+import io.eventuate.common.id.IdGenerator;
+import io.eventuate.common.id.Int128;
 import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
 import io.eventuate.common.jdbc.EventuateSchema;
 import io.eventuate.common.jdbc.EventuateTransactionTemplate;
@@ -19,6 +21,7 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
 
   protected abstract EventuateCommonJdbcOperations getEventuateCommonJdbcOperations();
   protected abstract EventuateTransactionTemplate getEventuateTransactionTemplate();
+  protected abstract IdGenerator getIdGenerator();
   protected abstract DataSource getDataSource();
 
   public void testEventuateDuplicateKeyException() {
@@ -76,27 +79,32 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     String payload = "\"" + generateId() + "\"";
     String destination = generateId();
     long time = System.nanoTime();
-    Map<String, String> headers = new HashMap<>();
-    headers.put("header1k", "header1v");
-    headers.put("header2k", "header2v");
+    Map<String, String> expectedHeaders = new HashMap<>();
+    expectedHeaders.put("header1k", "header1v");
+    expectedHeaders.put("header2k", "header2v");
 
-    long messageId = getEventuateTransactionTemplate().executeInTransaction(() ->
-      getEventuateCommonJdbcOperations().insertIntoMessageTable(payload,
+    String messageId = getEventuateTransactionTemplate().executeInTransaction(() ->
+      getEventuateCommonJdbcOperations().insertIntoMessageTable(getIdGenerator(),
+              payload,
               destination,
               String.valueOf(time),
-              headers,
+              expectedHeaders,
               eventuateSchema));
 
-    List<Map<String, Object>> messages = getMessages(messageId);
+    List<Map<String, Object>> messages = getMessages(messageIdToRowId(messageId));
 
     Assert.assertEquals(1, messages.size());
 
     Map<String, Object> event = messages.get(0);
 
+    Map<String, String> actualHeaders = JSonMapper.fromJson(event.get("headers").toString(), Map.class);
+
+    actualHeaders.remove("ID");
+
     Assert.assertEquals(destination, event.get("destination"));
     Assert.assertEquals(payload, event.get("payload"));
     Assert.assertEquals(time, event.get("creation_time"));
-    Assert.assertEquals(headers, JSonMapper.fromJson(event.get("headers").toString(), Map.class));
+    Assert.assertEquals(expectedHeaders, actualHeaders);
   }
 
   protected String generateId() {
@@ -138,7 +146,7 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     }
   }
 
-  private List<Map<String, Object>> getMessages(long messageId) {
+  private List<Map<String, Object>> getMessages(Object messageId) {
     String table = eventuateSchema.qualifyTable("message");
     String sql = String.format("select id, destination, headers, payload, creation_time from %s where id = ?", table);
 
@@ -146,7 +154,7 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
          PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
 
-      preparedStatement.setLong(1, messageId);
+      preparedStatement.setObject(1, messageId);
 
       List<Map<String, Object>> messages = new ArrayList<>();
 
@@ -169,5 +177,13 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  protected Object messageIdToRowId(Object messageId) {
+    if (getIdGenerator().databaseIdRequired()) {
+      return Int128.fromString((String)messageId).getHi();
+    }
+
+    return messageId;
   }
 }

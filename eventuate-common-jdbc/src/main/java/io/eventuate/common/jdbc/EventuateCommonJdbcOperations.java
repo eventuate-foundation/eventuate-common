@@ -1,8 +1,10 @@
 package io.eventuate.common.jdbc;
 
+import io.eventuate.common.id.IdGenerator;
 import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
 import io.eventuate.common.json.mapper.JSonMapper;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -33,22 +35,82 @@ public class EventuateCommonJdbcOperations {
   }
 
 
-  public long insertIntoMessageTable(String payload,
-                                      String destination,
-                                      String currentTimeInMillisecondsSql,
-                                      Map<String, String> headers,
-                                      EventuateSchema eventuateSchema) {
+  public String insertIntoMessageTable(IdGenerator idGenerator,
+                                       String payload,
+                                       String destination,
+                                       String currentTimeInMillisecondsSql,
+                                       Map<String, String> headers,
+                                       EventuateSchema eventuateSchema) {
 
     String table = eventuateSchema.qualifyTable("message");
 
-    String sql = String.format("insert into %s(destination, headers, payload, creation_time) values(?, %s, %s, %s)",
+    String jsonHeadersColumn = columnToJson(eventuateSchema, "headers");
+    String jsonPayloadColumn = columnToJson(eventuateSchema, "payload");
+
+    if (idGenerator.databaseIdRequired()) {
+      return insertIntoMessageTableImprovedId(idGenerator,
+              table, jsonHeadersColumn, jsonPayloadColumn, currentTimeInMillisecondsSql, payload, destination, headers);
+    }
+    else
+    {
+      return insertIntoMessageTableDefaultId(idGenerator,
+              table, jsonHeadersColumn, jsonPayloadColumn, currentTimeInMillisecondsSql, payload, destination, headers);
+    }
+  }
+
+  private String insertIntoMessageTableDefaultId(IdGenerator idGenerator,
+                                                 String table,
+                                                 String jsonHeadersColumn,
+                                                 String jsonPayloadColumn,
+                                                 String currentTimeInMillisecondsSql,
+                                                 String payload,
+                                                 String destination,
+                                                 Map<String, String> headers) {
+
+    headers = new HashMap<>(headers);
+
+    String messageId = idGenerator.genId(null).asString();
+
+    headers.put("ID", idGenerator.genId(null).asString());
+
+    String sql = String.format("insert into %s(id, destination, headers, payload, creation_time) values(?, ?, %s, %s, %s)",
             table,
-            eventuateSqlDialect.castToJson("?", eventuateSchema, "message", "headers", eventuateJdbcStatementExecutor),
-            eventuateSqlDialect.castToJson("?", eventuateSchema, "message","payload", eventuateJdbcStatementExecutor),
+            jsonHeadersColumn,
+            jsonPayloadColumn,
             currentTimeInMillisecondsSql);
 
     String serializedHeaders = JSonMapper.toJson(headers);
 
-    return eventuateJdbcStatementExecutor.insertAndReturnGeneratedId(sql, destination, serializedHeaders, payload);
+    eventuateJdbcStatementExecutor.update(sql, messageId, destination, serializedHeaders, payload);
+
+    return messageId;
+  }
+
+  private String insertIntoMessageTableImprovedId(IdGenerator idGenerator,
+                                                  String table,
+                                                  String jsonHeadersColumn,
+                                                  String jsonPayloadColumn,
+                                                  String currentTimeInMillisecondsSql,
+                                                  String payload,
+                                                  String destination,
+                                                  Map<String, String> headers) {
+
+    String sql = String.format("insert into %s(destination, headers, payload, creation_time) values(?, %s, %s, %s)",
+            table,
+            jsonHeadersColumn,
+            jsonPayloadColumn,
+            currentTimeInMillisecondsSql);
+
+    String serializedHeaders = JSonMapper.toJson(headers);
+
+    long databaseId = eventuateJdbcStatementExecutor.insertAndReturnGeneratedId(sql,
+            "id", destination, serializedHeaders, payload);
+
+    return idGenerator.genId(databaseId).asString();
+  }
+
+  private String columnToJson(EventuateSchema eventuateSchema, String column) {
+    return eventuateSqlDialect.castToJson("?",
+            eventuateSchema, "message", column, eventuateJdbcStatementExecutor);
   }
 }

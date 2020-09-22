@@ -29,7 +29,7 @@ public class EventuateMicronautDataJdbcStatementExecutor implements EventuateJdb
   }
 
   @Override
-  public long insertAndReturnGeneratedId(String sql, Object... parameters) {
+  public long insertAndReturnGeneratedId(String sql, String idColumn, Object... parameters) {
     Connection connection = jdbcOperations.getConnection();
 
     try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {

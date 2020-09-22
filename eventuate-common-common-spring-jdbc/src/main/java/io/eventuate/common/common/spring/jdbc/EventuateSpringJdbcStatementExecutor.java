@@ -22,7 +22,7 @@ public class EventuateSpringJdbcStatementExecutor implements EventuateJdbcStatem
   }
 
   @Override
-  public long insertAndReturnGeneratedId(String sql, Object... params) {
+  public long insertAndReturnGeneratedId(String sql, String idColumn, Object... params) {
     try {
       KeyHolder holder = new GeneratedKeyHolder();
       jdbcTemplate.update(connection -> {
@@ -35,7 +35,12 @@ public class EventuateSpringJdbcStatementExecutor implements EventuateJdbcStatem
         return preparedStatement;
       }, holder);
 
-      return holder.getKey().longValue();
+      if (holder.getKeys().size() > 1) {
+        // necessary for postgres. For postgres holder returns all columns.
+        return (Long)holder.getKeys().get("id");
+      } else {
+        return  holder.getKey().longValue();
+      }
     } catch (DuplicateKeyException e) {
       throw new EventuateDuplicateKeyException(e);
     }

@@ -1,12 +1,17 @@
 package io.eventuate.common.id;
 
-public class IdGeneratorImpl implements IdGenerator {
+public class ImprovedIdGenerator implements IdGenerator {
 
   public static final long SERVICE_ID_MAX_VALUE = 0x0000ffffffffffffL;
 
   private final long serviceId;
 
-  public IdGeneratorImpl(long serviceId) {
+  @Override
+  public boolean databaseIdRequired() {
+    return true;
+  }
+
+  public ImprovedIdGenerator(long serviceId) {
     this.serviceId = serviceId;
 
     if (serviceId < 0 || serviceId > SERVICE_ID_MAX_VALUE) {
@@ -15,7 +20,12 @@ public class IdGeneratorImpl implements IdGenerator {
   }
 
   @Override
-  public Int128 genId(long databaseId) {
+  public Int128 genId(Long databaseId) {
+
+    if (databaseId == null) {
+      throw new IllegalArgumentException("database id is required");
+    }
+
     return new Int128(databaseId, serviceId);
   }
 }

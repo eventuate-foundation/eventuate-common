@@ -8,5 +8,8 @@ done
 
 
 for i in `ls *.sql | sort -V`; do
-	/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Eventuate123! -d master -i "$i"
+ echo ""
+ echo "RUNNING $i"
+ echo ""
+ /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Eventuate123! -d master -i "$i"
 done;
