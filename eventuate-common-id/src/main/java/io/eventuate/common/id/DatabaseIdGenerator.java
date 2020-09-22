@@ -1,6 +1,6 @@
 package io.eventuate.common.id;
 
-public class ImprovedIdGenerator implements IdGenerator {
+public class DatabaseIdGenerator implements IdGenerator {
 
   public static final long SERVICE_ID_MAX_VALUE = 0x0000ffffffffffffL;
 
@@ -11,7 +11,7 @@ public class ImprovedIdGenerator implements IdGenerator {
     return true;
   }
 
-  public ImprovedIdGenerator(long serviceId) {
+  public DatabaseIdGenerator(long serviceId) {
     this.serviceId = serviceId;
 
     if (serviceId < 0 || serviceId > SERVICE_ID_MAX_VALUE) {

@@ -13,11 +13,11 @@ fi
 
 docker="./gradlew ${DATABASE?}Compose"
 dockerjson="./gradlew ${DATABASE?}jsonCompose"
-dockerimprovedid="./gradlew ${DATABASE?}improvedidCompose"
+dockerdatabaseid="./gradlew ${DATABASE?}databaseidCompose"
 
 ${docker}Down
 ${dockerjson}Down
-${dockerimprovedid}Down
+${dockerdatabaseid}Down
 
 ./gradlew ${GRADLE_OPTS} testClasses
 
@@ -39,19 +39,19 @@ cd ..
 
 
 
-${dockerimprovedid}Up
+${dockerdatabaseid}Up
 
 export EVENTUATELOCAL_CDC_READER_ID=1
 
 echo ""
-echo "TESTING DATABASE WITH IMPROVED ID"
+echo "TESTING DATABASE WITH DATABASE ID"
 echo ""
 
 ./gradlew $* :eventuate-common-micronaut-data-jdbc:cleanTest :eventuate-common-micronaut-data-jdbc:test \
 :eventuate-common-micronaut-spring-jdbc:cleanTest :eventuate-common-micronaut-spring-jdbc:test \
 :eventuate-common-spring-jdbc:cleanTest :eventuate-common-spring-jdbc:test
 
-${dockerimprovedid}Down
+${dockerdatabaseid}Down
 
 
 

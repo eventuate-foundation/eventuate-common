@@ -1,5 +1,5 @@
 mssql:
-  build: ./mssql-improved-id
+  build: ./mssql-database-id
   ports:
     - 1433:1433
   environment:

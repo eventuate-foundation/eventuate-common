@@ -1,5 +1,5 @@
 mysql:
-  build: ./mysql-improved-id
+  build: ./mysql-database-id
   ports:
     - 3306:3306
   environment:

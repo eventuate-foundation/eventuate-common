@@ -1,5 +1,5 @@
 mariadb:
-  build: ./mariadb-improved-id
+  build: ./mariadb-database-id
   ports:
     - 3306:3306
   environment:

@@ -48,24 +48,24 @@ public class EventuateCommonJdbcOperations {
     String jsonPayloadColumn = columnToJson(eventuateSchema, "payload");
 
     if (idGenerator.databaseIdRequired()) {
-      return insertIntoMessageTableImprovedId(idGenerator,
+      return insertIntoMessageTableDatabaseId(idGenerator,
               table, jsonHeadersColumn, jsonPayloadColumn, currentTimeInMillisecondsSql, payload, destination, headers);
     }
     else
     {
-      return insertIntoMessageTableDefaultId(idGenerator,
+      return insertIntoMessageTableApplicationId(idGenerator,
               table, jsonHeadersColumn, jsonPayloadColumn, currentTimeInMillisecondsSql, payload, destination, headers);
     }
   }
 
-  private String insertIntoMessageTableDefaultId(IdGenerator idGenerator,
-                                                 String table,
-                                                 String jsonHeadersColumn,
-                                                 String jsonPayloadColumn,
-                                                 String currentTimeInMillisecondsSql,
-                                                 String payload,
-                                                 String destination,
-                                                 Map<String, String> headers) {
+  private String insertIntoMessageTableApplicationId(IdGenerator idGenerator,
+                                                     String table,
+                                                     String jsonHeadersColumn,
+                                                     String jsonPayloadColumn,
+                                                     String currentTimeInMillisecondsSql,
+                                                     String payload,
+                                                     String destination,
+                                                     Map<String, String> headers) {
 
     headers = new HashMap<>(headers);
 
@@ -86,7 +86,7 @@ public class EventuateCommonJdbcOperations {
     return messageId;
   }
 
-  private String insertIntoMessageTableImprovedId(IdGenerator idGenerator,
+  private String insertIntoMessageTableDatabaseId(IdGenerator idGenerator,
                                                   String table,
                                                   String jsonHeadersColumn,
                                                   String jsonPayloadColumn,

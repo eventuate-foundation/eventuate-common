@@ -114,9 +114,9 @@ dockerCompose {
         removeContainers = project.ext.removeContainers
     }
 
-    mysqlimprovedid {
+    mysqldatabaseid {
         projectName = null
-        useComposeFiles = ["docker-compose-mysql-improved-id.yml"]
+        useComposeFiles = ["docker-compose-mysql-database-id.yml"]
         removeContainers = project.ext.removeContainers
     }
 
@@ -132,9 +132,9 @@ dockerCompose {
         removeContainers = project.ext.removeContainers
     }
 
-    mariadbimprovedid {
+    mariadbdatabaseid {
         projectName = null
-        useComposeFiles = ["docker-compose-mariadb-improved-id.yml"]
+        useComposeFiles = ["docker-compose-mariadb-database-id.yml"]
         removeContainers = project.ext.removeContainers
     }
 
@@ -150,9 +150,9 @@ dockerCompose {
         removeContainers = project.ext.removeContainers
     }
 
-    postgresimprovedid {
+    postgresdatabaseid {
         projectName = null
-        useComposeFiles = ["docker-compose-postgres-improved-id.yml"]
+        useComposeFiles = ["docker-compose-postgres-database-id.yml"]
         removeContainers = project.ext.removeContainers
     }
 
@@ -168,9 +168,9 @@ dockerCompose {
         removeContainers = project.ext.removeContainers
     }
 
-    mssqlimprovedid {
+    mssqldatabaseid {
         projectName = null
-        useComposeFiles = ["docker-compose-mssql-improved-id.yml"]
+        useComposeFiles = ["docker-compose-mssql-database-id.yml"]
         removeContainers = project.ext.removeContainers
     }
 

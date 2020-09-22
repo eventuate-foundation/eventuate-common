@@ -7,7 +7,7 @@ import java.util.Enumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultIdGenerator implements IdGenerator {
+public class ApplicationIdGenerator implements IdGenerator {
 
   private Logger logger = LoggerFactory.getLogger(getClass());
   private static final long MAX_COUNTER = 1 << 16;
@@ -17,7 +17,7 @@ public class DefaultIdGenerator implements IdGenerator {
   private long counter = 0;
 
 
-  public DefaultIdGenerator() {
+  public ApplicationIdGenerator() {
     try {
       macAddress = getMacAddress();
       logger.debug("Mac address {}", macAddress);
