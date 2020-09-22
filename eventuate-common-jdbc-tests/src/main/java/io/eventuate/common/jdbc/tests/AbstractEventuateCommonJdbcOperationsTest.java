@@ -99,7 +99,10 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
 
     Map<String, String> actualHeaders = JSonMapper.fromJson(event.get("headers").toString(), Map.class);
 
-    actualHeaders.remove("ID");
+    if (!getIdGenerator().databaseIdRequired()) {
+      Assert.assertTrue(actualHeaders.containsKey("ID"));
+      actualHeaders.remove("ID");
+    }
 
     Assert.assertEquals(destination, event.get("destination"));
     Assert.assertEquals(payload, event.get("payload"));
