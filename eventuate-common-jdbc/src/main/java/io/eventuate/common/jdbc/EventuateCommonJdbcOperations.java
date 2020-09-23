@@ -71,7 +71,7 @@ public class EventuateCommonJdbcOperations {
 
     String messageId = idGenerator.genId(null).asString();
 
-    headers.put("ID", idGenerator.genId(null).asString());
+    headers.put("ID", messageId);
 
     String sql = String.format("insert into %s(id, destination, headers, payload, creation_time) values(?, ?, %s, %s, %s)",
             table,

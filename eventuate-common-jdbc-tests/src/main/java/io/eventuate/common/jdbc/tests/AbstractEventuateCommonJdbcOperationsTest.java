@@ -101,6 +101,7 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
 
     if (!getIdGenerator().databaseIdRequired()) {
       Assert.assertTrue(actualHeaders.containsKey("ID"));
+      Assert.assertEquals(messageId, actualHeaders.get("ID"));
       actualHeaders.remove("ID");
     }
 
