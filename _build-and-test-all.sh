@@ -21,11 +21,15 @@ ${dockerdatabaseid}Down
 
 ./gradlew ${GRADLE_OPTS} testClasses
 
-${docker}UP
+
 
 echo ""
 echo "TESTING REGULAR DATABASE"
 echo ""
+
+
+
+${docker}UP
 
 ./gradlew $* cleanTest build
 
@@ -33,19 +37,18 @@ ${docker}Down
 
 
 
+echo ""
+echo "TESTING WITH XID WITH APPLICATION ID GENERATION"
+echo ""
+
+
+
 cd ${DATABASE}
 sh ./build-docker.sh
 cd ..
 
-
-
 ${dockerdatabaseid}Up
 
-export EVENTUATELOCAL_CDC_READER_ID=1
-
-echo ""
-echo "TESTING DATABASE WITH DATABASE ID"
-echo ""
 
 ./gradlew $* :eventuate-common-micronaut-data-jdbc:cleanTest :eventuate-common-micronaut-data-jdbc:test \
 :eventuate-common-micronaut-spring-jdbc:cleanTest :eventuate-common-micronaut-spring-jdbc:test \
@@ -55,15 +58,29 @@ ${dockerdatabaseid}Down
 
 
 
-unset EVENTUATELOCAL_CDC_READER_ID
+echo ""
+echo "TESTING WITH XID WITH DATABASE ID GENERATION"
+echo ""
+
+${dockerdatabaseid}Up
+
+export EVENTUATELOCAL_CDC_READER_ID=1
+
+./gradlew $* :eventuate-common-micronaut-data-jdbc:cleanTest :eventuate-common-micronaut-data-jdbc:test \
+:eventuate-common-micronaut-spring-jdbc:cleanTest :eventuate-common-micronaut-spring-jdbc:test \
+:eventuate-common-spring-jdbc:cleanTest :eventuate-common-spring-jdbc:test
+
+${dockerdatabaseid}Down
+
+echo ""
+echo "TESTING DATABASE WITH JSON SUPPORT"
+echo ""
 
 
 
 ${dockerjson}Up
 
-echo ""
-echo "TESTING DATABASE WITH JSON SUPPORT"
-echo ""
+unset EVENTUATELOCAL_CDC_READER_ID
 
 ./gradlew $* :eventuate-common-micronaut-data-jdbc:cleanTest :eventuate-common-micronaut-data-jdbc:test \
 :eventuate-common-micronaut-spring-jdbc:cleanTest :eventuate-common-micronaut-spring-jdbc:test \

@@ -37,7 +37,7 @@ public class EventuateSpringJdbcStatementExecutor implements EventuateJdbcStatem
 
       if (holder.getKeys().size() > 1) {
         // necessary for postgres. For postgres holder returns all columns.
-        return (Long)holder.getKeys().get("id");
+        return (Long)holder.getKeys().get(idColumn);
       } else {
         return  holder.getKey().longValue();
       }

@@ -1,5 +1,6 @@
 CREATE TABLE eventuate.new_message (
-  id bigserial PRIMARY KEY,
+  id VARCHAR(1000),
+  xid bigserial PRIMARY KEY,
   destination TEXT NOT NULL,
   headers TEXT NOT NULL,
   payload TEXT NOT NULL,
@@ -7,7 +8,7 @@ CREATE TABLE eventuate.new_message (
   creation_time BIGINT
 );
 
-INSERT INTO eventuate.new_message (destination, headers, payload, published, creation_time) SELECT destination, headers, payload, published, creation_time FROM eventuate.message;
+INSERT INTO eventuate.new_message (id, destination, headers, payload, published, creation_time) SELECT '', destination, headers, payload, published, creation_time FROM eventuate.message;
 
 DROP TABLE eventuate.message;
 

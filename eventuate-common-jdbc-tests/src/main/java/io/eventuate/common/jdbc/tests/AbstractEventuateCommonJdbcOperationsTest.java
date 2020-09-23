@@ -150,15 +150,16 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     }
   }
 
-  private List<Map<String, Object>> getMessages(Object messageId) {
+  private List<Map<String, Object>> getMessages(IdColumnAndValue idColumnAndValue) {
     String table = eventuateSchema.qualifyTable("message");
-    String sql = String.format("select id, destination, headers, payload, creation_time from %s where id = ?", table);
+    String sql = String.format("select %s, destination, headers, payload, creation_time from %s where %s = ?",
+            idColumnAndValue.getColumn(), table, idColumnAndValue.getColumn());
 
     try (Connection connection = getDataSource().getConnection();
          PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
 
-      preparedStatement.setObject(1, messageId);
+      preparedStatement.setObject(1, idColumnAndValue.getValue());
 
       List<Map<String, Object>> messages = new ArrayList<>();
 
@@ -166,7 +167,6 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
         while (rs.next()) {
           Map<String, Object> message = new HashMap<>();
 
-          message.put("id", rs.getString("id"));
           message.put("destination", rs.getString("destination"));
           message.put("headers", rs.getString("headers"));
           message.put("payload", rs.getString("payload"));
@@ -183,11 +183,29 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     }
   }
 
-  protected Object messageIdToRowId(Object messageId) {
+  protected IdColumnAndValue messageIdToRowId(Object messageId) {
     if (getIdGenerator().databaseIdRequired()) {
-      return Int128.fromString((String)messageId).getHi();
+      return new IdColumnAndValue("xid", Int128.fromString((String)messageId).getHi());
     }
 
-    return messageId;
+    return new IdColumnAndValue("id", messageId);
+  }
+
+  protected static class IdColumnAndValue {
+    private String column;
+    private Object value;
+
+    public IdColumnAndValue(String column, Object value) {
+      this.column = column;
+      this.value = value;
+    }
+
+    public String getColumn() {
+      return column;
+    }
+
+    public Object getValue() {
+      return value;
+    }
   }
 }

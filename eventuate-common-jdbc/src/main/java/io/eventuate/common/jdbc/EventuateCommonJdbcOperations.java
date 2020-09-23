@@ -95,7 +95,7 @@ public class EventuateCommonJdbcOperations {
                                                   String destination,
                                                   Map<String, String> headers) {
 
-    String sql = String.format("insert into %s(destination, headers, payload, creation_time) values(?, %s, %s, %s)",
+    String sql = String.format("insert into %s(id, destination, headers, payload, creation_time) values('', ?, %s, %s, %s)",
             table,
             jsonHeadersColumn,
             jsonPayloadColumn,
@@ -104,7 +104,7 @@ public class EventuateCommonJdbcOperations {
     String serializedHeaders = JSonMapper.toJson(headers);
 
     long databaseId = eventuateJdbcStatementExecutor.insertAndReturnGeneratedId(sql,
-            "id", destination, serializedHeaders, payload);
+            "xid", destination, serializedHeaders, payload);
 
     return idGenerator.genId(databaseId).asString();
   }

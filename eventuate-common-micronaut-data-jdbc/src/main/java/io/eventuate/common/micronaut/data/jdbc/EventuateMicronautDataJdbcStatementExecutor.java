@@ -42,7 +42,14 @@ public class EventuateMicronautDataJdbcStatementExecutor implements EventuateJdb
 
       try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
         if (generatedKeys.next()) {
-          return generatedKeys.getLong(1);
+
+          if (generatedKeys.getMetaData().getColumnCount() == 1) {
+            // generate id can have different name than column (GENERATED_ID for mysql)
+            return generatedKeys.getLong(1);
+          }
+
+          //contains all columns for postgres
+          return generatedKeys.getLong(idColumn);
         }
         else {
           throw new EventuateSqlException("Id was not generated");

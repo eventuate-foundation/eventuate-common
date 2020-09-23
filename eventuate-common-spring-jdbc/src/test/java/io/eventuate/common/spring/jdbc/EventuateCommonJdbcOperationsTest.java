@@ -85,7 +85,11 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
     String messageId = eventuateCommonJdbcOperations
             .insertIntoMessageTable(idGenerator, rawPayload, "", "0", Collections.emptyMap(), eventuateSchema);
 
-    SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(String.format("select payload from %s where id = ?", eventuateSchema.qualifyTable("message")), messageIdToRowId(messageId));
+    IdColumnAndValue idColumnAndValue = messageIdToRowId(messageId);
+
+    SqlRowSet sqlRowSet = jdbcTemplate
+            .queryForRowSet(String.format("select payload from %s where %s = ?",
+                    eventuateSchema.qualifyTable("message"), idColumnAndValue.getColumn()), idColumnAndValue.getValue());
 
     sqlRowSet.next();
 
