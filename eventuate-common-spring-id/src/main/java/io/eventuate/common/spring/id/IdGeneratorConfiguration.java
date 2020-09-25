@@ -12,14 +12,14 @@ import org.springframework.context.annotation.Configuration;
 public class IdGeneratorConfiguration {
 
   @Bean
-  @ConditionalOnProperty(name = "eventuatelocal.cdc.reader.id", matchIfMissing = true)
+  @ConditionalOnProperty(name = "eventuate.outbox.id", matchIfMissing = true)
   public IdGenerator idGenerator() {
     return new ApplicationIdGenerator();
   }
 
   @Bean
-  @ConditionalOnProperty(name = "eventuatelocal.cdc.reader.id")
-  public IdGenerator idGenerator(@Value("${eventuatelocal.cdc.reader.id:#{null}}") long id) {
+  @ConditionalOnProperty(name = "eventuate.outbox.id")
+  public IdGenerator idGenerator(@Value("${eventuate.outbox.id:#{null}}") long id) {
     return new DatabaseIdGenerator(id);
   }
 }

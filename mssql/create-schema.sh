@@ -6,6 +6,18 @@ do
  sleep 5
 done
 
+if [[ "${USE_JSON_PAYLOAD_AND_HEADERS}" == "true" ]]; then
+  cp /usr/src/app/additional-scripts/3.setup-json.sql /usr/src/app
+  echo "3.setup-json.sql is activated"
+fi
+
+if [[ "${USE_DB_ID}" == "true" ]]; then
+
+  /usr/src/app/additional-scripts
+
+  cp /usr/src/app/additional-scripts/4.setup-db-id.sql /usr/src/app
+  echo "4.setup-db-id.sql is activated"
+fi
 
 for i in `ls *.sql | sort -V`; do
  echo ""

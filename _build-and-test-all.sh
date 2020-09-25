@@ -12,12 +12,7 @@ if [ "$1" = "--clean" ] ; then
 fi
 
 docker="./gradlew ${DATABASE?}Compose"
-dockerjson="./gradlew ${DATABASE?}jsonCompose"
-dockerdatabaseid="./gradlew ${DATABASE?}databaseidCompose"
-
 ${docker}Down
-${dockerjson}Down
-${dockerdatabaseid}Down
 
 ./gradlew ${GRADLE_OPTS} testClasses
 
@@ -38,39 +33,38 @@ ${docker}Down
 
 
 echo ""
-echo "TESTING WITH XID WITH APPLICATION ID GENERATION"
+echo "TESTING DATABASE WITH DBID WITH APPLICATION ID GENERATION"
 echo ""
 
 
 
-cd ${DATABASE}
-sh ./build-docker.sh
-cd ..
-
-${dockerdatabaseid}Up
-
+export USE_DB_ID=true
+${docker}Up
 
 ./gradlew $* :eventuate-common-micronaut-data-jdbc:cleanTest :eventuate-common-micronaut-data-jdbc:test \
 :eventuate-common-micronaut-spring-jdbc:cleanTest :eventuate-common-micronaut-spring-jdbc:test \
 :eventuate-common-spring-jdbc:cleanTest :eventuate-common-spring-jdbc:test
 
-${dockerdatabaseid}Down
+${docker}Down
 
 
 
 echo ""
-echo "TESTING WITH XID WITH DATABASE ID GENERATION"
+echo "TESTING DATABASE WITH DBID WITH DATABASE ID GENERATION"
 echo ""
 
-${dockerdatabaseid}Up
 
-export EVENTUATELOCAL_CDC_READER_ID=1
+
+export EVENTUATE_OUTBOX_ID=1
+${docker}Up
 
 ./gradlew $* :eventuate-common-micronaut-data-jdbc:cleanTest :eventuate-common-micronaut-data-jdbc:test \
 :eventuate-common-micronaut-spring-jdbc:cleanTest :eventuate-common-micronaut-spring-jdbc:test \
 :eventuate-common-spring-jdbc:cleanTest :eventuate-common-spring-jdbc:test
 
-${dockerdatabaseid}Down
+${docker}Down
+
+
 
 echo ""
 echo "TESTING DATABASE WITH JSON SUPPORT"
@@ -78,12 +72,13 @@ echo ""
 
 
 
-${dockerjson}Up
-
-unset EVENTUATELOCAL_CDC_READER_ID
+unset USE_DB_ID
+unset EVENTUATE_OUTBOX_ID
+export USE_JSON_PAYLOAD_AND_HEADERS=true
+${docker}Up
 
 ./gradlew $* :eventuate-common-micronaut-data-jdbc:cleanTest :eventuate-common-micronaut-data-jdbc:test \
 :eventuate-common-micronaut-spring-jdbc:cleanTest :eventuate-common-micronaut-spring-jdbc:test \
 :eventuate-common-spring-jdbc:cleanTest :eventuate-common-spring-jdbc:test
 
-${dockerjson}Down
+${docker}Down

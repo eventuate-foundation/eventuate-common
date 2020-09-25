@@ -13,14 +13,14 @@ import javax.inject.Singleton;
 public class IdGeneratorFactory {
 
   @Singleton
-  @Requires(missingProperty = "eventuatelocal.cdc.reader.id")
+  @Requires(missingProperty = "eventuate.outbox.id")
   public IdGenerator idGenerator() {
     return new ApplicationIdGenerator();
   }
 
   @Singleton
-  @Requires(property = "eventuatelocal.cdc.reader.id")
-  public IdGenerator idGenerator(@Value("${eventuatelocal.cdc.reader.id}") long id) {
+  @Requires(property = "eventuate.outbox.id")
+  public IdGenerator idGenerator(@Value("${eventuate.outbox.id}") long id) {
     return new DatabaseIdGenerator(id);
   }
 }

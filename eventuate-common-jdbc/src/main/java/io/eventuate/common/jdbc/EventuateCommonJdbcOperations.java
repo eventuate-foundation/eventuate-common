@@ -10,6 +10,8 @@ import java.util.Optional;
 
 public class EventuateCommonJdbcOperations {
 
+  public static final String MESSAGE_AUTO_GENERATED_ID_COLUMN = "dbid";
+
   private EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor;
   private EventuateSqlDialect eventuateSqlDialect;
 
@@ -104,7 +106,7 @@ public class EventuateCommonJdbcOperations {
     String serializedHeaders = JSonMapper.toJson(headers);
 
     long databaseId = eventuateJdbcStatementExecutor.insertAndReturnGeneratedId(sql,
-            "xid", destination, serializedHeaders, payload);
+            MESSAGE_AUTO_GENERATED_ID_COLUMN, destination, serializedHeaders, payload);
 
     return idGenerator.genId(databaseId).asString();
   }

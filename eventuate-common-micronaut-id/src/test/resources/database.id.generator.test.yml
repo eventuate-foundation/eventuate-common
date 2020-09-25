@@ -1,4 +1,3 @@
-eventuatelocal:
-  cdc:
-    reader:
-      id: 1
+eventuate:
+  outbox:
+    id: 1

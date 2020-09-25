@@ -4,10 +4,12 @@ zookeeper:
     - 2181:2181
 
 mysql:
-  build: ./mysql
+  build: ./mysql/
   ports:
     - 3306:3306
   environment:
     - MYSQL_ROOT_PASSWORD=rootpassword
     - MYSQL_USER=mysqluser
     - MYSQL_PASSWORD=mysqlpw
+    - USE_DB_ID=${USE_DB_ID}
+    - USE_JSON_PAYLOAD_AND_HEADERS=${USE_JSON_PAYLOAD_AND_HEADERS}

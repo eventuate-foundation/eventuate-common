@@ -15,6 +15,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+import static io.eventuate.common.jdbc.EventuateCommonJdbcOperations.MESSAGE_AUTO_GENERATED_ID_COLUMN;
+
 
 public abstract class AbstractEventuateCommonJdbcOperationsTest {
   private EventuateSchema eventuateSchema = new EventuateSchema();
@@ -185,7 +187,7 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
 
   protected IdColumnAndValue messageIdToRowId(Object messageId) {
     if (getIdGenerator().databaseIdRequired()) {
-      return new IdColumnAndValue("xid", Int128.fromString((String)messageId).getHi());
+      return new IdColumnAndValue(MESSAGE_AUTO_GENERATED_ID_COLUMN, Int128.fromString((String)messageId).getHi());
     }
 
     return new IdColumnAndValue("id", messageId);

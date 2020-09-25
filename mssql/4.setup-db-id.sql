@@ -3,7 +3,7 @@ GO
 
 CREATE TABLE eventuate.new_message (
   id VARCHAR(767),
-  xid BIGINT IDENTITY(1,1) PRIMARY KEY,
+  dbid BIGINT IDENTITY(1,1) PRIMARY KEY,
   destination NVARCHAR(MAX) NOT NULL,
   headers NVARCHAR(MAX) NOT NULL,
   payload NVARCHAR(MAX) NOT NULL,
@@ -12,7 +12,8 @@ CREATE TABLE eventuate.new_message (
 );
 GO
 
-INSERT INTO eventuate.new_message (id, destination, headers, payload, published, creation_time) SELECT '', destination, headers, payload, published, creation_time FROM eventuate.message;
+INSERT INTO eventuate.new_message (id, destination, headers, payload, published, creation_time)
+    SELECT id, destination, headers, payload, published, creation_time FROM eventuate.message;
 GO
 
 DROP TABLE eventuate.message;
