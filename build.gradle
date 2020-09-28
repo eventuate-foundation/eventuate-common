@@ -1,11 +1,13 @@
 buildscript {
     repositories {
         mavenCentral()
+        eventuateMavenRepoUrl.split(',').each { repoUrl -> maven { url repoUrl } }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootPluginVersion")
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
         classpath "com.avast.gradle:gradle-docker-compose-plugin:$dockerComposePluginVersion"
+        classpath "io.eventuate.plugins.gradle:eventuate-plugins-gradle-publish:$eventuatePluginsGradleVersion"
     }
 }
 
@@ -14,6 +16,8 @@ plugins {
 }
 
 apply plugin: 'docker-compose'
+apply plugin: "io.eventuate.plugins.gradle.publish.EventuatePublish"
+apply plugin: "io.eventuate.plugins.gradle.publish.EventuatePublishDockerImages"
 
 allprojects {
     group = "io.eventuate.common"
@@ -27,25 +31,8 @@ projects {
 }
 
 subprojects {
-    apply plugin: 'java'
-    apply plugin: 'maven'
-    apply plugin: 'com.jfrog.bintray'
-
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
-
-    bintray {
-        publish = true
-        user = System.getenv('BINTRAY_USER')
-        key = System.getenv('BINTRAY_KEY')
-        configurations = ['archives']
-        pkg {
-            repo = "eventuate-maven-$bintrayRepoType"
-            name = 'eventuate-common'
-            licenses = ['Apache-2.0']
-            vcsUrl = 'https://github.com/eventuate-foundation/eventuate-common'
-        }
-    }
 
     repositories {
         mavenCentral()
@@ -55,35 +42,6 @@ subprojects {
 
     dependencies {
         testCompile "junit:junit:4.12"
-    }
-
-    configurations {
-        deployerJars
-    }
-
-    dependencies {
-        deployerJars 'org.springframework.build:aws-maven:5.0.0.RELEASE'
-    }
-
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                configuration = configurations.deployerJars
-                repository(url: deployUrl) {
-                  authentication(userName: System.getenv('S3_REPO_AWS_ACCESS_KEY'), password: System.getenv('S3_REPO_AWS_SECRET_ACCESS_KEY'))
-                }
-                pom.project {
-                    licenses {
-                        license {
-                            name 'The Apache Software License, Version 2.0'
-                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                            distribution 'repo'
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -130,5 +88,13 @@ dockerCompose {
         projectName = null
         useComposeFiles = ["docker-compose-mssql.yml"]
         removeContainers = project.ext.removeContainers
+    }
+
+    publish {
+      environment.put "DOCKER_IMAGE_TAG", dockerImageTag
+      projectName = null
+      useComposeFiles = ["docker-compose-mysql.yml", "docker-compose-mssql.yml",
+                         "docker-compose-postgres.yml", "docker-compose-mariadb.yml", ]
+      removeContainers = project.ext.removeContainers
     }
 }
