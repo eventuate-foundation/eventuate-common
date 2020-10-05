@@ -3,9 +3,11 @@ package io.eventuate.common.jdbc.tests;
 import io.eventuate.common.id.IdGenerator;
 import io.eventuate.common.id.Int128;
 import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
+import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.EventuateSchema;
 import io.eventuate.common.jdbc.EventuateTransactionTemplate;
 import io.eventuate.common.json.mapper.JSonMapper;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 
 import javax.sql.DataSource;
@@ -15,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+import static io.eventuate.common.jdbc.EventuateCommonJdbcOperations.EVENT_AUTO_GENERATED_ID_COLUMN;
 import static io.eventuate.common.jdbc.EventuateCommonJdbcOperations.MESSAGE_AUTO_GENERATED_ID_COLUMN;
 
 
@@ -25,30 +28,26 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
   protected abstract EventuateTransactionTemplate getEventuateTransactionTemplate();
   protected abstract IdGenerator getIdGenerator();
   protected abstract DataSource getDataSource();
+  protected abstract EventuateJdbcStatementExecutor getEventuateJdbcStatementExecutor();
 
   public void testEventuateDuplicateKeyException() {
-    String eventId = generateId();
+    String table = eventuateSchema.qualifyTable("entities");
+
+    String sql = String.format("insert into %s values (?, ?, ?);", table);
+
     String entityId = generateId();
-    String eventData = generateId();
-    String eventType = generateId();
     String entityType = generateId();
-    String triggeringEvent = generateId();
-    String metadata = generateId();
 
     getEventuateTransactionTemplate().executeInTransaction(() -> {
 
-      getEventuateCommonJdbcOperations().insertIntoEventsTable(eventId,
-              entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
-
-      getEventuateCommonJdbcOperations().insertIntoEventsTable(eventId,
-              entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
+      getEventuateJdbcStatementExecutor().update(sql, entityType, entityId, System.nanoTime());
+      getEventuateJdbcStatementExecutor().update(sql, entityType, entityId, System.nanoTime());
 
       return null;
     });
   }
 
   public void testInsertIntoEventsTable() throws SQLException {
-    String eventId = generateId();
     String entityId = generateId();
     String eventData = generateId();
     String eventType = generateId();
@@ -56,18 +55,28 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     String triggeringEvent = generateId();
     String metadata = generateId();
 
-    getEventuateTransactionTemplate().executeInTransaction(() -> {
-      getEventuateCommonJdbcOperations().insertIntoEventsTable(eventId,
-              entityId, eventData, eventType, entityType, Optional.of(triggeringEvent), Optional.of(metadata), eventuateSchema);
+    String eventId = getEventuateTransactionTemplate().executeInTransaction(() ->
+      getEventuateCommonJdbcOperations().insertIntoEventsTable(getIdGenerator(),
+              entityId,
+              eventData,
+              eventType,
+              entityType,
+              Optional.of(triggeringEvent),
+              Optional.of(metadata),
+              eventuateSchema));
 
-      return null;
-    });
-
-    List<Map<String, Object>> events = getEvents(eventId);
+    List<Map<String, Object>> events = getEvents(eventIdToRowId(eventId));
 
     Assert.assertEquals(1, events.size());
 
     Map<String, Object> event = events.get(0);
+
+    boolean eventIdIsEmpty = StringUtils.isEmpty((String) event.get("event_id"));
+    if (getIdGenerator().databaseIdRequired()) {
+      Assert.assertTrue(eventIdIsEmpty);
+    } else {
+      Assert.assertFalse(eventIdIsEmpty);
+    }
 
     Assert.assertEquals(eventType, event.get("event_type"));
     Assert.assertEquals(eventData, event.get("event_data"));
@@ -117,15 +126,16 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     return UUID.randomUUID().toString();
   }
 
-  private List<Map<String, Object>> getEvents(String eventId) {
+  private List<Map<String, Object>> getEvents(IdColumnAndValue idColumnAndValue) {
     String table = eventuateSchema.qualifyTable("events");
-    String sql = String.format("select event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata from %s where event_id = ?", table);
+    String sql = String.format("select event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata from %s where %s = ?",
+            table, idColumnAndValue.getColumn());
 
     try (Connection connection = getDataSource().getConnection();
          PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
 
-      preparedStatement.setString(1, eventId);
+      preparedStatement.setObject(1, idColumnAndValue.getValue());
 
       List<Map<String, Object>> events = new ArrayList<>();
 
@@ -191,6 +201,14 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     }
 
     return new IdColumnAndValue("id", messageId);
+  }
+
+  protected IdColumnAndValue eventIdToRowId(Object eventId) {
+    if (getIdGenerator().databaseIdRequired()) {
+      return new IdColumnAndValue(EVENT_AUTO_GENERATED_ID_COLUMN, Int128.fromString((String)eventId).getHi());
+    }
+
+    return new IdColumnAndValue("event_id", eventId);
   }
 
   protected static class IdColumnAndValue {

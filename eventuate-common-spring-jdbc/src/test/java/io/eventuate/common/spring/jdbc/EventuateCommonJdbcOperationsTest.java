@@ -122,4 +122,9 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
   protected DataSource getDataSource() {
     return dataSource;
   }
+
+  @Override
+  protected EventuateJdbcStatementExecutor getEventuateJdbcStatementExecutor() {
+    return eventuateJdbcStatementExecutor;
+  }
 }

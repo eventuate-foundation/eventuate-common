@@ -11,6 +11,7 @@ import java.util.Optional;
 public class EventuateCommonJdbcOperations {
 
   public static final String MESSAGE_AUTO_GENERATED_ID_COLUMN = "dbid";
+  public static final String EVENT_AUTO_GENERATED_ID_COLUMN = "id";
 
   private EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor;
   private EventuateSqlDialect eventuateSqlDialect;
@@ -21,7 +22,7 @@ public class EventuateCommonJdbcOperations {
     this.eventuateSqlDialect = eventuateSqlDialect;
   }
 
-  public void insertIntoEventsTable(String eventId,
+  public String insertIntoEventsTable(IdGenerator idGenerator,
                                     String entityId,
                                     String eventData,
                                     String eventType,
@@ -31,11 +32,40 @@ public class EventuateCommonJdbcOperations {
                                     EventuateSchema eventuateSchema) {
 
     String table = eventuateSchema.qualifyTable("events");
-    String sql = String.format("INSERT INTO %s (event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata) VALUES (?, ?, ?, ?, ?, ?, ?);", table);
 
-    eventuateJdbcStatementExecutor.update(sql, eventId, eventType, eventData, entityType, entityId, triggeringEvent.orElse(null), metadata.orElse(null));
+    if (idGenerator.databaseIdRequired()) {
+      String sql = String.format("INSERT INTO %s (event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata) VALUES ('', ?, ?, ?, ?, ?, ?);", table);
+
+      Long databaseId = eventuateJdbcStatementExecutor
+              .insertAndReturnGeneratedId(sql,
+                      EVENT_AUTO_GENERATED_ID_COLUMN,
+                      eventType,
+                      eventData,
+                      entityType,
+                      entityId,
+                      triggeringEvent.orElse(null),
+                      metadata.orElse(null));
+
+      return idGenerator.genId(databaseId).asString();
+    }
+    else {
+      String sql = String.format("INSERT INTO %s (event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata) VALUES (?, ?, ?, ?, ?, ?, ?);", table);
+
+      String eventId = idGenerator.genId(null).asString();
+
+      eventuateJdbcStatementExecutor
+              .update(sql,
+                      eventId,
+                      eventType,
+                      eventData,
+                      entityType,
+                      entityId,
+                      triggeringEvent.orElse(null),
+                      metadata.orElse(null));
+
+      return eventId;
+    }
   }
-
 
   public String insertIntoMessageTable(IdGenerator idGenerator,
                                        String payload,

@@ -1,9 +1,11 @@
 package io.eventuate.common.spring.jdbc;
 
+import io.eventuate.common.id.IdGenerator;
 import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
 import io.eventuate.common.jdbc.EventuateSchema;
 import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
 import io.eventuate.common.jdbc.sqldialect.SqlDialectSelector;
+import io.eventuate.common.spring.id.IdGeneratorConfiguration;
 import io.eventuate.common.spring.jdbc.sqldialect.SqlDialectConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,7 +26,9 @@ import java.util.*;
 public class SqlDialectIntegrationTest {
   @Configuration
   @EnableAutoConfiguration
-  @Import({SqlDialectConfiguration.class, EventuateCommonJdbcOperationsConfiguration.class})
+  @Import({SqlDialectConfiguration.class,
+          EventuateCommonJdbcOperationsConfiguration.class,
+          IdGeneratorConfiguration.class})
   public static class Config {}
 
 
@@ -43,6 +47,9 @@ public class SqlDialectIntegrationTest {
 
   @Autowired
   private EventuateCommonJdbcOperations eventuateCommonJdbcOperations;
+
+  @Autowired
+  private IdGenerator idGenerator;
 
   @Test
   public void testAddLimitToSimpleSelect() {
@@ -73,7 +80,7 @@ public class SqlDialectIntegrationTest {
 
     for (int i = 0; i < SELECTABLE_RECORDS; i++)
     {
-      eventuateCommonJdbcOperations.insertIntoEventsTable(generateId(),
+      eventuateCommonJdbcOperations.insertIntoEventsTable(idGenerator,
               generateId(),
               generateId(),
               eventType,
@@ -118,7 +125,7 @@ public class SqlDialectIntegrationTest {
 
   private void prepareRandomData() {
     for (int i = 0; i < DEFAULT_DB_RECORDS; i++) {
-      eventuateCommonJdbcOperations.insertIntoEventsTable(generateId(),
+      eventuateCommonJdbcOperations.insertIntoEventsTable(idGenerator,
               generateId(),
               generateId(),
               generateId(),

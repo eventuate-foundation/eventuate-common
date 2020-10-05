@@ -3,6 +3,7 @@ package io.eventuate.common.micronaut.spring.jdbc;
 import io.eventuate.common.id.IdGenerator;
 import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
 import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
+import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.EventuateTransactionTemplate;
 import io.eventuate.common.jdbc.tests.AbstractEventuateCommonJdbcOperationsTest;
 import io.micronaut.test.annotation.MicronautTest;
@@ -28,6 +29,9 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
 
   @Inject
   private IdGenerator idGenerator;
+
+  @Inject
+  private EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor;
 
   @Test
   @Override
@@ -65,5 +69,10 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
   @Override
   protected IdGenerator getIdGenerator() {
     return idGenerator;
+  }
+
+  @Override
+  protected EventuateJdbcStatementExecutor getEventuateJdbcStatementExecutor() {
+    return eventuateJdbcStatementExecutor;
   }
 }

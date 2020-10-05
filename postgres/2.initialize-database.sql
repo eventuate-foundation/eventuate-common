@@ -10,6 +10,8 @@ CREATE TABLE eventuate.message (
   creation_time BIGINT
 );
 
+CREATE INDEX message_published_idx ON eventuate.message(published, id);
+
 CREATE TABLE eventuate.received_messages (
   consumer_id VARCHAR(1000),
   message_id VARCHAR(1000),
