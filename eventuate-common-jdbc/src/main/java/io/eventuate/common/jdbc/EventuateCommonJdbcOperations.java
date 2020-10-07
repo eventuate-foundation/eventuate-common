@@ -23,18 +23,33 @@ public class EventuateCommonJdbcOperations {
   }
 
   public String insertIntoEventsTable(IdGenerator idGenerator,
+                                      String entityId,
+                                      String eventData,
+                                      String eventType,
+                                      String entityType,
+                                      Optional<String> triggeringEvent,
+                                      Optional<String> metadata,
+                                      EventuateSchema eventuateSchema) {
+
+    return insertIntoEventsTable(idGenerator,
+            entityId, eventData, eventType, entityType, triggeringEvent, metadata, eventuateSchema, false);
+  }
+
+  public String insertIntoEventsTable(IdGenerator idGenerator,
                                     String entityId,
                                     String eventData,
                                     String eventType,
                                     String entityType,
                                     Optional<String> triggeringEvent,
                                     Optional<String> metadata,
-                                    EventuateSchema eventuateSchema) {
+                                    EventuateSchema eventuateSchema,
+                                    boolean published) {
 
     String table = eventuateSchema.qualifyTable("events");
 
     if (idGenerator.databaseIdRequired()) {
-      String sql = String.format("INSERT INTO %s (event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata) VALUES ('', ?, ?, ?, ?, ?, ?);", table);
+      String sql = String.format("INSERT INTO %s (event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata, published)" +
+              " VALUES ('', ?, ?, ?, ?, ?, ?, ?);", table);
 
       Long databaseId = eventuateJdbcStatementExecutor
               .insertAndReturnGeneratedId(sql,
@@ -44,12 +59,14 @@ public class EventuateCommonJdbcOperations {
                       entityType,
                       entityId,
                       triggeringEvent.orElse(null),
-                      metadata.orElse(null));
+                      metadata.orElse(null),
+                      booleanToInt(published));
 
       return idGenerator.genId(databaseId).asString();
     }
     else {
-      String sql = String.format("INSERT INTO %s (event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata) VALUES (?, ?, ?, ?, ?, ?, ?);", table);
+      String sql = String.format("INSERT INTO %s (event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata, published)" +
+              " VALUES (?, ?, ?, ?, ?, ?, ?, ?);", table);
 
       String eventId = idGenerator.genId(null).asString();
 
@@ -61,7 +78,8 @@ public class EventuateCommonJdbcOperations {
                       entityType,
                       entityId,
                       triggeringEvent.orElse(null),
-                      metadata.orElse(null));
+                      metadata.orElse(null),
+                      booleanToInt(published));
 
       return eventId;
     }
@@ -74,6 +92,17 @@ public class EventuateCommonJdbcOperations {
                                        Map<String, String> headers,
                                        EventuateSchema eventuateSchema) {
 
+    return insertIntoMessageTable(idGenerator, payload, destination, currentTimeInMillisecondsSql, headers, eventuateSchema, false);
+  }
+
+  public String insertIntoMessageTable(IdGenerator idGenerator,
+                                       String payload,
+                                       String destination,
+                                       String currentTimeInMillisecondsSql,
+                                       Map<String, String> headers,
+                                       EventuateSchema eventuateSchema,
+                                       boolean published) {
+
     String table = eventuateSchema.qualifyTable("message");
 
     String jsonHeadersColumn = columnToJson(eventuateSchema, "headers");
@@ -81,12 +110,12 @@ public class EventuateCommonJdbcOperations {
 
     if (idGenerator.databaseIdRequired()) {
       return insertIntoMessageTableDatabaseId(idGenerator,
-              table, jsonHeadersColumn, jsonPayloadColumn, currentTimeInMillisecondsSql, payload, destination, headers);
+              table, jsonHeadersColumn, jsonPayloadColumn, currentTimeInMillisecondsSql, payload, destination, headers, published);
     }
     else
     {
       return insertIntoMessageTableApplicationId(idGenerator,
-              table, jsonHeadersColumn, jsonPayloadColumn, currentTimeInMillisecondsSql, payload, destination, headers);
+              table, jsonHeadersColumn, jsonPayloadColumn, currentTimeInMillisecondsSql, payload, destination, headers, published);
     }
   }
 
@@ -97,7 +126,8 @@ public class EventuateCommonJdbcOperations {
                                                      String currentTimeInMillisecondsSql,
                                                      String payload,
                                                      String destination,
-                                                     Map<String, String> headers) {
+                                                     Map<String, String> headers,
+                                                     boolean published) {
 
     headers = new HashMap<>(headers);
 
@@ -105,7 +135,7 @@ public class EventuateCommonJdbcOperations {
 
     headers.put("ID", messageId);
 
-    String sql = String.format("insert into %s(id, destination, headers, payload, creation_time) values(?, ?, %s, %s, %s)",
+    String sql = String.format("insert into %s(id, destination, headers, payload, creation_time, published) values(?, ?, %s, %s, %s, ?)",
             table,
             jsonHeadersColumn,
             jsonPayloadColumn,
@@ -113,7 +143,7 @@ public class EventuateCommonJdbcOperations {
 
     String serializedHeaders = JSonMapper.toJson(headers);
 
-    eventuateJdbcStatementExecutor.update(sql, messageId, destination, serializedHeaders, payload);
+    eventuateJdbcStatementExecutor.update(sql, messageId, destination, serializedHeaders, payload, booleanToInt(published));
 
     return messageId;
   }
@@ -125,9 +155,10 @@ public class EventuateCommonJdbcOperations {
                                                   String currentTimeInMillisecondsSql,
                                                   String payload,
                                                   String destination,
-                                                  Map<String, String> headers) {
+                                                  Map<String, String> headers,
+                                                  boolean published) {
 
-    String sql = String.format("insert into %s(id, destination, headers, payload, creation_time) values('', ?, %s, %s, %s)",
+    String sql = String.format("insert into %s(id, destination, headers, payload, creation_time, published) values('', ?, %s, %s, %s, ?)",
             table,
             jsonHeadersColumn,
             jsonPayloadColumn,
@@ -136,9 +167,13 @@ public class EventuateCommonJdbcOperations {
     String serializedHeaders = JSonMapper.toJson(headers);
 
     long databaseId = eventuateJdbcStatementExecutor.insertAndReturnGeneratedId(sql,
-            MESSAGE_AUTO_GENERATED_ID_COLUMN, destination, serializedHeaders, payload);
+            MESSAGE_AUTO_GENERATED_ID_COLUMN, destination, serializedHeaders, payload, booleanToInt(published));
 
     return idGenerator.genId(databaseId).asString();
+  }
+
+  private int booleanToInt(boolean bool) {
+    return bool ? 1 : 0;
   }
 
   private String columnToJson(EventuateSchema eventuateSchema, String column) {
