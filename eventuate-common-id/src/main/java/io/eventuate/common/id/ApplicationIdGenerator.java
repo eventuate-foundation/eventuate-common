@@ -3,6 +3,7 @@ package io.eventuate.common.id;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,5 +81,10 @@ public class ApplicationIdGenerator implements IdGenerator {
   @Override
   public synchronized Int128 genId(Long databaseId) {
     return genIdInternal();
+  }
+
+  @Override
+  public Optional<Int128> incrementIdIfPossible(Int128 anchorId) {
+    return Optional.of(genId(null));
   }
 }

@@ -83,7 +83,7 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
     String rawPayload = "\"" + payloadData + "\"";
 
     String messageId = eventuateCommonJdbcOperations
-            .insertIntoMessageTable(idGenerator, rawPayload, "", "0", Collections.emptyMap(), eventuateSchema);
+            .insertIntoMessageTable(idGenerator, rawPayload, "", Collections.emptyMap(), eventuateSchema);
 
     IdColumnAndValue idColumnAndValue = messageIdToRowId(messageId);
 

@@ -98,7 +98,6 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
       getEventuateCommonJdbcOperations().insertIntoMessageTable(getIdGenerator(),
               payload,
               destination,
-              String.valueOf(time),
               expectedHeaders,
               eventuateSchema));
 
@@ -118,7 +117,8 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
 
     Assert.assertEquals(destination, event.get("destination"));
     Assert.assertEquals(payload, event.get("payload"));
-    Assert.assertEquals(time, event.get("creation_time"));
+    //since time is generated automatically now, it is hard to predict accurate time. So there is estimated time is used (5 min accuracy)
+    Assert.assertTrue(System.currentTimeMillis() - (long) event.get("creation_time") < 5 * 60 * 1000);
     Assert.assertEquals(expectedHeaders, actualHeaders);
   }
 

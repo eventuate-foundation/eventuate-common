@@ -88,17 +88,15 @@ public class EventuateCommonJdbcOperations {
   public String insertIntoMessageTable(IdGenerator idGenerator,
                                        String payload,
                                        String destination,
-                                       String currentTimeInMillisecondsSql,
                                        Map<String, String> headers,
                                        EventuateSchema eventuateSchema) {
 
-    return insertIntoMessageTable(idGenerator, payload, destination, currentTimeInMillisecondsSql, headers, eventuateSchema, false);
+    return insertIntoMessageTable(idGenerator, payload, destination, headers, eventuateSchema, false);
   }
 
   public String insertIntoMessageTable(IdGenerator idGenerator,
                                        String payload,
                                        String destination,
-                                       String currentTimeInMillisecondsSql,
                                        Map<String, String> headers,
                                        EventuateSchema eventuateSchema,
                                        boolean published) {
@@ -110,12 +108,12 @@ public class EventuateCommonJdbcOperations {
 
     if (idGenerator.databaseIdRequired()) {
       return insertIntoMessageTableDatabaseId(idGenerator,
-              table, jsonHeadersColumn, jsonPayloadColumn, currentTimeInMillisecondsSql, payload, destination, headers, published);
+              table, jsonHeadersColumn, jsonPayloadColumn, payload, destination, headers, published);
     }
     else
     {
       return insertIntoMessageTableApplicationId(idGenerator,
-              table, jsonHeadersColumn, jsonPayloadColumn, currentTimeInMillisecondsSql, payload, destination, headers, published);
+              table, jsonHeadersColumn, jsonPayloadColumn, payload, destination, headers, published);
     }
   }
 
@@ -123,7 +121,6 @@ public class EventuateCommonJdbcOperations {
                                                      String table,
                                                      String jsonHeadersColumn,
                                                      String jsonPayloadColumn,
-                                                     String currentTimeInMillisecondsSql,
                                                      String payload,
                                                      String destination,
                                                      Map<String, String> headers,
@@ -139,7 +136,7 @@ public class EventuateCommonJdbcOperations {
             table,
             jsonHeadersColumn,
             jsonPayloadColumn,
-            currentTimeInMillisecondsSql);
+            eventuateSqlDialect.getCurrentTimeInMillisecondsExpression());
 
     String serializedHeaders = JSonMapper.toJson(headers);
 
@@ -152,7 +149,6 @@ public class EventuateCommonJdbcOperations {
                                                   String table,
                                                   String jsonHeadersColumn,
                                                   String jsonPayloadColumn,
-                                                  String currentTimeInMillisecondsSql,
                                                   String payload,
                                                   String destination,
                                                   Map<String, String> headers,
@@ -162,7 +158,7 @@ public class EventuateCommonJdbcOperations {
             table,
             jsonHeadersColumn,
             jsonPayloadColumn,
-            currentTimeInMillisecondsSql);
+            eventuateSqlDialect.getCurrentTimeInMillisecondsExpression());
 
     String serializedHeaders = JSonMapper.toJson(headers);
 
