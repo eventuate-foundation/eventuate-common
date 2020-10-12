@@ -94,7 +94,16 @@ public class EventuateCommonJdbcOperations {
     return insertIntoMessageTable(idGenerator, payload, destination, headers, eventuateSchema, false);
   }
 
-  public String insertIntoMessageTable(IdGenerator idGenerator,
+  public String insertPublishedMessageIntoMessageTable(IdGenerator idGenerator,
+                                       String payload,
+                                       String destination,
+                                       Map<String, String> headers,
+                                       EventuateSchema eventuateSchema) {
+
+    return insertIntoMessageTable(idGenerator, payload, destination, headers, eventuateSchema, true);
+  }
+
+  private String insertIntoMessageTable(IdGenerator idGenerator,
                                        String payload,
                                        String destination,
                                        Map<String, String> headers,
