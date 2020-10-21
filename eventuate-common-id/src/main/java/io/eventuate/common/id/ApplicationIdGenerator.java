@@ -3,11 +3,12 @@ package io.eventuate.common.id;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class IdGeneratorImpl implements IdGenerator {
+public class ApplicationIdGenerator implements IdGenerator {
 
   private Logger logger = LoggerFactory.getLogger(getClass());
   private static final long MAX_COUNTER = 1 << 16;
@@ -17,7 +18,7 @@ public class IdGeneratorImpl implements IdGenerator {
   private long counter = 0;
 
 
-  public IdGeneratorImpl() {
+  public ApplicationIdGenerator() {
     try {
       macAddress = getMacAddress();
       logger.debug("Mac address {}", macAddress);
@@ -26,6 +27,11 @@ public class IdGeneratorImpl implements IdGenerator {
     } catch (SocketException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public boolean databaseIdRequired() {
+    return false;
   }
 
   private Long getMacAddress() throws SocketException {
@@ -73,7 +79,12 @@ public class IdGeneratorImpl implements IdGenerator {
   }
 
   @Override
-  public synchronized Int128 genId() {
+  public synchronized Int128 genId(Long databaseId) {
     return genIdInternal();
+  }
+
+  @Override
+  public Optional<Int128> incrementIdIfPossible(Int128 anchorId) {
+    return Optional.of(genId(null));
   }
 }

@@ -11,28 +11,51 @@ if [ "$1" = "--clean" ] ; then
   shift
 fi
 
-docker="./gradlew ${DATABASE?}Compose"
-dockerjson="./gradlew ${DATABASE?}jsonCompose"
+function testJdbc() {
+  ${docker}Up
 
+  ./gradlew $* :eventuate-common-micronaut-data-jdbc:cleanTest :eventuate-common-micronaut-data-jdbc:test \
+  :eventuate-common-micronaut-spring-jdbc:cleanTest :eventuate-common-micronaut-spring-jdbc:test \
+  :eventuate-common-spring-jdbc:cleanTest :eventuate-common-spring-jdbc:test
+
+  ${docker}Down
+}
+
+docker="./gradlew ${DATABASE?}Compose"
 ${docker}Down
-${dockerjson}Down
 
 ./gradlew ${GRADLE_OPTS} testClasses
 
+
+
+echo ""
+echo "TESTING REGULAR DATABASE"
+echo ""
+
 ${docker}UP
-
 ./gradlew $* cleanTest build
-
 ${docker}Down
 
-cd ${DATABASE}
-sh ./build-docker.sh
-cd ..
+echo ""
+echo "TESTING DATABASE WITH DBID WITH APPLICATION ID GENERATION"
+echo ""
 
-${dockerjson}Up
+export USE_DB_ID=true
+testJdbc
 
-./gradlew $* :eventuate-common-micronaut-data-jdbc:cleanTest :eventuate-common-micronaut-data-jdbc:test \
-:eventuate-common-micronaut-spring-jdbc:cleanTest :eventuate-common-micronaut-spring-jdbc:test \
-:eventuate-common-spring-jdbc:cleanTest :eventuate-common-spring-jdbc:test
+echo ""
+echo "TESTING DATABASE WITH DBID WITH DATABASE ID GENERATION"
+echo ""
 
-${dockerjson}Down
+export EVENTUATE_OUTBOX_ID=1
+testJdbc
+
+echo ""
+echo "TESTING DATABASE WITH JSON SUPPORT"
+echo ""
+
+unset USE_DB_ID
+unset EVENTUATE_OUTBOX_ID
+export USE_JSON_PAYLOAD_AND_HEADERS=true
+testJdbc
+

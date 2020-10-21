@@ -1,9 +1,11 @@
 package io.eventuate.common.spring.jdbc;
 
+import io.eventuate.common.id.IdGenerator;
 import io.eventuate.common.jdbc.*;
 import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
 import io.eventuate.common.jdbc.sqldialect.SqlDialectSelector;
 import io.eventuate.common.jdbc.tests.AbstractEventuateCommonJdbcOperationsTest;
+import io.eventuate.common.spring.id.IdGeneratorConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +29,7 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
 
   @Configuration
   @EnableAutoConfiguration
-  @Import(EventuateCommonJdbcOperationsConfiguration.class)
+  @Import({EventuateCommonJdbcOperationsConfiguration.class, IdGeneratorConfiguration.class})
   public static class Config {
   }
 
@@ -52,6 +54,9 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
   @Autowired
   private SqlDialectSelector sqlDialectSelector;
 
+  @Autowired
+  private IdGenerator idGenerator;
+
   @Test(expected = EventuateDuplicateKeyException.class)
   @Override
   public void testEventuateDuplicateKeyException() {
@@ -74,13 +79,17 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
   public void testJsonColumnToStringConversion() {
     EventuateSchema eventuateSchema = new EventuateSchema();
 
-    String messageId = generateId();
     String payloadData = generateId();
     String rawPayload = "\"" + payloadData + "\"";
 
-    eventuateCommonJdbcOperations.insertIntoMessageTable(messageId, rawPayload, "", "0", Collections.emptyMap(), eventuateSchema);
+    String messageId = eventuateCommonJdbcOperations
+            .insertIntoMessageTable(idGenerator, rawPayload, "", Collections.emptyMap(), eventuateSchema);
 
-    SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(String.format("select payload from %s where id = ?", eventuateSchema.qualifyTable("message")), messageId);
+    IdColumnAndValue idColumnAndValue = messageIdToRowId(messageId);
+
+    SqlRowSet sqlRowSet = jdbcTemplate
+            .queryForRowSet(String.format("select payload from %s where %s = ?",
+                    eventuateSchema.qualifyTable("message"), idColumnAndValue.getColumn()), idColumnAndValue.getValue());
 
     sqlRowSet.next();
 
@@ -105,7 +114,17 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
   }
 
   @Override
+  protected IdGenerator getIdGenerator() {
+    return idGenerator;
+  }
+
+  @Override
   protected DataSource getDataSource() {
     return dataSource;
+  }
+
+  @Override
+  protected EventuateJdbcStatementExecutor getEventuateJdbcStatementExecutor() {
+    return eventuateJdbcStatementExecutor;
   }
 }

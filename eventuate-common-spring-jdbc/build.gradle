@@ -2,6 +2,8 @@ apply plugin: PublicModulePlugin
 
 dependencies {
     compile project (":eventuate-common-common-spring-jdbc")
+
+    testCompile project (":eventuate-common-spring-id")
     testCompile project (":eventuate-common-jdbc-tests")
 
     compile "org.springframework.boot:spring-boot-starter:$springBootVersion"
