@@ -7,6 +7,7 @@ services:
 
   mssql:
     build: ./mssql
+    image: eventuateio/eventuate-mssql:$DOCKER_IMAGE_TAG
     ports:
       - 1433:1433
     environment:
