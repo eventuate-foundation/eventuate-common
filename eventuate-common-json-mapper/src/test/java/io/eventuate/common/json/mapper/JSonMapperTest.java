@@ -5,6 +5,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
@@ -86,9 +87,39 @@ public class JSonMapperTest {
     }
   }
 
+  static class SomeEventWithInstant{
+    private Int128 id;
+    private Instant timestamp;
+
+    public SomeEventWithInstant() {
+    }
+
+    public SomeEventWithInstant(Int128 id, Instant timestamp) {
+      this.id = id;
+      this.timestamp = timestamp;
+    }
+
+    public Int128 getId() {
+      return id;
+    }
+
+    public void setId(Int128 id) {
+      this.id = id;
+    }
+
+    public Instant getTimestamp() {
+      return timestamp;
+    }
+
+    public void setTimestamp(Instant timestamp) {
+      this.timestamp = timestamp;
+    }
+  }
 
   private final String amountAsString = "1345.13";
   private SomeEvent original = new SomeEvent(new Int128(5, 7), new BigDecimal(amountAsString), "foo");
+  private final Instant timestmap = Instant.now();
+  private SomeEventWithInstant someEventWithInstant = new SomeEventWithInstant(new Int128(5, 7), timestmap);
 
 
   @Test
@@ -119,5 +150,13 @@ public class JSonMapperTest {
     SubsetEvent x = JSonMapper.fromJson(s, SubsetEvent.class);
     assertEquals(original.getId(), x.getId());
     assertEquals(amountAsString, x.getAmount());
+  }
+
+  @Test
+  public void shouldConvertInstant(){
+    String s = JSonMapper.toJson(someEventWithInstant);
+    SomeEventWithInstant x = JSonMapper.fromJson(s, SomeEventWithInstant.class);
+    assertEquals(original.getId(), x.getId());
+    assertEquals(timestmap, x.getTimestamp());
   }
 }

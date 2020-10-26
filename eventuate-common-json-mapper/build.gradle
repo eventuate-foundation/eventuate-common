@@ -6,6 +6,8 @@ dependencies {
     compile "commons-lang:commons-lang:2.6"
     compile "com.fasterxml.jackson.core:jackson-databind:2.10.2"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.10.2"
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.2'
+
 }
 
 test {
