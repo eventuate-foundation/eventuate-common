@@ -35,7 +35,20 @@ public class EventuateCommonJdbcOperations {
             entityId, eventData, eventType, entityType, triggeringEvent, metadata, eventuateSchema, false);
   }
 
-  public String insertIntoEventsTable(IdGenerator idGenerator,
+  public String insertPublishedEventIntoEventsTable(IdGenerator idGenerator,
+                                      String entityId,
+                                      String eventData,
+                                      String eventType,
+                                      String entityType,
+                                      Optional<String> triggeringEvent,
+                                      Optional<String> metadata,
+                                      EventuateSchema eventuateSchema) {
+
+    return insertIntoEventsTable(idGenerator,
+            entityId, eventData, eventType, entityType, triggeringEvent, metadata, eventuateSchema, true);
+  }
+
+  private String insertIntoEventsTable(IdGenerator idGenerator,
                                     String entityId,
                                     String eventData,
                                     String eventType,
