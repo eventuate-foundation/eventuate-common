@@ -8,7 +8,10 @@ CREATE TABLE new_message (
   payload LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   published SMALLINT DEFAULT 0,
   creation_time BIGINT
-) AUTO_INCREMENT = <<CURRENT_TIME_IN_MILLISECONDS>>;
+);
+
+INSERT INTO new_message (id, dbid, destination, headers, payload, published, creation_time)
+    VALUES ('', ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000), '', '\"\"', '\"\"', 1, ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000));
 
 INSERT INTO new_message (id, destination, headers, payload, published, creation_time)
     SELECT id, destination, headers, payload, published, creation_time FROM message;
@@ -16,7 +19,6 @@ INSERT INTO new_message (id, destination, headers, payload, published, creation_
 DROP TABLE message;
 
 ALTER TABLE new_message RENAME TO message;
-
 
 CREATE INDEX message_published_idx ON message(published, dbid);
 
@@ -30,7 +32,10 @@ create table new_events (
   triggering_event VARCHAR(1000),
   metadata VARCHAR(1000),
   published TINYINT DEFAULT 0
-) AUTO_INCREMENT = <<CURRENT_TIME_IN_MILLISECONDS>>;
+);
+
+INSERT INTO new_events (id, event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata, published)
+    VALUES (ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000), '', '', '', '', '', '', '', 1);
 
 INSERT INTO new_events (event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata, published)
     SELECT event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata, published FROM events;
