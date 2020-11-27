@@ -11,7 +11,7 @@ CREATE TABLE new_message (
 );
 
 INSERT INTO new_message (id, dbid, destination, headers, payload, published, creation_time)
-    VALUES ('', ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000), '', '\"\"', '\"\"', 1, ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000));
+    VALUES ('', ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000), 'CDC-IGNORED', '{}', '\"ID-GENERATION-STARTING-VALUE\"', 1, ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000));
 
 INSERT INTO new_message (id, destination, headers, payload, published, creation_time)
     SELECT id, destination, headers, payload, published, creation_time FROM message;
@@ -35,7 +35,7 @@ create table new_events (
 );
 
 INSERT INTO new_events (id, event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata, published)
-    VALUES (ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000), '', '', '', '', '', '', '', 1);
+    VALUES (ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000), '', 'CDC-IGNORED', 'ID-GENERATION-STARTING-VALUE', 'CDC-IGNORED', 'CDC-IGNORED', '', '', 1);
 
 INSERT INTO new_events (event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata, published)
     SELECT event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata, published FROM events;
