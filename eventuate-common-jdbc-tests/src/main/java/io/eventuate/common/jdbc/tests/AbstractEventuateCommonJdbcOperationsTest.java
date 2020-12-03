@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import static io.eventuate.common.jdbc.EventuateCommonJdbcOperations.EVENT_AUTO_GENERATED_ID_COLUMN;
 import static io.eventuate.common.jdbc.EventuateCommonJdbcOperations.MESSAGE_AUTO_GENERATED_ID_COLUMN;
@@ -90,7 +91,6 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
   public void testInsertIntoMessageTable() throws SQLException {
     String payload = "\"" + generateId() + "\"";
     String destination = generateId();
-    long time = System.nanoTime();
     Map<String, String> expectedHeaders = new HashMap<>();
     expectedHeaders.put("header1k", "header1v");
     expectedHeaders.put("header2k", "header2v");
@@ -121,6 +121,37 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     //since time is generated automatically now, it is hard to predict accurate time. So there is estimated time is used (5 min accuracy)
     Assert.assertTrue(System.currentTimeMillis() - (long) event.get("creation_time") < 5 * 60 * 1000);
     Assert.assertEquals(expectedHeaders, actualHeaders);
+  }
+
+  protected void testGeneratedIdOfEventsTableRow() {
+    testGeneratedId(() ->
+            getEventuateTransactionTemplate().executeInTransaction(() ->
+                    (long)eventIdToRowId(getEventuateCommonJdbcOperations().insertIntoEventsTable(getIdGenerator(),
+                            generateId(),
+                            generateId(),
+                            generateId(),
+                            generateId(),
+                            Optional.of(generateId()),
+                            Optional.of(generateId()),
+                            eventuateSchema)).getValue()));
+  }
+
+  protected void testGeneratedIdOfMessageTableRow() {
+    testGeneratedId(() ->
+      getEventuateTransactionTemplate().executeInTransaction(() ->
+              (long)messageIdToRowId(getEventuateCommonJdbcOperations().insertIntoMessageTable(getIdGenerator(),
+                      "\"" + generateId() + "\"",
+                      generateId(),
+                      Collections.emptyMap(),
+                      eventuateSchema)).getValue()));
+  }
+
+  private void testGeneratedId(Supplier<Long> insertOperation) {
+    if (!getIdGenerator().databaseIdRequired()) return; //nothing to do
+
+    long rowId = insertOperation.get();
+
+    assertIdSequenceUsesCurrentTimeAsStartingValue(rowId);
   }
 
   protected String generateId() {
@@ -198,11 +229,7 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
 
   protected IdColumnAndValue messageIdToRowId(String messageId) {
     if (getIdGenerator().databaseIdRequired()) {
-      long rowId = extractRowIdFromEventId(messageId);
-
-      assertIdSequenceUsesCurrentTimeAsStartingValue(rowId);
-
-      return new IdColumnAndValue(MESSAGE_AUTO_GENERATED_ID_COLUMN, rowId);
+      return new IdColumnAndValue(MESSAGE_AUTO_GENERATED_ID_COLUMN, extractRowIdFromEventId(messageId));
     }
 
     return new IdColumnAndValue("id", messageId);
@@ -210,11 +237,7 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
 
   protected IdColumnAndValue eventIdToRowId(String eventId) {
     if (getIdGenerator().databaseIdRequired()) {
-      long rowId = extractRowIdFromEventId(eventId);
-
-      assertIdSequenceUsesCurrentTimeAsStartingValue(rowId);
-
-      return new IdColumnAndValue(EVENT_AUTO_GENERATED_ID_COLUMN, rowId);
+      return new IdColumnAndValue(EVENT_AUTO_GENERATED_ID_COLUMN, extractRowIdFromEventId(eventId));
     }
 
     return new IdColumnAndValue("event_id", eventId);
@@ -224,14 +247,15 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     return Int128.fromString(id).getHi();
   }
 
-
   //(database id generation) The auto generated values must greater than any existing message IDs
   //https://github.com/eventuate-foundation/eventuate-common/issues/53
   private void assertIdSequenceUsesCurrentTimeAsStartingValue(long id) {
     final long precision = TimeUnit.HOURS.toMillis(1);
 
-    Assert.assertTrue("Row id should start from current time in milliseconds after migration",
-            System.currentTimeMillis() - id < precision);
+    long currentTime = System.currentTimeMillis();
+
+    Assert.assertTrue(String.format("Row id should start from current time in milliseconds after migration (current time: %s, id: %s)", currentTime, id),
+            currentTime - id < precision);
   }
 
   protected static class IdColumnAndValue {

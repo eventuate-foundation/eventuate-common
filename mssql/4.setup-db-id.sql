@@ -23,7 +23,7 @@ SET IDENTITY_INSERT eventuate.new_message OFF;
 GO
 
 INSERT INTO eventuate.new_message (id, destination, headers, payload, published, creation_time)
-    SELECT id, destination, headers, payload, published, creation_time FROM eventuate.message;
+    SELECT id, destination, headers, payload, published, creation_time FROM eventuate.message ORDER BY id;
 GO
 
 DROP TABLE eventuate.message;
@@ -59,7 +59,7 @@ SET IDENTITY_INSERT eventuate.new_events OFF;
 GO
 
 INSERT INTO eventuate.new_events (event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata, published)
-    SELECT event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata, published FROM eventuate.events;
+    SELECT event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata, published FROM eventuate.events ORDER BY event_id;
 GO
 
 DROP TABLE eventuate.events;
