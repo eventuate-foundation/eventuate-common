@@ -15,7 +15,7 @@ CREATE TABLE eventuate.new_message (
 ALTER SEQUENCE eventuate.message_table_id_sequence OWNED BY eventuate.new_message.dbid;
 
 INSERT INTO eventuate.new_message (id, destination, headers, payload, published, creation_time)
-    SELECT id, destination, headers, payload, published, creation_time FROM eventuate.message;
+    SELECT id, destination, headers, payload, published, creation_time FROM eventuate.message ORDER BY id;
 
 DROP TABLE eventuate.message;
 
@@ -40,7 +40,7 @@ CREATE TABLE eventuate.new_events (
 ALTER SEQUENCE eventuate.events_table_id_sequence OWNED BY eventuate.new_events.id;
 
 INSERT INTO eventuate.new_events (event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata, published)
-    SELECT event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata, published FROM eventuate.events;
+    SELECT event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata, published FROM eventuate.events ORDER BY event_id;
 
 DROP TABLE eventuate.events;
 
