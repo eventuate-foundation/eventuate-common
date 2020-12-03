@@ -65,6 +65,18 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
 
   @Test
   @Override
+  public void testGeneratedIdOfEventsTableRow() {
+    super.testGeneratedIdOfEventsTableRow();
+  }
+
+  @Test
+  @Override
+  public void testGeneratedIdOfMessageTableRow() {
+    super.testGeneratedIdOfMessageTableRow();
+  }
+
+  @Test
+  @Override
   public void testInsertIntoEventsTable() throws SQLException {
     super.testInsertIntoEventsTable();
   }
