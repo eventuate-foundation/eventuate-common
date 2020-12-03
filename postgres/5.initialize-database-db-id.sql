@@ -1,12 +1,18 @@
+CREATE SEQUENCE eventuate.message_table_id_sequence START 1;
+
+select setval('eventuate.message_table_id_sequence', (ROUND(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) * 1000))::BIGINT);
+
 CREATE TABLE eventuate.new_message (
   id VARCHAR(1000),
-  dbid bigserial PRIMARY KEY,
+  dbid BIGINT NOT NULL DEFAULT nextval('eventuate.message_table_id_sequence') PRIMARY KEY,
   destination TEXT NOT NULL,
   headers TEXT NOT NULL,
   payload TEXT NOT NULL,
   published SMALLINT DEFAULT 0,
   creation_time BIGINT
 );
+
+ALTER SEQUENCE eventuate.message_table_id_sequence OWNED BY eventuate.new_message.dbid;
 
 INSERT INTO eventuate.new_message (id, destination, headers, payload, published, creation_time)
     SELECT id, destination, headers, payload, published, creation_time FROM eventuate.message;
@@ -15,8 +21,12 @@ DROP TABLE eventuate.message;
 
 ALTER TABLE eventuate.new_message RENAME TO message;
 
+CREATE SEQUENCE eventuate.events_table_id_sequence START 1;
+
+select setval('eventuate.events_table_id_sequence', (ROUND(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) * 1000))::BIGINT);
+
 CREATE TABLE eventuate.new_events (
-  id bigserial PRIMARY KEY,
+  id BIGINT NOT NULL DEFAULT nextval('eventuate.events_table_id_sequence') PRIMARY KEY,
   event_id VARCHAR(1000),
   event_type VARCHAR(1000),
   event_data VARCHAR(1000) NOT NULL,
@@ -26,6 +36,8 @@ CREATE TABLE eventuate.new_events (
   metadata VARCHAR(1000),
   published SMALLINT DEFAULT 0
 );
+
+ALTER SEQUENCE eventuate.events_table_id_sequence OWNED BY eventuate.new_events.id;
 
 INSERT INTO eventuate.new_events (event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata, published)
     SELECT event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata, published FROM eventuate.events;

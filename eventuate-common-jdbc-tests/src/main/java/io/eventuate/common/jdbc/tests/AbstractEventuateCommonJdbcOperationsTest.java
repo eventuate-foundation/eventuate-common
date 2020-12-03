@@ -16,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static io.eventuate.common.jdbc.EventuateCommonJdbcOperations.EVENT_AUTO_GENERATED_ID_COLUMN;
 import static io.eventuate.common.jdbc.EventuateCommonJdbcOperations.MESSAGE_AUTO_GENERATED_ID_COLUMN;
@@ -195,20 +196,42 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     }
   }
 
-  protected IdColumnAndValue messageIdToRowId(Object messageId) {
+  protected IdColumnAndValue messageIdToRowId(String messageId) {
     if (getIdGenerator().databaseIdRequired()) {
-      return new IdColumnAndValue(MESSAGE_AUTO_GENERATED_ID_COLUMN, Int128.fromString((String)messageId).getHi());
+      long rowId = extractRowIdFromEventId(messageId);
+
+      assertIdSequenceUsesCurrentTimeAsStartingValue(rowId);
+
+      return new IdColumnAndValue(MESSAGE_AUTO_GENERATED_ID_COLUMN, rowId);
     }
 
     return new IdColumnAndValue("id", messageId);
   }
 
-  protected IdColumnAndValue eventIdToRowId(Object eventId) {
+  protected IdColumnAndValue eventIdToRowId(String eventId) {
     if (getIdGenerator().databaseIdRequired()) {
-      return new IdColumnAndValue(EVENT_AUTO_GENERATED_ID_COLUMN, Int128.fromString((String)eventId).getHi());
+      long rowId = extractRowIdFromEventId(eventId);
+
+      assertIdSequenceUsesCurrentTimeAsStartingValue(rowId);
+
+      return new IdColumnAndValue(EVENT_AUTO_GENERATED_ID_COLUMN, rowId);
     }
 
     return new IdColumnAndValue("event_id", eventId);
+  }
+
+  private long extractRowIdFromEventId(String id) {
+    return Int128.fromString(id).getHi();
+  }
+
+
+  //(database id generation) The auto generated values must greater than any existing message IDs
+  //https://github.com/eventuate-foundation/eventuate-common/issues/53
+  private void assertIdSequenceUsesCurrentTimeAsStartingValue(long id) {
+    final long precision = TimeUnit.HOURS.toMillis(1);
+
+    Assert.assertTrue("Row id should start from current time in milliseconds after migration",
+            System.currentTimeMillis() - id < precision);
   }
 
   protected static class IdColumnAndValue {
