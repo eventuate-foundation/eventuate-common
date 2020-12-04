@@ -6,6 +6,7 @@ import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
 import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.EventuateSchema;
 import io.eventuate.common.jdbc.EventuateTransactionTemplate;
+import io.eventuate.common.jdbc.sqldialect.MySqlDialect;
 import io.eventuate.common.json.mapper.JSonMapper;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
@@ -124,30 +125,56 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
   }
 
   protected void testGeneratedIdOfEventsTableRow() {
-    testGeneratedId(() ->
-            getEventuateTransactionTemplate().executeInTransaction(() ->
-                    (long)eventIdToRowId(getEventuateCommonJdbcOperations().insertIntoEventsTable(getIdGenerator(),
-                            generateId(),
-                            generateId(),
-                            generateId(),
-                            generateId(),
-                            Optional.of(generateId()),
-                            Optional.of(generateId()),
-                            eventuateSchema)).getValue()));
+    testGeneratedId(this::insertRandomEvent, this::assertIdAnchorEventCreated);
+  }
+
+  private long insertRandomEvent() {
+    return getEventuateTransactionTemplate().executeInTransaction(() ->
+            (long)eventIdToRowId(getEventuateCommonJdbcOperations().insertIntoEventsTable(getIdGenerator(),
+                    generateId(),
+                    generateId(),
+                    generateId(),
+                    generateId(),
+                    Optional.of(generateId()),
+                    Optional.of(generateId()),
+                    eventuateSchema)).getValue());
+  }
+
+  private void assertIdAnchorEventCreated() {
+    if (getEventuateCommonJdbcOperations().getEventuateSqlDialect() instanceof MySqlDialect) {
+      List<Map<String, Object>> anchorEvents =
+              getEventuateJdbcStatementExecutor().queryForList("select * from eventuate.events where event_type = 'CDC-IGNORED'");
+
+      Assert.assertEquals(1, anchorEvents.size());
+    }
   }
 
   protected void testGeneratedIdOfMessageTableRow() {
-    testGeneratedId(() ->
-      getEventuateTransactionTemplate().executeInTransaction(() ->
-              (long)messageIdToRowId(getEventuateCommonJdbcOperations().insertIntoMessageTable(getIdGenerator(),
-                      "\"" + generateId() + "\"",
-                      generateId(),
-                      Collections.emptyMap(),
-                      eventuateSchema)).getValue()));
+    testGeneratedId(this::insertRandomMessage, this::assertIdAnchorMessageCreated);
   }
 
-  private void testGeneratedId(Supplier<Long> insertOperation) {
+  private long insertRandomMessage() {
+    return getEventuateTransactionTemplate().executeInTransaction(() ->
+            (long)messageIdToRowId(getEventuateCommonJdbcOperations().insertIntoMessageTable(getIdGenerator(),
+                    "\"" + generateId() + "\"",
+                    generateId(),
+                    Collections.emptyMap(),
+                    eventuateSchema)).getValue());
+  }
+
+  private void assertIdAnchorMessageCreated() {
+    if (getEventuateCommonJdbcOperations().getEventuateSqlDialect() instanceof MySqlDialect) {
+      List<Map<String, Object>> anchorMessages =
+              getEventuateJdbcStatementExecutor().queryForList("select * from eventuate.message where destination = 'CDC-IGNORED'");
+
+      Assert.assertEquals(1, anchorMessages.size());
+    }
+  }
+
+  private void testGeneratedId(Supplier<Long> insertOperation, Runnable idAnchorVerificationCallback) {
     if (!getIdGenerator().databaseIdRequired()) return; //nothing to do
+
+    idAnchorVerificationCallback.run();
 
     long rowId = insertOperation.get();
 
