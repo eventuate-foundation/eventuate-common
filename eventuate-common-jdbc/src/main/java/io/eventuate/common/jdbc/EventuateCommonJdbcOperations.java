@@ -22,6 +22,10 @@ public class EventuateCommonJdbcOperations {
     this.eventuateSqlDialect = eventuateSqlDialect;
   }
 
+  public EventuateSqlDialect getEventuateSqlDialect() {
+    return eventuateSqlDialect;
+  }
+
   public String insertIntoEventsTable(IdGenerator idGenerator,
                                       String entityId,
                                       String eventData,
