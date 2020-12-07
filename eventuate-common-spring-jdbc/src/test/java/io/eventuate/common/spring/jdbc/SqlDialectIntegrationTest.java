@@ -55,7 +55,6 @@ public class SqlDialectIntegrationTest {
   public void testAddLimitToSimpleSelect() {
     final int LIMIT = 3;
 
-    clearEventsTable();
     prepareRandomData();
 
     String sqlWithoutLimit = String.format("select * from %s", DEFAULT_EVENTUATE_SCHEMA.qualifyTable("events"));
@@ -64,7 +63,7 @@ public class SqlDialectIntegrationTest {
     List<Map<String, Object>> resultWithLimit = jdbcTemplate.queryForList(sqlWithLimit);
     List<Map<String, Object>> resultWithoutLimit = jdbcTemplate.queryForList(sqlWithoutLimit);
 
-    Assert.assertEquals(DEFAULT_DB_RECORDS, resultWithoutLimit.size());
+    Assert.assertTrue(resultWithoutLimit.size() >= DEFAULT_DB_RECORDS);
     Assert.assertEquals(LIMIT, resultWithLimit.size());
   }
 
@@ -73,7 +72,6 @@ public class SqlDialectIntegrationTest {
     final int LIMIT = 2;
     final int SELECTABLE_RECORDS = 3;
 
-    clearEventsTable();
     prepareRandomData();
 
     String eventType = generateId();
@@ -117,10 +115,6 @@ public class SqlDialectIntegrationTest {
 
   private void assertAllRowsHaveTheSameEventType(List<Map<String, Object>> rows, String eventType) {
     Assert.assertTrue(rows.stream().allMatch(row -> row.get("event_type").equals(eventType)));
-  }
-
-  private void clearEventsTable() {
-    jdbcTemplate.execute(String.format("truncate table %s", DEFAULT_EVENTUATE_SCHEMA.qualifyTable("events")));
   }
 
   private void prepareRandomData() {
