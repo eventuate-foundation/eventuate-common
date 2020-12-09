@@ -4,6 +4,7 @@ set -o pipefail
 
 SCRIPTS="
 ./build-and-test-all-mysql.sh
+./build-and-test-all-mysql8.sh
 ./build-and-test-all-mariadb.sh
 ./build-and-test-all-mssql.sh
 ./build-and-test-all-postgres.sh

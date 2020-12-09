@@ -16,6 +16,7 @@ jobs:
           key: eventuate-common-{{ checksum "gradle.properties" }}
       - run: TERM=dumb ./.circleci/upgrade-docker-compose.sh
       - run: TERM=dumb ./build-and-test-all-mysql.sh
+      - run: TERM=dumb ./build-and-test-all-mysql8.sh
       - run: TERM=dumb ./build-and-test-all-mariadb.sh
       - run: TERM=dumb ./build-and-test-all-mssql.sh
       - run: TERM=dumb ./build-and-test-all-postgres.sh

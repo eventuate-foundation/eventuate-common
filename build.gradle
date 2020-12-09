@@ -73,6 +73,12 @@ dockerCompose {
         removeContainers = project.ext.removeContainers
     }
 
+    mysql8 {
+        projectName = null
+        useComposeFiles = ["docker-compose-mysql8.yml"]
+        removeContainers = project.ext.removeContainers
+    }
+
     mariadb {
         projectName = null
         useComposeFiles = ["docker-compose-mariadb.yml"]
