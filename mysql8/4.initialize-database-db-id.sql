@@ -27,8 +27,8 @@ create table new_events (
   event_id LONGTEXT,
   event_type LONGTEXT,
   event_data LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  entity_type VARCHAR(1000) CHARACTER SET latin1 NOT NULL,
-  entity_id VARCHAR(1000) CHARACTER SET latin1 NOT NULL,
+  entity_type VARCHAR(255) NOT NULL,
+  entity_id VARCHAR(255) NOT NULL,
   triggering_event LONGTEXT,
   metadata LONGTEXT,
   published TINYINT DEFAULT 0
