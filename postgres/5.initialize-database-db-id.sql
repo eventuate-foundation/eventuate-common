@@ -3,8 +3,8 @@ CREATE SEQUENCE eventuate.message_table_id_sequence START 1;
 select setval('eventuate.message_table_id_sequence', (ROUND(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) * 1000))::BIGINT);
 
 CREATE TABLE eventuate.new_message (
-  id VARCHAR(1000),
   dbid BIGINT NOT NULL DEFAULT nextval('eventuate.message_table_id_sequence') PRIMARY KEY,
+  id VARCHAR(1000),
   destination TEXT NOT NULL,
   headers TEXT NOT NULL,
   payload TEXT NOT NULL,

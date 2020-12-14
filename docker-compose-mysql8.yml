@@ -1,14 +1,10 @@
 version: '3'
 services:
-  zookeeper:
-    build: ./zookeeper
-    image: eventuateio/eventuate-zookeeper:$DOCKER_IMAGE_TAG
-    ports:
-      - 2181:2181
-
   mysql:
-    build: mysql8/
-    image: eventuateio/eventuate-mysql:$DOCKER_IMAGE_TAG
+    build:
+      context: ./mysql
+      dockerfile: Dockerfile-mysql8
+    image: eventuateio/eventuate-mysql8:$DOCKER_IMAGE_TAG
     ports:
       - 3306:3306
     environment:

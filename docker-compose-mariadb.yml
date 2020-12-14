@@ -1,12 +1,9 @@
 version: '3'
 services:
-  zookeeper:
-    build: ./zookeeper
-    ports:
-      - 2181:2181
-
   mariadb:
-    build: ./mariadb
+    build:
+      context: ./mysql
+      dockerfile: Dockerfile-mariadb
     image: eventuateio/eventuate-mariadb:$DOCKER_IMAGE_TAG
     ports:
       - 3306:3306

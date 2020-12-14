@@ -1,11 +1,5 @@
 version: '3'
 services:
-  zookeeper:
-    build: ./zookeeper
-    image: eventuateio/eventuate-zookeeper:$DOCKER_IMAGE_TAG
-    ports:
-      - 2181:2181
-
   mysql:
     build: ./mysql/
     image: eventuateio/eventuate-mysql:$DOCKER_IMAGE_TAG
