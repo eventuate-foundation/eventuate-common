@@ -38,7 +38,7 @@ create table eventuate.entities (
 );
 GO
 
-CREATE INDEX entities_idx ON eventuate.events(entity_type, entity_id);
+CREATE INDEX entities_idx ON eventuate.entities(entity_type, entity_id);
 GO
 
 create table eventuate.snapshots (
