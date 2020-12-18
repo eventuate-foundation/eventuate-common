@@ -13,6 +13,9 @@ public class EventuateCommonJdbcOperations {
   public static final String MESSAGE_AUTO_GENERATED_ID_COLUMN = "dbid";
   public static final String EVENT_AUTO_GENERATED_ID_COLUMN = "id";
 
+  public static final String MESSAGE_APPLICATION_GENERATED_ID_COLUMN = "id";
+  public static final String EVENT_APPLICATION_GENERATED_ID_COLUMN = "event_id";
+
   private EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor;
   private EventuateSqlDialect eventuateSqlDialect;
 

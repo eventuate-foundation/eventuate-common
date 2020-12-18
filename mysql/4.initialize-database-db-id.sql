@@ -24,7 +24,7 @@ CREATE INDEX message_published_idx ON message(published, dbid);
 
 create table new_events (
   id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  event_id LONGTEXT,
+  event_id VARCHAR(255),
   event_type LONGTEXT,
   event_data LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   entity_type VARCHAR(255) NOT NULL,

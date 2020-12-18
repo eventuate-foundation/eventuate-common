@@ -127,15 +127,19 @@ public class SqlDialectIntegrationTest {
 
   @Test
   public void testEventsPrimaryKeyColumn() throws SQLException {
-    testPrimaryKeyColumn("events", useDbId ? EventuateCommonJdbcOperations.EVENT_AUTO_GENERATED_ID_COLUMN : "event_id");
+    assertPrimaryKeyColumnEquals("events", useDbId
+            ? EventuateCommonJdbcOperations.EVENT_AUTO_GENERATED_ID_COLUMN
+            : EventuateCommonJdbcOperations.EVENT_APPLICATION_GENERATED_ID_COLUMN);
   }
 
   @Test
   public void testMessagePrimaryKeyColumn() throws SQLException {
-    testPrimaryKeyColumn("message", useDbId ? EventuateCommonJdbcOperations.MESSAGE_AUTO_GENERATED_ID_COLUMN : "id");
+    assertPrimaryKeyColumnEquals("message", useDbId
+            ? EventuateCommonJdbcOperations.MESSAGE_AUTO_GENERATED_ID_COLUMN
+            : EventuateCommonJdbcOperations.MESSAGE_APPLICATION_GENERATED_ID_COLUMN);
   }
 
-  private void testPrimaryKeyColumn(String table, String expectedKeyColumn) throws SQLException {
+  private void assertPrimaryKeyColumnEquals(String table, String expectedKeyColumn) throws SQLException {
     String pkColumn = getDialect()
             .getPrimaryKeyColumn(dataSource, dataSourceUrl, new SchemaAndTable(EventuateSchema.DEFAULT_SCHEMA, table));
 
