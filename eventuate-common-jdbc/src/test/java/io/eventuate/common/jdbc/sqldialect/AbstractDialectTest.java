@@ -10,15 +10,18 @@ import java.util.Optional;
 public abstract class AbstractDialectTest {
   private SqlDialectSelector sqlDialectSelector;
 
+  private String name;
   private String driver;
   private Class<? extends EventuateSqlDialect> expectedDialectClass;
   private String expectedCurrentTimeInMillisecondsExpression;
 
 
-  public AbstractDialectTest(String driver,
+  public AbstractDialectTest(String name,
+                             String driver,
                              Class<? extends EventuateSqlDialect> expectedDialectClass,
                              String expectedCurrentTimeInMillisecondsExpression,
                              Optional<String> customCurrentTimeInMillisecondsExpression) {
+    this.name = name;
     this.driver = driver;
     this.expectedDialectClass = expectedDialectClass;
     this.expectedCurrentTimeInMillisecondsExpression = expectedCurrentTimeInMillisecondsExpression;
@@ -34,14 +37,30 @@ public abstract class AbstractDialectTest {
   }
 
   @Test
-  public void testDialect() {
-    Assert.assertEquals(expectedDialectClass, getDialect().getClass());
+  public void testDialectSelectionByDriver() {
+    Assert.assertEquals(expectedDialectClass, getDialectByDriver().getClass());
 
     Assert.assertEquals(expectedCurrentTimeInMillisecondsExpression,
-            getDialect().getCurrentTimeInMillisecondsExpression());
+            getDialectByDriver().getCurrentTimeInMillisecondsExpression());
   }
 
-  protected EventuateSqlDialect getDialect() {
+  @Test
+  public void testDialectSelectionByName() {
+    Assert.assertEquals(expectedDialectClass, getDialectByName().getClass());
+
+    Assert.assertEquals(expectedCurrentTimeInMillisecondsExpression,
+            getDialectByName().getCurrentTimeInMillisecondsExpression());
+  }
+
+  protected EventuateSqlDialect getDialectByDriver() {
     return sqlDialectSelector.getDialect(driver);
+  }
+
+  protected EventuateSqlDialect getDialectByNameAndDriver() {
+    return sqlDialectSelector.getDialect("other", Optional.of(driver));
+  }
+
+  protected EventuateSqlDialect getDialectByName() {
+    return sqlDialectSelector.getDialect(name, Optional.empty());
   }
 }

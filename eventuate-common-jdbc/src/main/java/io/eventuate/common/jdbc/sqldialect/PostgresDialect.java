@@ -4,20 +4,21 @@ import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.EventuateSchema;
 import org.postgresql.util.PGobject;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class PostgresDialect extends DefaultEventuateSqlDialect {
+public class PostgresDialect extends AbstractEventuateSqlDialect {
 
   private ConcurrentMap<ColumnCacheKey, String> columnTypeCache = new ConcurrentHashMap<>();
 
   public PostgresDialect() {
-    super("(ROUND(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) * 1000))");
-  }
-
-  @Override
-  public boolean supports(String driver) {
-    return "org.postgresql.Driver".equals(driver);
+    super(Optional.of("org.postgresql.Driver"),
+            Collections.unmodifiableSet(new HashSet<>(Arrays.asList("postgresql", "pgsql", "pg"))),
+            "(ROUND(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) * 1000))");
   }
 
   @Override

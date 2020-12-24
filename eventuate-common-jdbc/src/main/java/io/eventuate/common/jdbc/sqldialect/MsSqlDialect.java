@@ -1,9 +1,13 @@
 package io.eventuate.common.jdbc.sqldialect;
 
-public class MsSqlDialect extends DefaultEventuateSqlDialect {
+import java.util.Collections;
+import java.util.Optional;
+
+public class MsSqlDialect extends AbstractEventuateSqlDialect {
 
   public MsSqlDialect() {
-    super("(SELECT DATEDIFF_BIG(ms, '1970-01-01', GETUTCDATE()))");
+    super(Optional.of("com.microsoft.sqlserver.jdbc.SQLServerDriver"),
+            Collections.singleton("mssql"), "(SELECT DATEDIFF_BIG(ms, '1970-01-01', GETUTCDATE()))");
   }
 
   @Override
@@ -12,15 +16,5 @@ public class MsSqlDialect extends DefaultEventuateSqlDialect {
     if (newSql.equals(sql))
       throw new IllegalArgumentException("Didn't replace in " + newSql);
     return newSql;
-  }
-
-  @Override
-  public boolean supports(String driver) {
-    return "com.microsoft.sqlserver.jdbc.SQLServerDriver".equals(driver);
-  }
-
-  @Override
-  public int getOrder() {
-    return Integer.MIN_VALUE;
   }
 }

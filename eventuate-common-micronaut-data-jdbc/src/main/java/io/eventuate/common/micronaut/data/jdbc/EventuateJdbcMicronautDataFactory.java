@@ -1,5 +1,6 @@
 package io.eventuate.common.micronaut.data.jdbc;
 
+import io.eventuate.common.jdbc.EventuateCommonJdbcStatementExecutor;
 import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.EventuateTransactionTemplate;
 import io.micronaut.context.annotation.Factory;
@@ -12,7 +13,7 @@ public class EventuateJdbcMicronautDataFactory {
 
   @Singleton
   public EventuateJdbcStatementExecutor eventuateCommonJdbcOperations(JdbcOperations jdbcOperations) {
-    return new EventuateMicronautDataJdbcStatementExecutor(jdbcOperations);
+    return new EventuateCommonJdbcStatementExecutor(jdbcOperations::getConnection);
   }
 
   @Singleton

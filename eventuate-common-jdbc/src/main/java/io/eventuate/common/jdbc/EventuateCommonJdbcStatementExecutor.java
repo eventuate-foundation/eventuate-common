@@ -1,36 +1,38 @@
-package io.eventuate.common.micronaut.data.jdbc;
-
-import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
-import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
-import io.eventuate.common.jdbc.EventuateRowMapper;
-import io.eventuate.common.jdbc.EventuateSqlException;
-import io.micronaut.data.jdbc.runtime.JdbcOperations;
+package io.eventuate.common.jdbc;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Supplier;
 
-public class EventuateMicronautDataJdbcStatementExecutor implements EventuateJdbcStatementExecutor {
+public class EventuateCommonJdbcStatementExecutor implements EventuateJdbcStatementExecutor {
 
-  private static final Set DUPLICATE_KEY_ERROR_CODES = new HashSet<>(Arrays.asList(
+  private static final Set<Integer> DUPLICATE_KEY_ERROR_CODES = new HashSet<>(Arrays.asList(
           1062, // MySQL
-          2601,2627, // MS-SQL
+          2601, 2627, // MS-SQL
           23505, // Postgres
           23001 // H2
   ));
 
-  private JdbcOperations jdbcOperations;
+  private Supplier<Connection> connectionProvider;
 
-  public EventuateMicronautDataJdbcStatementExecutor(JdbcOperations jdbcOperations) {
-    this.jdbcOperations = jdbcOperations;
+  public EventuateCommonJdbcStatementExecutor(Supplier<Connection> connectionProvider) {
+    this.connectionProvider = connectionProvider;
   }
 
   @Override
   public long insertAndReturnGeneratedId(String sql, String idColumn, Object... parameters) {
-    Connection connection = jdbcOperations.getConnection();
+    Connection connection = connectionProvider.get();
 
     try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -64,7 +66,7 @@ public class EventuateMicronautDataJdbcStatementExecutor implements EventuateJdb
 
   @Override
   public int update(String sql, Object... parameters) {
-    Connection connection = jdbcOperations.getConnection();
+    Connection connection = connectionProvider.get();
 
     try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
@@ -83,7 +85,7 @@ public class EventuateMicronautDataJdbcStatementExecutor implements EventuateJdb
 
   @Override
   public <T> List<T> query(String sql, EventuateRowMapper<T> eventuateRowMapper, Object... parameters) {
-    Connection connection = jdbcOperations.getConnection();
+    Connection connection = connectionProvider.get();
 
     try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
@@ -109,7 +111,7 @@ public class EventuateMicronautDataJdbcStatementExecutor implements EventuateJdb
 
   @Override
   public List<Map<String, Object>> queryForList(String sql, Object... parameters) {
-    Connection connection = jdbcOperations.getConnection();
+    Connection connection = connectionProvider.get();
 
     try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 

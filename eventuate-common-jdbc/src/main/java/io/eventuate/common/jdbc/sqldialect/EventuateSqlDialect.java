@@ -9,6 +9,7 @@ import java.sql.SQLException;
 
 public interface EventuateSqlDialect extends EventuateSqlDialectOrder {
   boolean supports(String driver);
+  boolean accepts(String name);
 
   String getCurrentTimeInMillisecondsExpression();
 

@@ -2,20 +2,17 @@ package io.eventuate.common.jdbc.sqldialect;
 
 import io.eventuate.common.jdbc.JdbcUrlParser;
 
-public class MySqlDialect extends DefaultEventuateSqlDialect {
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Optional;
+
+public class MySqlDialect extends AbstractEventuateSqlDialect {
 
   public MySqlDialect() {
-    super("ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000)");
-  }
-
-  @Override
-  public boolean supports(String driver) {
-    return "com.mysql.cj.jdbc.Driver".equals(driver);
-  }
-
-  @Override
-  public int getOrder() {
-    return Integer.MIN_VALUE;
+    super(Optional.of("com.mysql.cj.jdbc.Driver"),
+            Collections.unmodifiableSet(new HashSet<>(Arrays.asList("mysql", "mariadb"))),
+            "ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000)");
   }
 
   @Override
