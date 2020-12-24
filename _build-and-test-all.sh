@@ -18,6 +18,10 @@ function testJdbc() {
   :eventuate-common-micronaut-spring-jdbc:cleanTest :eventuate-common-micronaut-spring-jdbc:test \
   :eventuate-common-spring-jdbc:cleanTest :eventuate-common-spring-jdbc:test
 
+  if [[ "${DATABASE}" == "mysql" ]]; then
+    ./gradlew $* :eventuate-common-quarkus-jdbc:cleanTest :eventuate-common-quarkus-jdbc:test
+  fi
+
   ${docker}Down
 }
 
@@ -33,7 +37,13 @@ echo "TESTING REGULAR DATABASE"
 echo ""
 
 ${docker}UP
-./gradlew $* cleanTest build
+
+if [[ "${DATABASE}" == "mysql" ]]; then
+  ./gradlew $* cleanTest build
+else
+  ./gradlew $* cleanTest build -x :eventuate-common-quarkus-jdbc:test :eventuate-common-quarkus-id:test
+fi
+
 ${docker}Down
 
 echo ""

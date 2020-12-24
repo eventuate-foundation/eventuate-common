@@ -1,0 +1,26 @@
+plugins {
+    id "io.quarkus" version "${quarkusVersion}"
+}
+
+apply plugin: PublicModulePlugin
+
+dependencies {
+    compile project (":eventuate-common-jdbc")
+
+    compile 'io.quarkus:quarkus-core'
+    compile 'io.quarkus.arc:arc'
+    compile 'io.quarkus:quarkus-arc-deployment'
+    compile 'io.quarkus:quarkus-agroal'
+    compile "io.quarkus:quarkus-jdbc-mysql"
+
+    testCompile project (":eventuate-common-quarkus-id")
+    testCompile project (":eventuate-common-jdbc-tests")
+
+    testCompile 'io.quarkus:quarkus-junit5'
+
+    implementation enforcedPlatform("io.quarkus:quarkus-bom:${quarkusVersion}")
+}
+
+test {
+    useJUnitPlatform()
+}
