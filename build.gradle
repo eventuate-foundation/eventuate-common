@@ -69,32 +69,39 @@ dockerCompose {
 
     mysql {
         projectName = null
-        useComposeFiles = ["docker-compose-mysql.yml"]
+        useComposeFiles = ["docker-compose-mysql.yml", "docker-compose-zookeeper.yml"]
+        removeContainers = project.ext.removeContainers
+    }
+
+    mysql8 {
+        projectName = null
+        useComposeFiles = ["docker-compose-mysql8.yml", "docker-compose-zookeeper.yml"]
         removeContainers = project.ext.removeContainers
     }
 
     mariadb {
         projectName = null
-        useComposeFiles = ["docker-compose-mariadb.yml"]
+        useComposeFiles = ["docker-compose-mariadb.yml", "docker-compose-zookeeper.yml"]
         removeContainers = project.ext.removeContainers
     }
 
     postgres {
         projectName = null
-        useComposeFiles = ["docker-compose-postgres.yml"]
+        useComposeFiles = ["docker-compose-postgres.yml", "docker-compose-zookeeper.yml"]
         removeContainers = project.ext.removeContainers
     }
 
     mssql {
         projectName = null
-        useComposeFiles = ["docker-compose-mssql.yml"]
+        useComposeFiles = ["docker-compose-mssql.yml", "docker-compose-zookeeper.yml"]
         removeContainers = project.ext.removeContainers
     }
 
     publish {
       projectName = null
       useComposeFiles = ["docker-compose-mysql.yml", "docker-compose-mssql.yml",
-                         "docker-compose-postgres.yml", "docker-compose-mariadb.yml", ]
+                         "docker-compose-postgres.yml", "docker-compose-mariadb.yml",
+                         "docker-compose-zookeeper.yml"]
       removeContainers = project.ext.removeContainers
     }
 }

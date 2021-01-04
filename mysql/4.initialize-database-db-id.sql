@@ -1,8 +1,8 @@
 USE eventuate;
 
 CREATE TABLE new_message (
-  id VARCHAR(767),
   dbid BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  id LONGTEXT,
   destination LONGTEXT NOT NULL,
   headers LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   payload LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -24,13 +24,13 @@ CREATE INDEX message_published_idx ON message(published, dbid);
 
 create table new_events (
   id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  event_id varchar(1000),
-  event_type varchar(1000),
-  event_data varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  entity_type VARCHAR(1000) NOT NULL,
-  entity_id VARCHAR(1000) NOT NULL,
-  triggering_event VARCHAR(1000),
-  metadata VARCHAR(1000),
+  event_id LONGTEXT,
+  event_type LONGTEXT,
+  event_data LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  entity_type VARCHAR(255) NOT NULL,
+  entity_id VARCHAR(255) NOT NULL,
+  triggering_event LONGTEXT,
+  metadata LONGTEXT,
   published TINYINT DEFAULT 0
 );
 

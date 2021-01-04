@@ -26,7 +26,7 @@ CREATE TABLE eventuate.entities (
   PRIMARY KEY(entity_type, entity_id)
 );
 
-CREATE INDEX entities_idx ON eventuate.events(entity_type, entity_id);
+CREATE INDEX entities_idx ON eventuate.entities(entity_type, entity_id);
 
 CREATE TABLE eventuate.snapshots (
   entity_type VARCHAR(1000),

@@ -2,8 +2,8 @@ USE eventuate;
 GO
 
 CREATE TABLE eventuate.new_message (
-  id VARCHAR(767),
   dbid BIGINT IDENTITY(1, 1) PRIMARY KEY,
+  id VARCHAR(767),
   destination NVARCHAR(MAX) NOT NULL,
   headers NVARCHAR(MAX) NOT NULL,
   payload NVARCHAR(MAX) NOT NULL,

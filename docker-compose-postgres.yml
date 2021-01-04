@@ -1,10 +1,5 @@
 version: '3'
 services:
-  zookeeper:
-    build: ./zookeeper
-    ports:
-      - 2181:2181
-
   postgres:
     build: ./postgres
     image: eventuateio/eventuate-postgres:$DOCKER_IMAGE_TAG

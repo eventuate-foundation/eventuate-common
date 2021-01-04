@@ -1,5 +1,7 @@
 package io.eventuate.common.jdbc.sqldialect;
 
+import io.eventuate.common.jdbc.JdbcUrlParser;
+
 public class MySqlDialect extends DefaultEventuateSqlDialect {
 
   public MySqlDialect() {
@@ -8,11 +10,16 @@ public class MySqlDialect extends DefaultEventuateSqlDialect {
 
   @Override
   public boolean supports(String driver) {
-    return "com.mysql.jdbc.Driver".equals(driver);
+    return "com.mysql.cj.jdbc.Driver".equals(driver);
   }
 
   @Override
   public int getOrder() {
     return Integer.MIN_VALUE;
+  }
+
+  @Override
+  public String getJdbcCatalogue(String dataSourceUrl) {
+    return JdbcUrlParser.parse(dataSourceUrl).getDatabase();
   }
 }
