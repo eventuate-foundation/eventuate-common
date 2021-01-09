@@ -1,11 +1,12 @@
 package io.eventuate.common.jdbc.sqldialect;
 
-public class DefaultEventuateSqlDialect implements EventuateSqlDialect {
+import java.util.Collections;
+import java.util.Optional;
 
-  private String customCurrentTimeInMillisecondsExpression;
+public class DefaultEventuateSqlDialect extends AbstractEventuateSqlDialect {
 
   public DefaultEventuateSqlDialect(String customCurrentTimeInMillisecondsExpression) {
-    this.customCurrentTimeInMillisecondsExpression = customCurrentTimeInMillisecondsExpression;
+    super(Optional.empty(), Collections.emptySet(), customCurrentTimeInMillisecondsExpression);
   }
 
   @Override
@@ -14,12 +15,8 @@ public class DefaultEventuateSqlDialect implements EventuateSqlDialect {
   }
 
   @Override
-  public String addLimitToSql(String sql, String limitExpression) {
-    return String.format("%s limit %s", sql, limitExpression);
-  }
-
-  public String getCurrentTimeInMillisecondsExpression() {
-    return customCurrentTimeInMillisecondsExpression;
+  public boolean accepts(String name) {
+    return true;
   }
 
   @Override

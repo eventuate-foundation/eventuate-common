@@ -8,7 +8,7 @@ import java.util.Collections;
 public class UnknownSqlDialectTest {
 
   @Test
-  public void testDialect() {
+  public void testDialectSelectionByDriver() {
     IllegalStateException exception = null;
 
     try {
