@@ -1,37 +1,64 @@
 version: 2
-jobs:
-  build:
-    machine: true
-    working_directory: ~/eventuate-common
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - eventuate-common-{{ checksum "gradle.properties" }}
-            - eventuate-common-
-      - run: TERM=dumb ./gradlew testClasses aggregateJavaDocs
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: eventuate-common-{{ checksum "gradle.properties" }}
-      - run: TERM=dumb ./.circleci/upgrade-docker-compose.sh
-      - run: TERM=dumb ./build-and-test-all-mysql.sh
-      - run: TERM=dumb ./build-and-test-all-mysql8.sh
-      - run: TERM=dumb ./build-and-test-all-mariadb.sh
-      - run: TERM=dumb ./build-and-test-all-mssql.sh
-      - run: TERM=dumb ./build-and-test-all-postgres.sh
-      - run:
-          name: Publish artifacts
-          command: |
-            TERM=dumb ./deploy-artifacts.sh
-          when: on_success
-      - run:
-          name: Save test results
-          command: ./save-containers-and-tests.sh
-          when: always
-      - store_test_results:
-          path: ~/junit
-      - store_artifacts:
-          path: ~/junit
-      - store_artifacts:
-          path: ~/container-logs
+orbs:
+  build-and-test:
+    jobs:
+      build-and-test:
+        parameters:
+          script:
+            description: the script to execute
+            type: string
+        machine: true
+        working_directory: ~/eventuate-common
+        steps:
+          - checkout
+          - restore_cache:
+              keys:
+                - eventuate-common-{{ checksum "gradle.properties" }}
+                - eventuate-common-
+          - run:
+              command: |
+                ./.circleci/upgrade-docker-compose.sh
+                ./gradlew testClasses aggregateJavaDocs
+          - save_cache:
+              paths:
+                - ~/.gradle
+              key: eventuate-common-{{ checksum "gradle.properties" }}
+          - run: <<parameters.script>>
+          - run:
+              name: Save test results
+              command: ./scripts/save-containers-and-tests.sh
+              when: always
+          - store_test_results:
+              path: ~/junit
+          - store_artifacts:
+              path: ~/junit
+          - store_artifacts:
+              path: ~/container-logs
+workflows:
+  version: 2.1
+  build-test-and-deploy:
+    jobs:
+      - build-and-test/build-and-test:
+          name: build-and-test-mysql
+          script: ./scripts/build-and-test-mysql.sh
+      - build-and-test/build-and-test:
+          name: ./build-and-test-all-mysql8
+          script: ./build-and-test-all-mysql8.sh
+      - build-and-test/build-and-test:
+          name: build-and-test-all-mariadb
+          script: ./build-and-test-all-mariadb.sh
+      - build-and-test/build-and-test:
+          name: build-and-test-all-mssql
+          script: ./build-and-test-all-mssql.sh
+      - build-and-test/build-and-test:
+          name: build-and-test-all-postgres
+          script: ./build-and-test-all-postgres.sh
+      - build-and-test/build-and-test:
+          name: deploy-artifacts
+          requires:
+            - build-and-test-mysql
+            - build-and-test-mysql8
+            - build-and-test-mariadb
+            - build-and-test-mssql
+            - build-and-test-postgres
+          script: ./scripts/deploy-artifacts.sh
