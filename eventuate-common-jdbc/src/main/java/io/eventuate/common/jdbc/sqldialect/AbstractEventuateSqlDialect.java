@@ -6,24 +6,23 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Optional;
 import java.util.Set;
 
 public abstract class AbstractEventuateSqlDialect implements EventuateSqlDialect {
 
-  private Optional<String> driver;
+  private Set<String> drivers;
   private Set<String> names;
   private String customCurrentTimeInMillisecondsExpression;
 
-  public AbstractEventuateSqlDialect(Optional<String> driver, Set<String> names, String customCurrentTimeInMillisecondsExpression) {
-    this.driver = driver;
+  public AbstractEventuateSqlDialect(Set<String> drivers, Set<String> names, String customCurrentTimeInMillisecondsExpression) {
+    this.drivers = drivers;
     this.names = names;
     this.customCurrentTimeInMillisecondsExpression = customCurrentTimeInMillisecondsExpression;
   }
 
   @Override
   public boolean supports(String driver) {
-    return this.driver.map(d -> d.equals(driver)).orElse(false);
+    return drivers.contains(driver);
   }
 
   @Override
