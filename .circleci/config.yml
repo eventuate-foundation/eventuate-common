@@ -13,7 +13,7 @@ orbs:
           - checkout
           - restore_cache:
               keys:
-                - eventuate-common-{{ checksum "gradle.properties" }}
+                - eventuate-common-{{ checksum "gradle.properties" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
                 - eventuate-common-
           - run:
               command: |
@@ -22,7 +22,7 @@ orbs:
           - save_cache:
               paths:
                 - ~/.gradle
-              key: eventuate-common-{{ checksum "gradle.properties" }}
+              key: eventuate-common-{{ checksum "gradle.properties" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
           - run: <<parameters.script>>
           - run:
               name: Save test results
