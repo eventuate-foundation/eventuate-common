@@ -40,7 +40,7 @@ workflows:
     jobs:
       - build-and-test/build-and-test:
           name: build-and-test-mysql
-          script: ./build-and-test-mysql.sh
+          script: ./build-and-test-all-mysql.sh
       - build-and-test/build-and-test:
           name: build-and-test-mysql8
           script: ./build-and-test-all-mysql8.sh
