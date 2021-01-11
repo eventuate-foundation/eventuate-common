@@ -7,7 +7,6 @@ import org.postgresql.util.PGobject;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -16,7 +15,7 @@ public class PostgresDialect extends AbstractEventuateSqlDialect {
   private ConcurrentMap<ColumnCacheKey, String> columnTypeCache = new ConcurrentHashMap<>();
 
   public PostgresDialect() {
-    super(Optional.of("org.postgresql.Driver"),
+    super(Collections.singleton("org.postgresql.Driver"),
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList("postgresql", "pgsql", "pg"))),
             "(ROUND(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) * 1000))");
   }
