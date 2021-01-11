@@ -26,7 +26,7 @@ orbs:
           - run: <<parameters.script>>
           - run:
               name: Save test results
-              command: ./scripts/save-containers-and-tests.sh
+              command: ./.circleci/save-containers-and-tests.sh
               when: always
           - store_test_results:
               path: ~/junit
