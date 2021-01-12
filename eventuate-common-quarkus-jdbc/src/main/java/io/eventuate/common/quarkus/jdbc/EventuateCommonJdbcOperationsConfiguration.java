@@ -10,12 +10,13 @@ import io.quarkus.arc.DefaultBean;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
+import javax.inject.Named;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 @ApplicationScoped
 public class EventuateCommonJdbcOperationsConfiguration {
@@ -23,9 +24,8 @@ public class EventuateCommonJdbcOperationsConfiguration {
   @Produces
   public EventuateCommonJdbcOperations eventuateCommonJdbcOperations(EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor,
                                                                      SqlDialectSelector sqlDialectSelector,
-                                                                     @ConfigProperty(name = "quarkus.datasource.db-kind") String dbName,
-                                                                     @ConfigProperty(name = "quarkus.datasource.jdbc.driver") Optional<String> driver) {
-    return new EventuateCommonJdbcOperations(eventuateJdbcStatementExecutor, sqlDialectSelector.getDialect(dbName, driver));
+                                                                     @ConfigProperty(name = "eventuateDatabase") String dbName) {
+    return new EventuateCommonJdbcOperations(eventuateJdbcStatementExecutor, sqlDialectSelector.getDialect(dbName, Optional.empty()));
   }
 
   @Produces

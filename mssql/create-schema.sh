@@ -25,3 +25,5 @@ for i in `ls *.sql | sort -V`; do
  echo ""
  /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Eventuate123! -d master -i "$i"
 done;
+
+sh /usr/src/app/additional-scripts/9.initialization-completed.sh

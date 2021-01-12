@@ -10,6 +10,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -26,7 +27,7 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
   EventuateTransactionTemplate eventuateTransactionTemplate;
 
   @Inject
-  DataSource dataSource;
+  Instance<DataSource> dataSource;
 
   @Inject
   IdGenerator idGenerator;
@@ -78,7 +79,7 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
 
   @Override
   protected DataSource getDataSource() {
-    return dataSource;
+    return dataSource.get();
   }
 
   @Override

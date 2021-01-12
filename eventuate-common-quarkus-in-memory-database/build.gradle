@@ -6,18 +6,13 @@ plugins {
 apply plugin: PublicModulePlugin
 
 dependencies {
-    compile project (":eventuate-common-jdbc")
+    compile project (":eventuate-common-in-memory-database")
 
     compile 'io.quarkus:quarkus-core'
     compile 'io.quarkus.arc:arc'
     compile 'io.quarkus:quarkus-arc-deployment'
     compile 'io.quarkus:quarkus-agroal'
     compile "io.quarkus:quarkus-jdbc-mysql"
-    compile "io.quarkus:quarkus-jdbc-postgresql"
-    compile "io.quarkus:quarkus-jdbc-mssql"
-
-    testCompile project (":eventuate-common-quarkus-id")
-    testCompile project (":eventuate-common-jdbc-tests")
 
     testCompile 'io.quarkus:quarkus-junit5'
 

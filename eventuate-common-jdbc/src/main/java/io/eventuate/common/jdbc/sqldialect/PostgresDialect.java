@@ -17,7 +17,7 @@ public class PostgresDialect extends AbstractEventuateSqlDialect {
 
   public PostgresDialect() {
     super(Optional.of("org.postgresql.Driver"),
-            Collections.unmodifiableSet(new HashSet<>(Arrays.asList("postgresql", "pgsql", "pg"))),
+            Collections.unmodifiableSet(new HashSet<>(Arrays.asList("postgres", "postgresql", "pgsql", "pg"))),
             "(ROUND(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) * 1000))");
   }
 
