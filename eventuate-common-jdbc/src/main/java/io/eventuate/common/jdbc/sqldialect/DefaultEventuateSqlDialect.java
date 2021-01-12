@@ -1,12 +1,11 @@
 package io.eventuate.common.jdbc.sqldialect;
 
 import java.util.Collections;
-import java.util.Optional;
 
 public class DefaultEventuateSqlDialect extends AbstractEventuateSqlDialect {
 
   public DefaultEventuateSqlDialect(String customCurrentTimeInMillisecondsExpression) {
-    super(Optional.empty(), Collections.emptySet(), customCurrentTimeInMillisecondsExpression);
+    super(Collections.emptySet(), Collections.emptySet(), customCurrentTimeInMillisecondsExpression);
   }
 
   @Override

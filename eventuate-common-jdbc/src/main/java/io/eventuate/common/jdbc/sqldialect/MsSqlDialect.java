@@ -1,12 +1,11 @@
 package io.eventuate.common.jdbc.sqldialect;
 
 import java.util.Collections;
-import java.util.Optional;
 
 public class MsSqlDialect extends AbstractEventuateSqlDialect {
 
   public MsSqlDialect() {
-    super(Optional.of("com.microsoft.sqlserver.jdbc.SQLServerDriver"),
+    super(Collections.singleton("com.microsoft.sqlserver.jdbc.SQLServerDriver"),
             Collections.singleton("mssql"), "(SELECT DATEDIFF_BIG(ms, '1970-01-01', GETUTCDATE()))");
   }
 

@@ -29,7 +29,7 @@ create table entities (
   PRIMARY KEY(entity_type, entity_id)
 );
 
-CREATE INDEX entities_idx ON events(entity_type, entity_id);
+CREATE INDEX entities_idx ON entities(entity_type, entity_id);
 
 create table snapshots (
   entity_type VARCHAR(255),
