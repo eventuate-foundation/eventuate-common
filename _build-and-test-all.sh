@@ -18,8 +18,6 @@ function testJdbc() {
   :eventuate-common-micronaut-spring-jdbc:cleanTest :eventuate-common-micronaut-spring-jdbc:test \
   :eventuate-common-spring-jdbc:cleanTest :eventuate-common-spring-jdbc:test
 
-  ./gradlew $* :eventuate-common-quarkus-jdbc:cleanTest :eventuate-common-quarkus-jdbc:test
-
   ${docker}Down
 }
 
