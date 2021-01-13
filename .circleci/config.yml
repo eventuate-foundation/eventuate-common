@@ -13,7 +13,7 @@ orbs:
           - checkout
           - restore_cache:
               keys:
-                - eventuate-common-{{ checksum "gradle.properties" }}
+                - eventuate-common-{{ checksum "gradle.properties" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
                 - eventuate-common-
           - run:
               command: |
@@ -22,11 +22,11 @@ orbs:
           - save_cache:
               paths:
                 - ~/.gradle
-              key: eventuate-common-{{ checksum "gradle.properties" }}
+              key: eventuate-common-{{ checksum "gradle.properties" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
           - run: <<parameters.script>>
           - run:
               name: Save test results
-              command: ./scripts/save-containers-and-tests.sh
+              command: ./.circleci/save-containers-and-tests.sh
               when: always
           - store_test_results:
               path: ~/junit
@@ -40,7 +40,7 @@ workflows:
     jobs:
       - build-and-test/build-and-test:
           name: build-and-test-mysql
-          script: ./scripts/build-and-test-all-mysql.sh
+          script: ./build-and-test-all-mysql.sh
       - build-and-test/build-and-test:
           name: build-and-test-mysql8
           script: ./build-and-test-all-mysql8.sh
@@ -61,4 +61,4 @@ workflows:
             - build-and-test-mariadb
             - build-and-test-mssql
             - build-and-test-postgres
-          script: ./scripts/deploy-artifacts.sh
+          script: ./deploy-artifacts.sh
