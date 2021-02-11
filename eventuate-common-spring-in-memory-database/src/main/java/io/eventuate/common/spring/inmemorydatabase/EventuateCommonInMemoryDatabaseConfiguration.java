@@ -1,7 +1,7 @@
 package io.eventuate.common.spring.inmemorydatabase;
 
+import io.eventuate.common.common.spring.inmemorydatabase.EventuateInMemoryDataSourceBuilder;
 import io.eventuate.common.inmemorydatabase.EventuateDatabaseScriptSupplier;
-import io.eventuate.common.inmemorydatabase.EventuateInMemoryDataSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

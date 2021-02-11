@@ -13,7 +13,7 @@ dependencyManagement {
 apply plugin: PublicModulePlugin
 
 dependencies {
-    compile project (":eventuate-common-in-memory-database")
+    compile project (":eventuate-common-common-spring-in-memory-database")
 
     annotationProcessor "io.micronaut:micronaut-inject-java"
     annotationProcessor "io.micronaut:micronaut-validation"

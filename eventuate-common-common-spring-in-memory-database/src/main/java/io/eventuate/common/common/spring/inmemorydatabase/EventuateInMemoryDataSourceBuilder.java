@@ -1,5 +1,6 @@
-package io.eventuate.common.inmemorydatabase;
+package io.eventuate.common.common.spring.inmemorydatabase;
 
+import io.eventuate.common.inmemorydatabase.EventuateDatabaseScriptSupplier;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
