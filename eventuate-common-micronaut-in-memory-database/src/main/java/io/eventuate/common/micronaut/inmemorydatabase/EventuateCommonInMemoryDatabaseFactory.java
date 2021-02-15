@@ -1,7 +1,7 @@
 package io.eventuate.common.micronaut.inmemorydatabase;
 
+import io.eventuate.common.common.spring.inmemorydatabase.EventuateInMemoryDataSourceBuilder;
 import io.eventuate.common.inmemorydatabase.EventuateDatabaseScriptSupplier;
-import io.eventuate.common.inmemorydatabase.EventuateInMemoryDataSourceBuilder;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Replaces;
 

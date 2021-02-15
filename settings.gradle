@@ -14,6 +14,7 @@ include 'eventuate-common-micronaut-id'
 include 'eventuate-common-spring-id'
 include 'eventuate-common-json-mapper'
 include 'eventuate-common-in-memory-database'
+include 'eventuate-common-common-spring-in-memory-database'
 include 'eventuate-common-spring-in-memory-database'
 include 'eventuate-common-micronaut-in-memory-database'
 
