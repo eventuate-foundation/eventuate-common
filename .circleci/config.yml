@@ -39,6 +39,8 @@ workflows:
   build-test-and-deploy:
     jobs:
       - build-and-test/build-and-test:
+          context:
+            - publish
           name: build-and-test-mysql
           script: ./build-and-test-all-mysql.sh
       - build-and-test/build-and-test:
