@@ -1,3 +1,4 @@
 #! /bin/bash -e
 
-./gradlew  publishEventuateArtifacts
+./gradlew publishEventuateArtifacts
+./gradlew publishEventuateDockerImages
