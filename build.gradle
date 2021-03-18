@@ -101,3 +101,7 @@ dockerCompose {
       removeContainers = project.ext.removeContainers
     }
 }
+
+configurations.all {
+    resolutionStrategy.cacheDynamicVersionsFor 10, 'minutes'
+}
