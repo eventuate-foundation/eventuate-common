@@ -9,7 +9,6 @@ get_db_id_migration_path () {
   echo "${db_id_migration_repository}/${version}"
 }
 
-rm -f $migration_file
 if [ "${DATABASE}" == "mysql" ]; then
   curl -s $(get_db_id_migration_path)/mysql/4.initialize-database-db-id.sql &> /dev/stdout | ./mysql-cli.sh -i
 elif [ "${DATABASE}" == "postgres" ]; then
