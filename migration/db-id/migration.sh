@@ -10,6 +10,11 @@ get_db_id_migration_path () {
   search="eventuateCommonVersion="
   version_line="$(grep $search ./gradle.properties)"
   version=${version_line#$search}
+
+  if [[ $version =~ "BUILD-SNAPSHOT" ]]; then
+     version=master
+  fi
+
   echo "${DB_ID_MIGRATION_REPOSITORY}/${version}"
 }
 
