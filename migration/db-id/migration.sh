@@ -2,11 +2,15 @@
 
 set -e
 
+if [ -z "$DB_ID_MIGRATION_REPOSITORY" ] ; then
+  export DB_ID_MIGRATION_REPOSITORY=https://raw.githubusercontent.com/eventuate-foundation/eventuate-common
+fi
+
 get_db_id_migration_path () {
   search="eventuateCommonVersion="
   version_line="$(grep $search ./gradle.properties)"
   version=${version_line#$search}
-  echo "${db_id_migration_repository}/${version}"
+  echo "${DB_ID_MIGRATION_REPOSITORY}/${version}"
 }
 
 if [ "${DATABASE}" == "mysql" ]; then
@@ -30,6 +34,6 @@ elif [ "${DATABASE}" == "mssql" ]; then
   rm -rf ${migration_tool}
 
 else
-  echo "Unknown Database"
+  echo "Unknown Database ${DATABASE}"
   exit 99
 fi
