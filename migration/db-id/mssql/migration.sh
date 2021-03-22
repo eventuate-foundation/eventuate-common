@@ -6,7 +6,7 @@ get_db_id_migration_path () {
   search="eventuateCommonVersion="
   version_line="$(grep $search ./gradle.properties)"
   version=${version_line#$search}
-  echo "https://raw.githubusercontent.com/eventuate-foundation/eventuate-common/${version}"
+  echo "${db_id_migration_repository}/${version}"
 }
 
 rm -f $migration_file
