@@ -10,6 +10,6 @@ services:
       TRAM_DB: "eventuate"
       TRAM_SCHEMA: "eventuate"
     volumes:
-      - ./migration:/scripts
+      - ${DB_ID_MIGRATION_DIR?}:/scripts
     working_dir: /scripts
     entrypoint: [ "bash", "./entrypoint.sh"]
