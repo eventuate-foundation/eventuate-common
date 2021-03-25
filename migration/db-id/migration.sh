@@ -27,7 +27,7 @@ get_db_id_migration_path () {
 
 db_id_migration_path=$(get_db_id_migration_path)
 
-if [ "${DATABASE}" == "mysql" ]; then
+if [ "${DATABASE}" == "mysql" ] || [ "${DATABASE}" == "mysql8" ] || [ "${DATABASE}" == "mariadb" ]; then
   curl -s ${db_id_migration_path}/mysql/4.initialize-database-db-id.sql &> /dev/stdout | ./mysql-cli.sh -i
 elif [ "${DATABASE}" == "postgres" ]; then
   curl -s ${db_id_migration_path}/postgres/5.initialize-database-db-id.sql &> /dev/stdout | ./postgres-cli.sh -i
@@ -40,7 +40,7 @@ elif [ "${DATABASE}" == "mssql" ]; then
   curl ${db_id_migration_path}/mssql/4.setup-db-id.sql --output ${migration_file} --create-dirs
   curl ${db_id_migration_path}/migration/db-id/mssql/${migration_tool} --output ${migration_tool}
   curl ${db_id_migration_path}/migration/db-id/mssql/entrypoint.sh --output ${migration_entrypoint}
-  docker-compose -f docker-compose-mssql-polling.yml -f ${migration_tool} run --no-deps mssql-migration
+  docker-compose -f ${migration_tool} run --no-deps mssql-migration
 
   rm -rf ${DB_ID_MIGRATION_DIR}
   rm -rf ${migration_tool}
