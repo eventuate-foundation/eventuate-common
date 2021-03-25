@@ -18,6 +18,6 @@ fi
 
 docker run $* \
    --name mysqlterm --network=${PWD##*/}_default --rm \
-   -e MYSQL_PORT_3306_TCP_ADDR=${DATABASE} -e MYSQL_PORT_3306_TCP_PORT=$MYSQL_PORT -e MYSQL_ENV_MYSQL_ROOT_PASSWORD=rootpassword \
+   -e HOST=${DATABASE} -e MYSQL_PORT=$MYSQL_PORT \
    ${mysqlimage}  \
-   sh -c 'exec mysql -h"$MYSQL_PORT_3306_TCP_ADDR" -P"$MYSQL_PORT_3306_TCP_PORT" -uroot -p"$MYSQL_ENV_MYSQL_ROOT_PASSWORD" -o eventuate'
+   sh -c 'exec mysql -h"$HOST" -P"$MYSQL_PORT" -uroot -prootpassword -o eventuate'
