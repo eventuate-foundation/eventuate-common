@@ -45,7 +45,7 @@ public class SqlDialectIntegrationTest {
   @Value("${spring.datasource.url}")
   private String dataSourceUrl;
 
-  @Value("${use.db.id:#{false}}")
+  @Value("${db.id.used:#{false}}")
   private boolean useDbId;
 
   @Autowired

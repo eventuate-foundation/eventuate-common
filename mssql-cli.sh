@@ -1,7 +1,13 @@
 #! /bin/bash -e
 
+if [ -z "$DATABASE" ] ; then
+  export DATABASE=mssql
+fi
+
 docker run $* \
    --name mssqlterm --rm \
-   -e MSSQL_HOST=$DOCKER_HOST_IP \
+   --network=${PWD##*/}_default \
+   -e MSSQL_HOST=${DATABASE} \
    mcr.microsoft.com/mssql/server:2017-latest  \
    sh -c 'exec /opt/mssql-tools/bin/sqlcmd -S "$MSSQL_HOST" -U SA -P "Eventuate123!"'
+
