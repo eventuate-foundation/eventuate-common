@@ -15,7 +15,7 @@ fi
 
 get_db_id_migration_path () {
   search="eventuateCommonVersion="
-  version_line="$(grep $search ./gradle.properties)"
+  version_line="$(grep eventuateCommonVersion= ./gradle.properties || git rev-parse --abbrev-ref HEAD)"
   version=${version_line#$search}
 
   if [[ $version =~ "BUILD-SNAPSHOT" ]]; then
@@ -26,6 +26,8 @@ get_db_id_migration_path () {
 }
 
 db_id_migration_path=$(get_db_id_migration_path)
+
+echo db_id_migration_path=$db_id_migration_path
 
 if [ "${DATABASE}" == "mysql" ] || [ "${DATABASE}" == "mysql8" ] || [ "${DATABASE}" == "mariadb" ]; then
   curl -s ${db_id_migration_path}/mysql/4.initialize-database-db-id.sql &> /dev/stdout | ./mysql-cli.sh -i
@@ -46,6 +48,8 @@ elif [ "${DATABASE}" == "mssql" ]; then
   rm -rf ${migration_tool}
 
 else
-  echo "Unknown Database ${DATABASE}"
+  echo "Unknown Database DATABASE=${DATABASE}"
   exit 99
 fi
+
+echo Migrated $DATABASE
