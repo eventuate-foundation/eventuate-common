@@ -12,7 +12,8 @@ dependencyManagement {
 
 
 dependencies {
-    compile project (":eventuate-common-common-spring-in-memory-database")
+    compile project (":eventuate-common-micronaut-data-jdbc")
+    compile project (":eventuate-common-in-memory-database")
 
     annotationProcessor "io.micronaut:micronaut-inject-java"
     annotationProcessor "io.micronaut:micronaut-validation"

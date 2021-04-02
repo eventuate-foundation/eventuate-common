@@ -1,16 +1,14 @@
 package io.eventuate.common.micronaut.jdbc.sqldialect;
 
-import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.sqldialect.*;
 import io.micronaut.context.annotation.Factory;
-import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.annotation.Value;
 
+import javax.annotation.Nullable;
 import javax.inject.Singleton;
 import java.util.Collection;
 
 @Factory
-//@Requires(property = "micronaut.eventuate.sql.dialect.factory", value = "true")
 public class SqlDialectFactory {
 
   @Singleton
@@ -29,7 +27,11 @@ public class SqlDialectFactory {
   }
 
   @Singleton
-  public DefaultEventuateSqlDialect defaultSqlDialect(@Value("${eventuate.current.time.in.milliseconds.sql:#{null}}") String customCurrentTimeInMillisecondsExpression) {
+  public DefaultEventuateSqlDialect defaultSqlDialect(@Nullable @Value("${eventuate.current.time.in.milliseconds.sql}") String customCurrentTimeInMillisecondsExpression) {
+    if (customCurrentTimeInMillisecondsExpression == null) {
+      customCurrentTimeInMillisecondsExpression = "null";
+    }
+
     return new DefaultEventuateSqlDialect(customCurrentTimeInMillisecondsExpression);
   }
 
