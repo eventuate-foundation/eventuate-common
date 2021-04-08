@@ -1,21 +1,31 @@
 package io.eventuate.common.micronaut.inmemorydatabase;
 
-import io.eventuate.common.common.spring.inmemorydatabase.EventuateInMemoryDataSourceBuilder;
+import io.eventuate.common.inmemorydatabase.EmbeddedDatabaseBuilder;
 import io.eventuate.common.inmemorydatabase.EventuateDatabaseScriptSupplier;
-import io.micronaut.context.annotation.Factory;
-import io.micronaut.context.annotation.Replaces;
+import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
+import io.eventuate.common.jdbc.EventuateTransactionTemplate;
+import io.micronaut.context.annotation.Context;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.sql.DataSource;
-import java.util.List;
+import javax.annotation.PostConstruct;
+import java.util.Arrays;
 
-@Factory
+@Context
 public class EventuateCommonInMemoryDatabaseFactory {
-  @Singleton
-  @Replaces(DataSource.class)
-  @Named("default")
-  public DataSource dataSource(List<EventuateDatabaseScriptSupplier> scripts) {
-    return new EventuateInMemoryDataSourceBuilder(scripts).build();
+
+  EventuateDatabaseScriptSupplier[] scripts;
+  EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor;
+  EventuateTransactionTemplate eventuateTransactionTemplate;
+
+  public EventuateCommonInMemoryDatabaseFactory(EventuateDatabaseScriptSupplier[] scripts,
+                                                EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor,
+                                                EventuateTransactionTemplate eventuateTransactionTemplate) {
+    this.scripts = scripts;
+    this.eventuateJdbcStatementExecutor = eventuateJdbcStatementExecutor;
+    this.eventuateTransactionTemplate = eventuateTransactionTemplate;
+  }
+
+  @PostConstruct
+  public void dataSource() {
+    new EmbeddedDatabaseBuilder(Arrays.stream(scripts), eventuateJdbcStatementExecutor, eventuateTransactionTemplate).build();
   }
 }
