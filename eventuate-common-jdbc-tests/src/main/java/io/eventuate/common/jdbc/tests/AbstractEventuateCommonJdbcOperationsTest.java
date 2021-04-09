@@ -186,72 +186,76 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
   }
 
   private List<Map<String, Object>> getEvents(IdColumnAndValue idColumnAndValue) {
-    String table = eventuateSchema.qualifyTable("events");
-    String sql = String.format("select event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata from %s where %s = ?",
-            table, idColumnAndValue.getColumn());
+    return getEventuateTransactionTemplate().executeInTransaction(() -> {
+      String table = eventuateSchema.qualifyTable("events");
+      String sql = String.format("select event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata from %s where %s = ?",
+              table, idColumnAndValue.getColumn());
 
-    try (Connection connection = getDataSource().getConnection();
-         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+      try (Connection connection = getDataSource().getConnection();
+           PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
 
-      preparedStatement.setObject(1, idColumnAndValue.getValue());
+        preparedStatement.setObject(1, idColumnAndValue.getValue());
 
-      List<Map<String, Object>> events = new ArrayList<>();
+        List<Map<String, Object>> events = new ArrayList<>();
 
-      try(ResultSet rs = preparedStatement.executeQuery()) {
-        while (rs.next()) {
-          Map<String, Object> event = new HashMap<>();
+        try(ResultSet rs = preparedStatement.executeQuery()) {
+          while (rs.next()) {
+            Map<String, Object> event = new HashMap<>();
 
-          event.put("event_id", rs.getString("event_id"));
-          event.put("event_type", rs.getString("event_type"));
-          event.put("event_data", rs.getString("event_data"));
-          event.put("entity_type", rs.getString("entity_type"));
-          event.put("entity_id", rs.getString("entity_id"));
-          event.put("triggering_event", rs.getString("triggering_event"));
-          event.put("metadata", rs.getString("metadata"));
+            event.put("event_id", rs.getString("event_id"));
+            event.put("event_type", rs.getString("event_type"));
+            event.put("event_data", rs.getString("event_data"));
+            event.put("entity_type", rs.getString("entity_type"));
+            event.put("entity_id", rs.getString("entity_id"));
+            event.put("triggering_event", rs.getString("triggering_event"));
+            event.put("metadata", rs.getString("metadata"));
 
-          events.add(event);
+            events.add(event);
+          }
         }
+
+        return events;
+
+      } catch (SQLException e) {
+        throw new RuntimeException(e);
       }
-
-      return events;
-
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
-    }
+    });
   }
 
   private List<Map<String, Object>> getMessages(IdColumnAndValue idColumnAndValue) {
-    String table = eventuateSchema.qualifyTable("message");
-    String sql = String.format("select %s, destination, headers, payload, creation_time from %s where %s = ?",
-            idColumnAndValue.getColumn(), table, idColumnAndValue.getColumn());
+    return getEventuateTransactionTemplate().executeInTransaction(() -> {
+      String table = eventuateSchema.qualifyTable("message");
+      String sql = String.format("select %s, destination, headers, payload, creation_time from %s where %s = ?",
+              idColumnAndValue.getColumn(), table, idColumnAndValue.getColumn());
 
-    try (Connection connection = getDataSource().getConnection();
-         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+      try (Connection connection = getDataSource().getConnection();
+           PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
 
-      preparedStatement.setObject(1, idColumnAndValue.getValue());
+        preparedStatement.setObject(1, idColumnAndValue.getValue());
 
-      List<Map<String, Object>> messages = new ArrayList<>();
+        List<Map<String, Object>> messages = new ArrayList<>();
 
-      try(ResultSet rs = preparedStatement.executeQuery()) {
-        while (rs.next()) {
-          Map<String, Object> message = new HashMap<>();
+        try(ResultSet rs = preparedStatement.executeQuery()) {
+          while (rs.next()) {
+            Map<String, Object> message = new HashMap<>();
 
-          message.put("destination", rs.getString("destination"));
-          message.put("headers", rs.getString("headers"));
-          message.put("payload", rs.getString("payload"));
-          message.put("creation_time", rs.getLong("creation_time"));
+            message.put("destination", rs.getString("destination"));
+            message.put("headers", rs.getString("headers"));
+            message.put("payload", rs.getString("payload"));
+            message.put("creation_time", rs.getLong("creation_time"));
 
-          messages.add(message);
+            messages.add(message);
+          }
         }
+
+        return messages;
+
+      } catch (SQLException e) {
+        throw new RuntimeException(e);
       }
-
-      return messages;
-
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
-    }
+    });
   }
 
   protected IdColumnAndValue messageIdToRowId(String messageId) {
