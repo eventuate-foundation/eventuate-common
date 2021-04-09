@@ -15,7 +15,6 @@ function testJdbc() {
   ${docker}Up
 
   ./gradlew $* :eventuate-common-micronaut-data-jdbc:cleanTest :eventuate-common-micronaut-data-jdbc:test \
-  :eventuate-common-micronaut-spring-jdbc:cleanTest :eventuate-common-micronaut-spring-jdbc:test \
   :eventuate-common-spring-jdbc:cleanTest :eventuate-common-spring-jdbc:test
 
   ${docker}Down
