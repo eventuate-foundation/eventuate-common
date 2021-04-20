@@ -22,6 +22,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
 
 @SpringBootTest(classes = EventuateCommonJdbcOperationsTest.Config.class)
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -116,8 +118,39 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
   }
 
   @Override
-  protected EventuateCommonJdbcOperations getEventuateCommonJdbcOperations() {
-    return eventuateCommonJdbcOperations;
+  protected String insertIntoMessageTable(String payload,
+                                          String destination,
+                                          Map<String, String> headers) {
+
+    return eventuateTransactionTemplate.executeInTransaction(() ->
+            eventuateCommonJdbcOperations.insertIntoMessageTable(idGenerator,
+                    payload,
+                    destination,
+                    headers,
+                    eventuateSchema)
+    );
+  }
+
+  @Override
+  protected String insertIntoEventsTable(String entityId,
+                                         String eventData,
+                                         String eventType,
+                                         String entityType,
+                                         Optional<String> triggeringEvent,
+                                         Optional<String> metadata) {
+
+    return eventuateTransactionTemplate.executeInTransaction(() ->
+            eventuateCommonJdbcOperations.insertIntoEventsTable(idGenerator,
+                    entityId, eventData, eventType, entityType, triggeringEvent, metadata, eventuateSchema));
+  }
+
+  @Override
+  protected void insertIntoEntitiesTable(String entityId, String entityType, EventuateSchema eventuateSchema) {
+    String table = eventuateSchema.qualifyTable("entities");
+    String sql = String.format("insert into %s values (?, ?, ?);", table);
+
+    eventuateTransactionTemplate.executeInTransaction(() ->
+            eventuateJdbcStatementExecutor.update(sql, entityId, entityType, System.nanoTime()));
   }
 
   @Override
@@ -136,7 +169,7 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
   }
 
   @Override
-  protected EventuateJdbcStatementExecutor getEventuateJdbcStatementExecutor() {
-    return eventuateJdbcStatementExecutor;
+  protected EventuateSqlDialect getEventuateSqlDialect() {
+    return eventuateCommonJdbcOperations.getEventuateSqlDialect();
   }
 }

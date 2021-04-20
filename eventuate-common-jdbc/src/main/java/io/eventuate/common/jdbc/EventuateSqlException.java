@@ -12,7 +12,7 @@ public class EventuateSqlException extends RuntimeException {
     super(e);
   }
 
-  public EventuateSqlException(Exception e) {
-    super(e);
+  public EventuateSqlException(Throwable t) {
+    super(t);
   }
 }
