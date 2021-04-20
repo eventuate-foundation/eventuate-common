@@ -7,7 +7,7 @@ public class EventuateDuplicateKeyException extends EventuateSqlException {
     super(sqlException);
   }
 
-  public EventuateDuplicateKeyException(Exception exception) {
-    super(exception);
+  public EventuateDuplicateKeyException(Throwable throwable) {
+    super(throwable);
   }
 }

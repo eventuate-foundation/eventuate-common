@@ -6,6 +6,7 @@ import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
 import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.EventuateSchema;
 import io.eventuate.common.jdbc.EventuateTransactionTemplate;
+import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
 import io.eventuate.common.jdbc.sqldialect.MySqlDialect;
 import io.eventuate.common.json.mapper.JSonMapper;
 import org.apache.commons.lang.StringUtils;
@@ -25,29 +26,32 @@ import static io.eventuate.common.jdbc.EventuateCommonJdbcOperations.MESSAGE_AUT
 
 
 public abstract class AbstractEventuateCommonJdbcOperationsTest {
-  private EventuateSchema eventuateSchema = new EventuateSchema();
+  protected EventuateSchema eventuateSchema = new EventuateSchema();
 
-  protected abstract EventuateCommonJdbcOperations getEventuateCommonJdbcOperations();
   protected abstract EventuateTransactionTemplate getEventuateTransactionTemplate();
   protected abstract IdGenerator getIdGenerator();
   protected abstract DataSource getDataSource();
-  protected abstract EventuateJdbcStatementExecutor getEventuateJdbcStatementExecutor();
+  protected abstract EventuateSqlDialect getEventuateSqlDialect();
+
+  protected abstract String insertIntoMessageTable(String payload,
+                                                   String destination,
+                                                   Map<String, String> headers);
+
+  protected abstract String insertIntoEventsTable(String entityId,
+                                                      String eventData,
+                                                      String eventType,
+                                                      String entityType,
+                                                      Optional<String> triggeringEvent,
+                                                      Optional<String> metadata);
+
+  protected abstract void insertIntoEntitiesTable(String entityId, String entityType, EventuateSchema eventuateSchema);
 
   public void testEventuateDuplicateKeyException() {
-    String table = eventuateSchema.qualifyTable("entities");
-
-    String sql = String.format("insert into %s values (?, ?, ?);", table);
-
     String entityId = generateId();
     String entityType = generateId();
 
-    getEventuateTransactionTemplate().executeInTransaction(() -> {
-
-      getEventuateJdbcStatementExecutor().update(sql, entityType, entityId, System.nanoTime());
-      getEventuateJdbcStatementExecutor().update(sql, entityType, entityId, System.nanoTime());
-
-      return null;
-    });
+    insertIntoEntitiesTable(entityId, entityType, eventuateSchema);
+    insertIntoEntitiesTable(entityId, entityType, eventuateSchema);
   }
 
   public void testInsertIntoEventsTable() throws SQLException {
@@ -58,15 +62,12 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     String triggeringEvent = generateId();
     String metadata = generateId();
 
-    String eventId = getEventuateTransactionTemplate().executeInTransaction(() ->
-      getEventuateCommonJdbcOperations().insertIntoEventsTable(getIdGenerator(),
-              entityId,
+    String eventId = insertIntoEventsTable(entityId,
               eventData,
               eventType,
               entityType,
               Optional.of(triggeringEvent),
-              Optional.of(metadata),
-              eventuateSchema));
+              Optional.of(metadata));
 
     List<Map<String, Object>> events = getEvents(eventIdToRowId(eventId));
 
@@ -96,12 +97,7 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     expectedHeaders.put("header1k", "header1v");
     expectedHeaders.put("header2k", "header2v");
 
-    String messageId = getEventuateTransactionTemplate().executeInTransaction(() ->
-      getEventuateCommonJdbcOperations().insertIntoMessageTable(getIdGenerator(),
-              payload,
-              destination,
-              expectedHeaders,
-              eventuateSchema));
+    String messageId = insertIntoMessageTable(payload, destination, expectedHeaders);
 
     List<Map<String, Object>> messages = getMessages(messageIdToRowId(messageId));
 
@@ -129,24 +125,34 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
   }
 
   private long insertRandomEvent() {
-    return getEventuateTransactionTemplate().executeInTransaction(() ->
-            (long)eventIdToRowId(getEventuateCommonJdbcOperations().insertIntoEventsTable(getIdGenerator(),
-                    generateId(),
-                    generateId(),
-                    generateId(),
-                    generateId(),
-                    Optional.of(generateId()),
-                    Optional.of(generateId()),
-                    eventuateSchema)).getValue());
+    return (long)eventIdToRowId(insertIntoEventsTable(generateId(),
+            generateId(),
+            generateId(),
+            generateId(),
+            Optional.of(generateId()),
+            Optional.of(generateId())))
+            .getValue();
   }
 
   private void assertIdAnchorEventCreated() {
-    if (getEventuateCommonJdbcOperations().getEventuateSqlDialect() instanceof MySqlDialect) {
-      List<Map<String, Object>> anchorEvents =
-              getEventuateJdbcStatementExecutor().queryForList("select * from eventuate.events where event_type = 'CDC-IGNORED'");
-
-      Assert.assertEquals(1, anchorEvents.size());
+    if (!(getEventuateSqlDialect() instanceof MySqlDialect)) {
+      return;
     }
+
+    getEventuateTransactionTemplate().executeInTransaction(() -> {
+      String table = eventuateSchema.qualifyTable("events");
+      String sql = String.format("select * from %s where event_type = 'CDC-IGNORED'", table);
+      try (Connection connection = getDataSource().getConnection();
+           PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try(ResultSet rs = preparedStatement.executeQuery()) {
+          Assert.assertTrue(rs.next());
+        }
+      } catch (SQLException e) {
+        throw new RuntimeException(e);
+      }
+
+      return null;
+    });
   }
 
   protected void testGeneratedIdOfMessageTableRow() {
@@ -154,21 +160,31 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
   }
 
   private long insertRandomMessage() {
-    return getEventuateTransactionTemplate().executeInTransaction(() ->
-            (long)messageIdToRowId(getEventuateCommonJdbcOperations().insertIntoMessageTable(getIdGenerator(),
-                    "\"" + generateId() + "\"",
-                    generateId(),
-                    Collections.emptyMap(),
-                    eventuateSchema)).getValue());
+    return (long) messageIdToRowId(insertIntoMessageTable("\"" + generateId() + "\"",
+            generateId(),
+            Collections.emptyMap()))
+            .getValue();
   }
 
   private void assertIdAnchorMessageCreated() {
-    if (getEventuateCommonJdbcOperations().getEventuateSqlDialect() instanceof MySqlDialect) {
-      List<Map<String, Object>> anchorMessages =
-              getEventuateJdbcStatementExecutor().queryForList("select * from eventuate.message where destination = 'CDC-IGNORED'");
-
-      Assert.assertEquals(1, anchorMessages.size());
+    if (!(getEventuateSqlDialect() instanceof MySqlDialect)) {
+      return;
     }
+
+    getEventuateTransactionTemplate().executeInTransaction(() -> {
+      String table = eventuateSchema.qualifyTable("message");
+      String sql = String.format("select * from %s where destination = 'CDC-IGNORED'", table);
+      try (Connection connection = getDataSource().getConnection();
+           PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try(ResultSet rs = preparedStatement.executeQuery()) {
+          Assert.assertTrue(rs.next());
+        }
+      } catch (SQLException e) {
+        throw new RuntimeException(e);
+      }
+
+      return null;
+    });
   }
 
   private void testGeneratedId(Supplier<Long> insertOperation, Runnable idAnchorVerificationCallback) {
@@ -185,7 +201,7 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     return UUID.randomUUID().toString();
   }
 
-  private List<Map<String, Object>> getEvents(IdColumnAndValue idColumnAndValue) {
+  protected List<Map<String, Object>> getEvents(IdColumnAndValue idColumnAndValue) {
     return getEventuateTransactionTemplate().executeInTransaction(() -> {
       String table = eventuateSchema.qualifyTable("events");
       String sql = String.format("select event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata from %s where %s = ?",
@@ -223,7 +239,7 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
     });
   }
 
-  private List<Map<String, Object>> getMessages(IdColumnAndValue idColumnAndValue) {
+  protected List<Map<String, Object>> getMessages(IdColumnAndValue idColumnAndValue) {
     return getEventuateTransactionTemplate().executeInTransaction(() -> {
       String table = eventuateSchema.qualifyTable("message");
       String sql = String.format("select %s, destination, headers, payload, creation_time from %s where %s = ?",
