@@ -24,6 +24,11 @@ import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.*;
 
+import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.EVENT_APPLICATION_GENERATED_ID_COLUMN;
+import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.EVENT_AUTO_GENERATED_ID_COLUMN;
+import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.MESSAGE_APPLICATION_GENERATED_ID_COLUMN;
+import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.MESSAGE_AUTO_GENERATED_ID_COLUMN;
+
 @SpringBootTest(classes = SqlDialectIntegrationTest.Config.class)
 @RunWith(SpringRunner.class)
 public class SqlDialectIntegrationTest {
@@ -128,15 +133,15 @@ public class SqlDialectIntegrationTest {
   @Test
   public void testEventsPrimaryKeyColumn() throws SQLException {
     assertPrimaryKeyColumnEquals("events", useDbId
-            ? EventuateCommonJdbcOperations.EVENT_AUTO_GENERATED_ID_COLUMN
-            : EventuateCommonJdbcOperations.EVENT_APPLICATION_GENERATED_ID_COLUMN);
+            ? EVENT_AUTO_GENERATED_ID_COLUMN
+            : EVENT_APPLICATION_GENERATED_ID_COLUMN);
   }
 
   @Test
   public void testMessagePrimaryKeyColumn() throws SQLException {
     assertPrimaryKeyColumnEquals("message", useDbId
-            ? EventuateCommonJdbcOperations.MESSAGE_AUTO_GENERATED_ID_COLUMN
-            : EventuateCommonJdbcOperations.MESSAGE_APPLICATION_GENERATED_ID_COLUMN);
+            ? MESSAGE_AUTO_GENERATED_ID_COLUMN
+            : MESSAGE_APPLICATION_GENERATED_ID_COLUMN);
   }
 
   private void assertPrimaryKeyColumnEquals(String table, String expectedKeyColumn) throws SQLException {

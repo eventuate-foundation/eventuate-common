@@ -1,5 +1,7 @@
 package io.eventuate.common.spring.jdbc.reactive;
 
+import io.eventuate.common.jdbc.EventuateJdbcOperationsUtils;
+import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
 import io.eventuate.common.jdbc.sqldialect.SqlDialectSelector;
 import io.eventuate.common.spring.id.IdGeneratorConfiguration;
 import io.eventuate.common.spring.jdbc.EventuateSchemaConfiguration;
@@ -23,6 +25,7 @@ import java.util.Optional;
         EventuateCommonReactiveMysqlConfiguration.class,
         IdGeneratorConfiguration.class})
 public class EventuateCommonReactiveDatabaseConfiguration {
+
   @Bean
   public DatabaseClient databaseClient(ConnectionFactory connectionFactory) {
     TransactionAwareConnectionFactoryProxy proxy = new TransactionAwareConnectionFactoryProxy(connectionFactory);
@@ -38,8 +41,11 @@ public class EventuateCommonReactiveDatabaseConfiguration {
   public EventuateCommonReactiveSpringJdbcOperations eventuateCommonReactiveSpringJdbcOperations(EventuateCommonReactiveDatabaseProperties eventuateCommonReactiveDatabaseProperties,
                                                                                                  SqlDialectSelector sqlDialectSelector,
                                                                                                  EventuateSpringReactiveJdbcStatementExecutor eventuateSpringReactiveJdbcStatementExecutor) {
-    return new EventuateCommonReactiveSpringJdbcOperations(eventuateSpringReactiveJdbcStatementExecutor,
-            sqlDialectSelector.getDialect(eventuateCommonReactiveDatabaseProperties.getDriver(), Optional.empty()));
+
+    EventuateSqlDialect eventuateSqlDialect = sqlDialectSelector.getDialect(eventuateCommonReactiveDatabaseProperties.getDriver(), Optional.empty());
+
+    return new EventuateCommonReactiveSpringJdbcOperations(new EventuateJdbcOperationsUtils(eventuateSqlDialect),
+            eventuateSpringReactiveJdbcStatementExecutor, eventuateSqlDialect);
   }
 
   @Bean

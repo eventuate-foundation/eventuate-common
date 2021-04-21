@@ -8,15 +8,25 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class EventuateCommonJdbcOperations extends EventuateAbstractJdbcOperations {
+import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.EVENT_AUTO_GENERATED_ID_COLUMN;
+import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.MESSAGE_AUTO_GENERATED_ID_COLUMN;
 
+public class EventuateCommonJdbcOperations {
+
+  private EventuateJdbcOperationsUtils eventuateJdbcOperationsUtils;
   private EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor;
+  private EventuateSqlDialect eventuateSqlDialect;
 
-  public EventuateCommonJdbcOperations(EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor,
+  public EventuateCommonJdbcOperations(EventuateJdbcOperationsUtils eventuateJdbcOperationsUtils,
+                                       EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor,
                                        EventuateSqlDialect eventuateSqlDialect) {
-    super(eventuateSqlDialect);
-
+    this.eventuateJdbcOperationsUtils = eventuateJdbcOperationsUtils;
+    this.eventuateSqlDialect = eventuateSqlDialect;
     this.eventuateJdbcStatementExecutor = eventuateJdbcStatementExecutor;
+  }
+
+  public EventuateSqlDialect getEventuateSqlDialect() {
+    return eventuateSqlDialect;
   }
 
   public String insertIntoEventsTable(IdGenerator idGenerator,
@@ -57,7 +67,7 @@ public class EventuateCommonJdbcOperations extends EventuateAbstractJdbcOperatio
 
     if (idGenerator.databaseIdRequired()) {
       Long databaseId = eventuateJdbcStatementExecutor
-              .insertAndReturnGeneratedId(insertIntoEventsTableDbIdSql(eventuateSchema),
+              .insertAndReturnGeneratedId(eventuateJdbcOperationsUtils.insertIntoEventsTableDbIdSql(eventuateSchema),
                       EVENT_AUTO_GENERATED_ID_COLUMN,
                       eventType,
                       eventData,
@@ -65,7 +75,7 @@ public class EventuateCommonJdbcOperations extends EventuateAbstractJdbcOperatio
                       entityId,
                       triggeringEvent.orElse(null),
                       metadata.orElse(null),
-                      booleanToInt(published));
+                      eventuateJdbcOperationsUtils.booleanToInt(published));
 
       return idGenerator.genId(databaseId).asString();
     }
@@ -73,7 +83,7 @@ public class EventuateCommonJdbcOperations extends EventuateAbstractJdbcOperatio
       String eventId = idGenerator.genId(null).asString();
 
       eventuateJdbcStatementExecutor
-              .update(insertIntoEventsTableApplicationIdSql(eventuateSchema),
+              .update(eventuateJdbcOperationsUtils.insertIntoEventsTableApplicationIdSql(eventuateSchema),
                       eventId,
                       eventType,
                       eventData,
@@ -81,7 +91,7 @@ public class EventuateCommonJdbcOperations extends EventuateAbstractJdbcOperatio
                       entityId,
                       triggeringEvent.orElse(null),
                       metadata.orElse(null),
-                      booleanToInt(published));
+                      eventuateJdbcOperationsUtils.booleanToInt(published));
 
       return eventId;
     }
@@ -135,8 +145,8 @@ public class EventuateCommonJdbcOperations extends EventuateAbstractJdbcOperatio
 
     String serializedHeaders = JSonMapper.toJson(headers);
 
-    eventuateJdbcStatementExecutor.update(insertIntoMessageTableApplicationIdSql(eventuateSchema),
-            messageId, destination, serializedHeaders, payload, booleanToInt(published));
+    eventuateJdbcStatementExecutor.update(eventuateJdbcOperationsUtils.insertIntoMessageTableApplicationIdSql(eventuateSchema),
+            messageId, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published));
 
     return messageId;
   }
@@ -150,13 +160,13 @@ public class EventuateCommonJdbcOperations extends EventuateAbstractJdbcOperatio
 
     String serializedHeaders = JSonMapper.toJson(headers);
 
-    long databaseId = eventuateJdbcStatementExecutor.insertAndReturnGeneratedId(insertIntoMessageTableDbIdSql(eventuateSchema),
-            MESSAGE_AUTO_GENERATED_ID_COLUMN, destination, serializedHeaders, payload, booleanToInt(published));
+    long databaseId = eventuateJdbcStatementExecutor.insertAndReturnGeneratedId(eventuateJdbcOperationsUtils.insertIntoMessageTableDbIdSql(eventuateSchema),
+            MESSAGE_AUTO_GENERATED_ID_COLUMN, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published));
 
     return idGenerator.genId(databaseId).asString();
   }
 
-  @Override //TODO: solve issue (see parent method) with postgres and move to parent class
+  //TODO: solve issue (see same method in EventuateJdbcOperationsUtils)
   protected String columnToJson(EventuateSchema eventuateSchema, String column) {
     return getEventuateSqlDialect().castToJson("?",
             eventuateSchema, "message", column, eventuateJdbcStatementExecutor);
