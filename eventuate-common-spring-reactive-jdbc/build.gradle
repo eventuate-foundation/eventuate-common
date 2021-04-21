@@ -3,7 +3,7 @@ dependencies {
     compile project (":eventuate-common-spring-jdbc")
     compile project (":eventuate-common-spring-id")
 
-    compile 'dev.miku:r2dbc-mysql:0.8.2.RELEASE'
+    compile "dev.miku:r2dbc-mysql:$r2dbcMysqlVersion"
     compile 'org.springframework.data:spring-data-r2dbc:1.3.0'
 
     testCompile project (":eventuate-common-jdbc-tests")
