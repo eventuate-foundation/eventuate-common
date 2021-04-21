@@ -2,8 +2,6 @@ package io.eventuate.common.jdbc.tests;
 
 import io.eventuate.common.id.IdGenerator;
 import io.eventuate.common.id.Int128;
-import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
-import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.EventuateSchema;
 import io.eventuate.common.jdbc.EventuateTransactionTemplate;
 import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
@@ -21,8 +19,8 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-import static io.eventuate.common.jdbc.EventuateCommonJdbcOperations.EVENT_AUTO_GENERATED_ID_COLUMN;
-import static io.eventuate.common.jdbc.EventuateCommonJdbcOperations.MESSAGE_AUTO_GENERATED_ID_COLUMN;
+import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.EVENT_AUTO_GENERATED_ID_COLUMN;
+import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.MESSAGE_AUTO_GENERATED_ID_COLUMN;
 
 
 public abstract class AbstractEventuateCommonJdbcOperationsTest {

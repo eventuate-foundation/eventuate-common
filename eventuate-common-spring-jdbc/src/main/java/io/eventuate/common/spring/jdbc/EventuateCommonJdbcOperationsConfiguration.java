@@ -2,7 +2,9 @@ package io.eventuate.common.spring.jdbc;
 
 import io.eventuate.common.common.spring.jdbc.EventuateSpringJdbcStatementExecutor;
 import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
+import io.eventuate.common.jdbc.EventuateJdbcOperationsUtils;
 import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
+import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
 import io.eventuate.common.jdbc.sqldialect.SqlDialectSelector;
 import io.eventuate.common.spring.jdbc.sqldialect.SqlDialectConfiguration;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +28,9 @@ public class EventuateCommonJdbcOperationsConfiguration {
   public EventuateCommonJdbcOperations eventuateCommonJdbcOperations(EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor,
                                                                      SqlDialectSelector sqlDialectSelector,
                                                                      @Value("${spring.datasource.driver-class-name}") String driver) {
-    return new EventuateCommonJdbcOperations(eventuateJdbcStatementExecutor, sqlDialectSelector.getDialect(driver));
+    EventuateSqlDialect eventuateSqlDialect = sqlDialectSelector.getDialect(driver);
+
+    return new EventuateCommonJdbcOperations(new EventuateJdbcOperationsUtils(eventuateSqlDialect),
+            eventuateJdbcStatementExecutor, eventuateSqlDialect);
   }
 }

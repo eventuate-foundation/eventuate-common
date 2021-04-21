@@ -1,8 +1,10 @@
 package io.eventuate.common.micronaut.jdbc;
 
 import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
+import io.eventuate.common.jdbc.EventuateJdbcOperationsUtils;
 import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.EventuateTransactionTemplate;
+import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
 import io.eventuate.common.jdbc.sqldialect.SqlDialectSelector;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Requires;
@@ -18,7 +20,10 @@ public class EventuateCommonJdbcOperationsFactory {
   public EventuateCommonJdbcOperations eventuateCommonJdbcOperations(EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor,
                                                                      SqlDialectSelector sqlDialectSelector,
                                                                      @Value("${datasources.default.driver-class-name}") String driver) {
-    return new EventuateCommonJdbcOperations(eventuateJdbcStatementExecutor, sqlDialectSelector.getDialect(driver));
+    EventuateSqlDialect eventuateSqlDialect = sqlDialectSelector.getDialect(driver);
+
+    return new EventuateCommonJdbcOperations(new EventuateJdbcOperationsUtils(eventuateSqlDialect),
+            eventuateJdbcStatementExecutor, eventuateSqlDialect);
   }
 
   @Singleton

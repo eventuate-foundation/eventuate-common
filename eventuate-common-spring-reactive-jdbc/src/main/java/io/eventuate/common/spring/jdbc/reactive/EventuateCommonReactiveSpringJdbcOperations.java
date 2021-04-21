@@ -1,7 +1,7 @@
 package io.eventuate.common.spring.jdbc.reactive;
 
 import io.eventuate.common.id.IdGenerator;
-import io.eventuate.common.jdbc.EventuateAbstractJdbcOperations;
+import io.eventuate.common.jdbc.EventuateJdbcOperationsUtils;
 import io.eventuate.common.jdbc.EventuateSchema;
 import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
 import io.eventuate.common.json.mapper.JSonMapper;
@@ -11,17 +11,25 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class EventuateCommonReactiveSpringJdbcOperations extends EventuateAbstractJdbcOperations {
+import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.EVENT_AUTO_GENERATED_ID_COLUMN;
+import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.MESSAGE_AUTO_GENERATED_ID_COLUMN;
 
+public class EventuateCommonReactiveSpringJdbcOperations {
+
+  private EventuateJdbcOperationsUtils eventuateJdbcOperationsUtils;
   private EventuateSpringReactiveJdbcStatementExecutor eventuateSpringReactiveJdbcStatementExecutor;
   private EventuateSqlDialect eventuateSqlDialect;
 
-  public EventuateCommonReactiveSpringJdbcOperations(EventuateSpringReactiveJdbcStatementExecutor eventuateSpringReactiveJdbcStatementExecutor,
+  public EventuateCommonReactiveSpringJdbcOperations(EventuateJdbcOperationsUtils eventuateJdbcOperationsUtils,
+                                                     EventuateSpringReactiveJdbcStatementExecutor eventuateSpringReactiveJdbcStatementExecutor,
                                                      EventuateSqlDialect eventuateSqlDialect) {
-    super(eventuateSqlDialect);
-
+    this.eventuateJdbcOperationsUtils = eventuateJdbcOperationsUtils;
     this.eventuateSpringReactiveJdbcStatementExecutor = eventuateSpringReactiveJdbcStatementExecutor;
     this.eventuateSqlDialect = eventuateSqlDialect;
+  }
+
+  public EventuateSqlDialect getEventuateSqlDialect() {
+    return eventuateSqlDialect;
   }
 
   public Mono<String> insertIntoEventsTable(IdGenerator idGenerator,
@@ -62,7 +70,7 @@ public class EventuateCommonReactiveSpringJdbcOperations extends EventuateAbstra
 
     if (idGenerator.databaseIdRequired()) {
       return eventuateSpringReactiveJdbcStatementExecutor
-              .insertAndReturnId(insertIntoEventsTableDbIdSql(eventuateSchema),
+              .insertAndReturnId(eventuateJdbcOperationsUtils.insertIntoEventsTableDbIdSql(eventuateSchema),
                       EVENT_AUTO_GENERATED_ID_COLUMN,
                       eventType,
                       eventData,
@@ -70,14 +78,14 @@ public class EventuateCommonReactiveSpringJdbcOperations extends EventuateAbstra
                       entityId,
                       triggeringEvent.orElse(null),
                       metadata.orElse(null),
-                      booleanToInt(published))
+                      eventuateJdbcOperationsUtils.booleanToInt(published))
               .map(id -> idGenerator.genId(id).asString());
     }
     else {
       String eventId = idGenerator.genId(null).asString();
 
       return eventuateSpringReactiveJdbcStatementExecutor
-              .update(insertIntoEventsTableApplicationIdSql(eventuateSchema),
+              .update(eventuateJdbcOperationsUtils.insertIntoEventsTableApplicationIdSql(eventuateSchema),
                       eventId,
                       eventType,
                       eventData,
@@ -85,7 +93,7 @@ public class EventuateCommonReactiveSpringJdbcOperations extends EventuateAbstra
                       entityId,
                       triggeringEvent.orElse(null),
                       metadata.orElse(null),
-                      booleanToInt(published))
+                      eventuateJdbcOperationsUtils.booleanToInt(published))
               .map(rows -> eventId);
     }
   }
@@ -140,8 +148,8 @@ public class EventuateCommonReactiveSpringJdbcOperations extends EventuateAbstra
     String serializedHeaders = JSonMapper.toJson(headers);
 
     return eventuateSpringReactiveJdbcStatementExecutor
-            .update(insertIntoMessageTableApplicationIdSql(eventuateSchema),
-                    messageId, destination, serializedHeaders, payload, booleanToInt(published))
+            .update(eventuateJdbcOperationsUtils.insertIntoMessageTableApplicationIdSql(eventuateSchema),
+                    messageId, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published))
             .map(rowsUpdated -> messageId);
   }
 
@@ -154,8 +162,8 @@ public class EventuateCommonReactiveSpringJdbcOperations extends EventuateAbstra
     String serializedHeaders = JSonMapper.toJson(headers);
 
     return eventuateSpringReactiveJdbcStatementExecutor
-            .insertAndReturnId(insertIntoMessageTableDbIdSql(eventuateSchema),
-                    MESSAGE_AUTO_GENERATED_ID_COLUMN, destination, serializedHeaders, payload, booleanToInt(published))
+            .insertAndReturnId(eventuateJdbcOperationsUtils.insertIntoMessageTableDbIdSql(eventuateSchema),
+                    MESSAGE_AUTO_GENERATED_ID_COLUMN, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published))
             .map(id -> idGenerator.genId(id).asString());
   }
 }

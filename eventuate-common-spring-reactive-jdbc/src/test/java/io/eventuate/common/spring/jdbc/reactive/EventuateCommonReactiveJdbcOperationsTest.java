@@ -23,13 +23,14 @@ import reactor.core.publisher.Mono;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static io.eventuate.common.jdbc.EventuateAbstractJdbcOperations.MESSAGE_APPLICATION_GENERATED_ID_COLUMN;
-import static io.eventuate.common.jdbc.EventuateAbstractJdbcOperations.MESSAGE_AUTO_GENERATED_ID_COLUMN;
+import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.MESSAGE_APPLICATION_GENERATED_ID_COLUMN;
+import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.MESSAGE_AUTO_GENERATED_ID_COLUMN;
 
 @SpringBootTest(classes = EventuateCommonReactiveJdbcOperationsTest.Config.class)
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -64,7 +65,7 @@ public class EventuateCommonReactiveJdbcOperationsTest extends AbstractEventuate
   private TransactionalOperator transactionalOperator;
 
   @Test
-  public void testTransactions() {
+  public void testTransactionRollbackOnException() {
     String payload1 = generateId();
     String dest1 = generateId();
 
@@ -77,7 +78,7 @@ public class EventuateCommonReactiveJdbcOperationsTest extends AbstractEventuate
                 throw new RuntimeException("Something happened");
               })
               .as(transactionalOperator::transactional)
-              .block();
+              .block(Duration.ofSeconds(30));
     } catch (Exception e) {
       //ignore
     }
