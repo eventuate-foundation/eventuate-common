@@ -27,30 +27,27 @@ public class EventuateJdbcOperationsUtils {
             " VALUES ('', ?, ?, ?, ?, ?, ?, ?);", eventuateSchema.qualifyTable("events"));
   }
 
-  public String insertIntoMessageTableApplicationIdSql(EventuateSchema eventuateSchema) {
+  public String insertIntoMessageTableApplicationIdSql(EventuateSchema eventuateSchema, SqlJsonConverter jsonConverter) {
     return insertIntoMessageTable(eventuateSchema,
-            "insert into %s(id, destination, headers, payload, creation_time, published) values(?, ?, %s, %s, %s, ?)");
+            "insert into %s(id, destination, headers, payload, creation_time, published) values(?, ?, %s, %s, %s, ?)",
+            jsonConverter);
   }
 
-  public String insertIntoMessageTableDbIdSql(EventuateSchema eventuateSchema) {
+  public String insertIntoMessageTableDbIdSql(EventuateSchema eventuateSchema, SqlJsonConverter jsonConverter) {
     return insertIntoMessageTable(eventuateSchema,
-            "insert into %s(id, destination, headers, payload, creation_time, published) values('', ?, %s, %s, %s, ?)");
+            "insert into %s(id, destination, headers, payload, creation_time, published) values('', ?, %s, %s, %s, ?)",
+            jsonConverter);
   }
 
-  public String insertIntoMessageTable(EventuateSchema eventuateSchema, String sql) {
+  public String insertIntoMessageTable(EventuateSchema eventuateSchema, String sql, SqlJsonConverter jsonConverter) {
     return String.format(sql,
             eventuateSchema.qualifyTable("message"),
-            columnToJson(eventuateSchema, "headers"),
-            columnToJson(eventuateSchema, "payload"),
+            jsonConverter.convert(eventuateSchema, "headers"),
+            jsonConverter.convert(eventuateSchema, "payload"),
             eventuateSqlDialect.getCurrentTimeInMillisecondsExpression());
   }
 
   public int booleanToInt(boolean bool) {
     return bool ? 1 : 0;
-  }
-
-  public String columnToJson(EventuateSchema eventuateSchema, String column) {
-    return eventuateSqlDialect.castToJson("?",
-            eventuateSchema, "message", column, null /*TODO: postgres requires access to database for conversion*/);
   }
 }

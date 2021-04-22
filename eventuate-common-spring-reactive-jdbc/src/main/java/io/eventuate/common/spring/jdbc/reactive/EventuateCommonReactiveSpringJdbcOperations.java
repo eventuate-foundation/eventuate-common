@@ -148,7 +148,7 @@ public class EventuateCommonReactiveSpringJdbcOperations {
     String serializedHeaders = JSonMapper.toJson(headers);
 
     return eventuateSpringReactiveJdbcStatementExecutor
-            .update(eventuateJdbcOperationsUtils.insertIntoMessageTableApplicationIdSql(eventuateSchema),
+            .update(eventuateJdbcOperationsUtils.insertIntoMessageTableApplicationIdSql(eventuateSchema, this::columnToJson),
                     messageId, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published))
             .map(rowsUpdated -> messageId);
   }
@@ -162,8 +162,13 @@ public class EventuateCommonReactiveSpringJdbcOperations {
     String serializedHeaders = JSonMapper.toJson(headers);
 
     return eventuateSpringReactiveJdbcStatementExecutor
-            .insertAndReturnId(eventuateJdbcOperationsUtils.insertIntoMessageTableDbIdSql(eventuateSchema),
+            .insertAndReturnId(eventuateJdbcOperationsUtils.insertIntoMessageTableDbIdSql(eventuateSchema, this::columnToJson),
                     MESSAGE_AUTO_GENERATED_ID_COLUMN, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published))
             .map(id -> idGenerator.genId(id).asString());
+  }
+
+  public String columnToJson(EventuateSchema eventuateSchema, String column) {
+    return eventuateSqlDialect.castToJson("?",
+            eventuateSchema, "message", column, null /*TODO: postgres requires access to database for conversion*/);
   }
 }
