@@ -145,7 +145,7 @@ public class EventuateCommonJdbcOperations {
 
     String serializedHeaders = JSonMapper.toJson(headers);
 
-    eventuateJdbcStatementExecutor.update(eventuateJdbcOperationsUtils.insertIntoMessageTableApplicationIdSql(eventuateSchema),
+    eventuateJdbcStatementExecutor.update(eventuateJdbcOperationsUtils.insertIntoMessageTableApplicationIdSql(eventuateSchema, this::columnToJson),
             messageId, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published));
 
     return messageId;
@@ -160,13 +160,12 @@ public class EventuateCommonJdbcOperations {
 
     String serializedHeaders = JSonMapper.toJson(headers);
 
-    long databaseId = eventuateJdbcStatementExecutor.insertAndReturnGeneratedId(eventuateJdbcOperationsUtils.insertIntoMessageTableDbIdSql(eventuateSchema),
+    long databaseId = eventuateJdbcStatementExecutor.insertAndReturnGeneratedId(eventuateJdbcOperationsUtils.insertIntoMessageTableDbIdSql(eventuateSchema, this::columnToJson),
             MESSAGE_AUTO_GENERATED_ID_COLUMN, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published));
 
     return idGenerator.genId(databaseId).asString();
   }
 
-  //TODO: solve issue (see same method in EventuateJdbcOperationsUtils)
   protected String columnToJson(EventuateSchema eventuateSchema, String column) {
     return getEventuateSqlDialect().castToJson("?",
             eventuateSchema, "message", column, eventuateJdbcStatementExecutor);
