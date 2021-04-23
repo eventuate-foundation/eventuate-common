@@ -73,14 +73,14 @@ public class EventuateCommonReactiveJdbcOperationsTest extends AbstractEventuate
 
     try {
       insertIntoMessageTableNoBlock(payload1, dest1, Collections.emptyMap())
-              .flatMap(idColumnAndValue -> {
+              .map(idColumnAndValue -> {
                 idAndColumn.set(idColumnAndValue);
-                throw new RuntimeException("Something happened");
+                throw new TransactionRollbackCheckException();
               })
               .as(transactionalOperator::transactional)
               .block(Duration.ofSeconds(30));
-    } catch (Exception e) {
-      //ignore
+    } catch (TransactionRollbackCheckException e) {
+      //does not need special actions
     }
 
     Assert.assertTrue(getMessages(idAndColumn.get()).isEmpty());
