@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.r2dbc.connection.R2dbcTransactionManager;
-import org.springframework.r2dbc.connection.TransactionAwareConnectionFactoryProxy;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.transaction.ReactiveTransactionManager;
 import org.springframework.transaction.reactive.TransactionalOperator;
@@ -28,8 +27,7 @@ public class EventuateCommonReactiveDatabaseConfiguration {
 
   @Bean
   public DatabaseClient databaseClient(ConnectionFactory connectionFactory) {
-    TransactionAwareConnectionFactoryProxy proxy = new TransactionAwareConnectionFactoryProxy(connectionFactory);
-    return DatabaseClient.create(proxy);
+    return DatabaseClient.create(connectionFactory);
   }
 
   @Bean
