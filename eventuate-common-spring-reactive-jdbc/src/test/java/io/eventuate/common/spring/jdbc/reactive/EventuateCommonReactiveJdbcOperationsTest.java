@@ -1,6 +1,6 @@
 package io.eventuate.common.spring.jdbc.reactive;
 
-import io.eventuate.common.common.spring.jdbc.EventuateSpringTransactionTemplate;
+import io.eventuate.common.spring.jdbc.EventuateSpringTransactionTemplate;
 import io.eventuate.common.id.IdGenerator;
 import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
 import io.eventuate.common.jdbc.EventuateSchema;

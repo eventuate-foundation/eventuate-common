@@ -1,4 +1,4 @@
-package io.eventuate.common.common.spring.jdbc;
+package io.eventuate.common.spring.jdbc;
 
 import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
 import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;

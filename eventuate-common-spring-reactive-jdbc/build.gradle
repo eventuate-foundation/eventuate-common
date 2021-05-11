@@ -1,11 +1,12 @@
 
 dependencies {
-    compile project (":eventuate-common-spring-jdbc")
+    compile project (":eventuate-common-common-spring-jdbc")
     compile project (":eventuate-common-spring-id")
 
     compile "dev.miku:r2dbc-mysql:$r2dbcMysqlVersion"
     compile "org.springframework.data:spring-data-r2dbc:$springDataR2dbcVersion"
 
+    testCompile project (":eventuate-common-spring-jdbc")
     testCompile project (":eventuate-common-jdbc-tests")
     testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
 }
