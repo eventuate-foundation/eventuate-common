@@ -1,4 +1,4 @@
-package io.eventuate.common.spring.jdbc.reactive;
+package io.eventuate.common.reactive.jdbc;
 
 import io.r2dbc.spi.Row;
 import io.r2dbc.spi.RowMetadata;

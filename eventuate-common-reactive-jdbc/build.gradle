@@ -1,0 +1,10 @@
+
+dependencies {
+    compile project (":eventuate-common-jdbc")
+
+    compile "dev.miku:r2dbc-mysql:$r2dbcMysqlVersion"
+}
+
+test {
+    forkEvery 1
+}
