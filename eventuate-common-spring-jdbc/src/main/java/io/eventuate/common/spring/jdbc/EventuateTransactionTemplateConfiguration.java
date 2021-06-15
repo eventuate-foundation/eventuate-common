@@ -1,6 +1,5 @@
 package io.eventuate.common.spring.jdbc;
 
-import io.eventuate.common.common.spring.jdbc.EventuateSpringTransactionTemplate;
 import io.eventuate.common.jdbc.EventuateTransactionTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

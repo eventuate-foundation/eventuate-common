@@ -1,4 +1,4 @@
-package io.eventuate.common.spring.jdbc.reactive;
+package io.eventuate.common.reactive.jdbc;
 
 public class EventuateReactiveDatabases {
   public static final String MYSQL = "mysql";

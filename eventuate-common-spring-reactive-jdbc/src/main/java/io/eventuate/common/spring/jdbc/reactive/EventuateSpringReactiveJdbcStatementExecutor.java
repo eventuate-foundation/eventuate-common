@@ -1,6 +1,8 @@
 package io.eventuate.common.spring.jdbc.reactive;
 
 import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
+import io.eventuate.common.reactive.jdbc.EventuateReactiveJdbcStatementExecutor;
+import io.eventuate.common.reactive.jdbc.EventuateReactiveRowMapper;
 import org.springframework.r2dbc.core.DatabaseClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -8,7 +10,7 @@ import reactor.core.publisher.Mono;
 import java.math.BigInteger;
 import java.util.Map;
 
-public class EventuateSpringReactiveJdbcStatementExecutor {
+public class EventuateSpringReactiveJdbcStatementExecutor implements EventuateReactiveJdbcStatementExecutor {
   private DatabaseClient databaseClient;
 
   public EventuateSpringReactiveJdbcStatementExecutor(DatabaseClient databaseClient) {

@@ -1,5 +1,6 @@
 include 'eventuate-common-eventuate-local'
 include 'eventuate-common-jdbc'
+include 'eventuate-common-reactive-jdbc'
 include 'eventuate-common-jdbc-tests'
 include 'eventuate-common-spring-jdbc'
 include 'eventuate-common-micronaut-jdbc'

@@ -1,6 +1,7 @@
 package io.eventuate.common.spring.jdbc.reactive;
 
-import io.eventuate.common.common.spring.jdbc.EventuateSpringTransactionTemplate;
+import io.eventuate.common.reactive.jdbc.EventuateCommonReactiveJdbcOperations;
+import io.eventuate.common.spring.jdbc.EventuateSpringTransactionTemplate;
 import io.eventuate.common.id.IdGenerator;
 import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
 import io.eventuate.common.jdbc.EventuateSchema;
@@ -50,7 +51,7 @@ public class EventuateCommonReactiveJdbcOperationsTest extends AbstractEventuate
   private EventuateSpringReactiveJdbcStatementExecutor eventuateSpringReactiveJdbcStatementExecutor;
 
   @Autowired
-  private EventuateCommonReactiveSpringJdbcOperations eventuateCommonReactiveSpringJdbcOperations;
+  private EventuateCommonReactiveJdbcOperations eventuateCommonReactiveJdbcOperations;
 
   @Autowired
   private EventuateTransactionTemplate eventuateTransactionTemplate;
@@ -135,7 +136,7 @@ public class EventuateCommonReactiveJdbcOperationsTest extends AbstractEventuate
                                           String destination,
                                           Map<String, String> headers) {
 
-    Mono<String> id = eventuateCommonReactiveSpringJdbcOperations.insertIntoMessageTable(idGenerator,
+    Mono<String> id = eventuateCommonReactiveJdbcOperations.insertIntoMessageTable(idGenerator,
             payload,
             destination,
             headers,
@@ -153,7 +154,7 @@ public class EventuateCommonReactiveJdbcOperationsTest extends AbstractEventuate
                                          Optional<String> triggeringEvent,
                                          Optional<String> metadata) {
 
-    Mono<String> result = eventuateCommonReactiveSpringJdbcOperations.insertIntoEventsTable(idGenerator,
+    Mono<String> result = eventuateCommonReactiveJdbcOperations.insertIntoEventsTable(idGenerator,
             entityId, eventData, eventType, entityType, triggeringEvent, metadata, eventuateSchema);
 
     return result.block();
@@ -179,6 +180,6 @@ public class EventuateCommonReactiveJdbcOperationsTest extends AbstractEventuate
 
   @Override
   protected EventuateSqlDialect getEventuateSqlDialect() {
-    return eventuateCommonReactiveSpringJdbcOperations.getEventuateSqlDialect();
+    return eventuateCommonReactiveJdbcOperations.getEventuateSqlDialect();
   }
 }

@@ -3,6 +3,7 @@ package io.eventuate.common.spring.jdbc.reactive;
 import io.eventuate.common.jdbc.EventuateJdbcOperationsUtils;
 import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
 import io.eventuate.common.jdbc.sqldialect.SqlDialectSelector;
+import io.eventuate.common.reactive.jdbc.EventuateCommonReactiveJdbcOperations;
 import io.eventuate.common.spring.id.IdGeneratorConfiguration;
 import io.eventuate.common.spring.jdbc.EventuateSchemaConfiguration;
 import io.eventuate.common.spring.jdbc.sqldialect.SqlDialectConfiguration;
@@ -36,13 +37,13 @@ public class EventuateCommonReactiveDatabaseConfiguration {
   }
 
   @Bean
-  public EventuateCommonReactiveSpringJdbcOperations eventuateCommonReactiveSpringJdbcOperations(EventuateCommonReactiveDatabaseProperties eventuateCommonReactiveDatabaseProperties,
-                                                                                                 SqlDialectSelector sqlDialectSelector,
-                                                                                                 EventuateSpringReactiveJdbcStatementExecutor eventuateSpringReactiveJdbcStatementExecutor) {
+  public EventuateCommonReactiveJdbcOperations eventuateCommonReactiveJdbcOperations(EventuateCommonReactiveDatabaseProperties eventuateCommonReactiveDatabaseProperties,
+                                                                                     SqlDialectSelector sqlDialectSelector,
+                                                                                     EventuateSpringReactiveJdbcStatementExecutor eventuateSpringReactiveJdbcStatementExecutor) {
 
     EventuateSqlDialect eventuateSqlDialect = sqlDialectSelector.getDialect(eventuateCommonReactiveDatabaseProperties.getDriver(), Optional.empty());
 
-    return new EventuateCommonReactiveSpringJdbcOperations(new EventuateJdbcOperationsUtils(eventuateSqlDialect),
+    return new EventuateCommonReactiveJdbcOperations(new EventuateJdbcOperationsUtils(eventuateSqlDialect),
             eventuateSpringReactiveJdbcStatementExecutor, eventuateSqlDialect);
   }
 

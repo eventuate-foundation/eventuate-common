@@ -1,4 +1,4 @@
-package io.eventuate.common.spring.jdbc.reactive;
+package io.eventuate.common.reactive.jdbc;
 
 import io.eventuate.common.id.IdGenerator;
 import io.eventuate.common.jdbc.EventuateJdbcOperationsUtils;
@@ -14,17 +14,17 @@ import java.util.Optional;
 import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.EVENT_AUTO_GENERATED_ID_COLUMN;
 import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.MESSAGE_AUTO_GENERATED_ID_COLUMN;
 
-public class EventuateCommonReactiveSpringJdbcOperations {
+public class EventuateCommonReactiveJdbcOperations {
 
   private EventuateJdbcOperationsUtils eventuateJdbcOperationsUtils;
-  private EventuateSpringReactiveJdbcStatementExecutor eventuateSpringReactiveJdbcStatementExecutor;
+  private EventuateReactiveJdbcStatementExecutor reactiveJdbcStatementExecutor;
   private EventuateSqlDialect eventuateSqlDialect;
 
-  public EventuateCommonReactiveSpringJdbcOperations(EventuateJdbcOperationsUtils eventuateJdbcOperationsUtils,
-                                                     EventuateSpringReactiveJdbcStatementExecutor eventuateSpringReactiveJdbcStatementExecutor,
-                                                     EventuateSqlDialect eventuateSqlDialect) {
+  public EventuateCommonReactiveJdbcOperations(EventuateJdbcOperationsUtils eventuateJdbcOperationsUtils,
+                                               EventuateReactiveJdbcStatementExecutor reactiveJdbcStatementExecutor,
+                                               EventuateSqlDialect eventuateSqlDialect) {
     this.eventuateJdbcOperationsUtils = eventuateJdbcOperationsUtils;
-    this.eventuateSpringReactiveJdbcStatementExecutor = eventuateSpringReactiveJdbcStatementExecutor;
+    this.reactiveJdbcStatementExecutor = reactiveJdbcStatementExecutor;
     this.eventuateSqlDialect = eventuateSqlDialect;
   }
 
@@ -69,7 +69,7 @@ public class EventuateCommonReactiveSpringJdbcOperations {
                                     boolean published) {
 
     if (idGenerator.databaseIdRequired()) {
-      return eventuateSpringReactiveJdbcStatementExecutor
+      return reactiveJdbcStatementExecutor
               .insertAndReturnId(eventuateJdbcOperationsUtils.insertIntoEventsTableDbIdSql(eventuateSchema),
                       EVENT_AUTO_GENERATED_ID_COLUMN,
                       eventType,
@@ -84,7 +84,7 @@ public class EventuateCommonReactiveSpringJdbcOperations {
     else {
       String eventId = idGenerator.genId(null).asString();
 
-      return eventuateSpringReactiveJdbcStatementExecutor
+      return reactiveJdbcStatementExecutor
               .update(eventuateJdbcOperationsUtils.insertIntoEventsTableApplicationIdSql(eventuateSchema),
                       eventId,
                       eventType,
@@ -147,7 +147,7 @@ public class EventuateCommonReactiveSpringJdbcOperations {
 
     String serializedHeaders = JSonMapper.toJson(headers);
 
-    return eventuateSpringReactiveJdbcStatementExecutor
+    return reactiveJdbcStatementExecutor
             .update(eventuateJdbcOperationsUtils.insertIntoMessageTableApplicationIdSql(eventuateSchema, this::columnToJson),
                     messageId, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published))
             .map(rowsUpdated -> messageId);
@@ -161,7 +161,7 @@ public class EventuateCommonReactiveSpringJdbcOperations {
                                                         EventuateSchema eventuateSchema) {
     String serializedHeaders = JSonMapper.toJson(headers);
 
-    return eventuateSpringReactiveJdbcStatementExecutor
+    return reactiveJdbcStatementExecutor
             .insertAndReturnId(eventuateJdbcOperationsUtils.insertIntoMessageTableDbIdSql(eventuateSchema, this::columnToJson),
                     MESSAGE_AUTO_GENERATED_ID_COLUMN, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published))
             .map(id -> idGenerator.genId(id).asString());
