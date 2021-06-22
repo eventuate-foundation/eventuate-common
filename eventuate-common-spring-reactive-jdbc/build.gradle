@@ -14,7 +14,7 @@ dependencies {
 test {
     def profile = System.env['SPRING_PROFILES_ACTIVE']
     if (profile != null && profile != '') {
-        exclude '**/EventuateCommonReactiveJdbcOperationsTest**'
+        exclude '**/EventuateCommonReactive**'
     }
 
     forkEvery 1

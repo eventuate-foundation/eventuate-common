@@ -8,6 +8,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.Map;
 
 public class EventuateSpringReactiveJdbcStatementExecutor implements EventuateReactiveJdbcStatementExecutor {
@@ -37,12 +38,26 @@ public class EventuateSpringReactiveJdbcStatementExecutor implements EventuateRe
             .map(m -> ((BigInteger)(m.get("LAST_INSERT_ID()"))).longValue());
   }
 
+//    Following code does not work properly because of bug in r2dbc, but should work in 0.8.3. See:
+//    https://github.com/mirromutth/r2dbc-mysql/issues/149
+//    https://github.com/mirromutth/r2dbc-mysql/pull/159
+//
+//  public Flux<Map<String, Object>> query(String sql, Object... params) {
+//    sql = reformatParameters(sql, params);
+//
+//    DatabaseClient.GenericExecuteSpec genericExecuteSpec = bindParameters(databaseClient.sql(sql), params);
+//
+//    return genericExecuteSpec.fetch().all();
+//  }
+
   public Flux<Map<String, Object>> query(String sql, Object... params) {
-    sql = reformatParameters(sql, params);
+    return queryForList(sql, (row, rowMetadata) -> {
+      Map<String, Object> result = new HashMap<>();
 
-    DatabaseClient.GenericExecuteSpec genericExecuteSpec = bindParameters(databaseClient.sql(sql), params);
+      rowMetadata.getColumnNames().forEach(name -> result.put(name, row.get(name)));
 
-    return genericExecuteSpec.fetch().all();
+      return result;
+    }, params);
   }
 
   public <T> Flux<T> queryForList(String sql, EventuateReactiveRowMapper<T> eventuateReactiveRowMapper, Object... params) {
