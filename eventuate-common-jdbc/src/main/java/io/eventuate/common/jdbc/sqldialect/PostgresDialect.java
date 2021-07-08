@@ -67,13 +67,10 @@ public class PostgresDialect extends AbstractEventuateSqlDialect {
     return columnTypeCache.computeIfAbsent(
             new ColumnCacheKey(eventuateSchema.getEventuateDatabaseSchema(), unqualifiedTable, column),
             columnCacheKey -> {
-              String informationSchema = eventuateSchema.qualifyTable("information_schema");
-
-              final String sql = String
-                      .format("select data_type from %s.columns where table_name = ? and column_name = ?", informationSchema);
+              String sql = "select data_type from information_schema.columns where table_schema = ? and table_name = ? and column_name = ?";
 
               return (String) eventuateJdbcStatementExecutor
-                      .queryForList(sql, unqualifiedTable, column)
+                      .queryForList(sql, eventuateSchema.getEventuateDatabaseSchema(), unqualifiedTable, column)
                       .get(0)
                       .get("data_type");
             });
