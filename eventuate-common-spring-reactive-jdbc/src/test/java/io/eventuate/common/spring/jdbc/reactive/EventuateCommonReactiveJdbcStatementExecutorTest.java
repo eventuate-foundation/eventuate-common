@@ -16,7 +16,7 @@ public class EventuateCommonReactiveJdbcStatementExecutorTest {
   private EventuateSpringReactiveJdbcStatementExecutor eventuateSpringReactiveJdbcStatementExecutor;
 
   @Test
-  public void testInsertIntoMessageTable() {
+  public void testInsert() {
     eventuateSpringReactiveJdbcStatementExecutor.update("drop table if exists eventuate.order_test").block();
 
     eventuateSpringReactiveJdbcStatementExecutor.update(
@@ -33,5 +33,22 @@ public class EventuateCommonReactiveJdbcStatementExecutorTest {
     Assert.assertEquals("b", row.get("b"));
     Assert.assertEquals("c", row.get("c"));
     Assert.assertEquals("d", row.get("d"));
+  }
+
+  @Test
+  public void testInsertNull() {
+    eventuateSpringReactiveJdbcStatementExecutor.update("drop table if exists eventuate.order_test").block();
+
+    eventuateSpringReactiveJdbcStatementExecutor.update(
+            "create table eventuate.order_test(id BIGINT AUTO_INCREMENT PRIMARY KEY, a VARCHAR(10))").block();
+
+    Long id = eventuateSpringReactiveJdbcStatementExecutor
+            .insertAndReturnId("insert into eventuate.order_test (a) values(?)", "id", (Object)null)
+            .block();
+
+    Map<String, Object> row = eventuateSpringReactiveJdbcStatementExecutor.query("select * from eventuate.order_test where id = ?", id).blockFirst();
+
+    Assert.assertEquals(id, row.get("id"));
+    Assert.assertNull(row.get("a"));
   }
 }

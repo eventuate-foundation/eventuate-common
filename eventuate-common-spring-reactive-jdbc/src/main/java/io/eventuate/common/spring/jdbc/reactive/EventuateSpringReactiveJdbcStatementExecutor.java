@@ -78,7 +78,12 @@ public class EventuateSpringReactiveJdbcStatementExecutor implements EventuateRe
 
   private DatabaseClient.GenericExecuteSpec bindParameters(DatabaseClient.GenericExecuteSpec genericExecuteSpec, Object[] params) {
     for (int i = 0; i < params.length; i++) {
-      genericExecuteSpec = genericExecuteSpec.bind(i, params[i]);
+      if (params[i] == null) {
+        genericExecuteSpec = genericExecuteSpec.bindNull(i, Object.class);
+      }
+      else {
+        genericExecuteSpec = genericExecuteSpec.bind(i, params[i]);
+      }
     }
 
     return genericExecuteSpec;
