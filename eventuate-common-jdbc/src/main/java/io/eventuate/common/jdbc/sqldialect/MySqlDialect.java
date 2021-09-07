@@ -18,4 +18,9 @@ public class MySqlDialect extends AbstractEventuateSqlDialect {
   public String getJdbcCatalogue(String dataSourceUrl) {
     return JdbcUrlParser.parse(dataSourceUrl).getDatabase();
   }
+
+  @Override
+  public String addReturningOfGeneratedIdToSql(String sql, String idColumn) {
+    return sql.concat("; SELECT LAST_INSERT_ID();");
+  }
 }

@@ -7,9 +7,12 @@ import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
 import io.eventuate.common.json.mapper.JSonMapper;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.EVENT_AUTO_GENERATED_ID_COLUMN;
 import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.MESSAGE_AUTO_GENERATED_ID_COLUMN;
@@ -19,13 +22,16 @@ public class EventuateCommonReactiveJdbcOperations {
   private EventuateJdbcOperationsUtils eventuateJdbcOperationsUtils;
   private EventuateReactiveJdbcStatementExecutor reactiveJdbcStatementExecutor;
   private EventuateSqlDialect eventuateSqlDialect;
+  private int blockingTimeoutForRetrievingMetadata;
 
   public EventuateCommonReactiveJdbcOperations(EventuateJdbcOperationsUtils eventuateJdbcOperationsUtils,
                                                EventuateReactiveJdbcStatementExecutor reactiveJdbcStatementExecutor,
-                                               EventuateSqlDialect eventuateSqlDialect) {
+                                               EventuateSqlDialect eventuateSqlDialect,
+                                               int blockingTimeoutForRetrievingMetadata) {
     this.eventuateJdbcOperationsUtils = eventuateJdbcOperationsUtils;
     this.reactiveJdbcStatementExecutor = reactiveJdbcStatementExecutor;
     this.eventuateSqlDialect = eventuateSqlDialect;
+    this.blockingTimeoutForRetrievingMetadata = blockingTimeoutForRetrievingMetadata;
   }
 
   public EventuateSqlDialect getEventuateSqlDialect() {
@@ -168,7 +174,14 @@ public class EventuateCommonReactiveJdbcOperations {
   }
 
   public String columnToJson(EventuateSchema eventuateSchema, String column) {
+
+    BiFunction<String, List<Object>, List<Map<String, Object>>> selectCallback =
+            (sql, params) -> reactiveJdbcStatementExecutor
+                    .query(sql, params.toArray())
+                    .collectList()
+                    .block(Duration.ofMillis(blockingTimeoutForRetrievingMetadata));
+
     return eventuateSqlDialect.castToJson("?",
-            eventuateSchema, "message", column, null /*TODO: postgres requires access to database for conversion*/);
+            eventuateSchema, "message", column, selectCallback);
   }
 }

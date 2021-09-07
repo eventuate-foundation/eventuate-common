@@ -3,6 +3,7 @@ dependencies {
     compile project (":eventuate-common-jdbc")
 
     compile "dev.miku:r2dbc-mysql:$r2dbcMysqlVersion"
+    compile "org.postgresql:r2dbc-postgresql:$r2dbcPostgresVersion"
 }
 
 test {

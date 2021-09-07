@@ -168,6 +168,6 @@ public class EventuateCommonJdbcOperations {
 
   protected String columnToJson(EventuateSchema eventuateSchema, String column) {
     return getEventuateSqlDialect().castToJson("?",
-            eventuateSchema, "message", column, eventuateJdbcStatementExecutor);
+            eventuateSchema, "message", column, (sql, args) -> eventuateJdbcStatementExecutor.queryForList(sql, args.toArray()));
   }
 }

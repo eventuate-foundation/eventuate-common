@@ -19,12 +19,12 @@ public class EventuateJdbcOperationsUtils {
 
   public String insertIntoEventsTableApplicationIdSql(EventuateSchema eventuateSchema) {
     return String.format("INSERT INTO %s (event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata, published)" +
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?);", eventuateSchema.qualifyTable("events"));
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?)", eventuateSchema.qualifyTable("events"));
   }
 
   public String insertIntoEventsTableDbIdSql(EventuateSchema eventuateSchema) {
     return String.format("INSERT INTO %s (event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata, published)" +
-            " VALUES ('', ?, ?, ?, ?, ?, ?, ?);", eventuateSchema.qualifyTable("events"));
+            " VALUES ('', ?, ?, ?, ?, ?, ?, ?)", eventuateSchema.qualifyTable("events"));
   }
 
   public String insertIntoMessageTableApplicationIdSql(EventuateSchema eventuateSchema, SqlJsonConverter jsonConverter) {

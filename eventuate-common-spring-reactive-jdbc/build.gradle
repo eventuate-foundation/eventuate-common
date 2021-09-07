@@ -13,7 +13,7 @@ dependencies {
 
 test {
     def profile = System.env['SPRING_PROFILES_ACTIVE']
-    if (profile != null && profile != '') {
+    if (profile != null && profile != '' && profile !='postgres') {
         exclude '**/EventuateCommonReactive**'
     }
 
