@@ -36,5 +36,5 @@ public interface EventuateSqlDialect extends EventuateSqlDialectOrder {
     return object.toString();
   }
 
-  String getPrimaryKeyColumn(DataSource dataSource, String dataSourceUrl, SchemaAndTable schemaAndTable) throws SQLException;
+  List<String> getPrimaryKeyColumns(DataSource dataSource, String dataSourceUrl, SchemaAndTable schemaAndTable) throws SQLException;
 }

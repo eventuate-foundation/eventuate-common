@@ -145,10 +145,11 @@ public class SqlDialectIntegrationTest {
   }
 
   private void assertPrimaryKeyColumnEquals(String table, String expectedKeyColumn) throws SQLException {
-    String pkColumn = getDialect()
-            .getPrimaryKeyColumn(dataSource, dataSourceUrl, new SchemaAndTable(EventuateSchema.DEFAULT_SCHEMA, table));
+    List<String> pkColumns = getDialect()
+            .getPrimaryKeyColumns(dataSource, dataSourceUrl, new SchemaAndTable(EventuateSchema.DEFAULT_SCHEMA, table));
 
-    Assert.assertEquals(expectedKeyColumn, pkColumn);
+    Assert.assertEquals(1, pkColumns.size());
+    Assert.assertEquals(expectedKeyColumn, pkColumns.stream().findAny().get());
   }
 
   private void assertAllRowsHaveTheSameEventType(List<Map<String, Object>> rows, String eventType) {
