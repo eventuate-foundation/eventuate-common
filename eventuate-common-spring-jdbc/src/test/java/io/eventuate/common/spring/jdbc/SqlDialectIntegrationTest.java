@@ -148,8 +148,7 @@ public class SqlDialectIntegrationTest {
     List<String> pkColumns = getDialect()
             .getPrimaryKeyColumns(dataSource, dataSourceUrl, new SchemaAndTable(EventuateSchema.DEFAULT_SCHEMA, table));
 
-    Assert.assertEquals(1, pkColumns.size());
-    Assert.assertEquals(expectedKeyColumn, pkColumns.stream().findAny().get());
+    Assert.assertEquals(Collections.singletonList(expectedKeyColumn), pkColumns);
   }
 
   private void assertAllRowsHaveTheSameEventType(List<Map<String, Object>> rows, String eventType) {
