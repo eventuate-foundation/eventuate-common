@@ -29,7 +29,7 @@ import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.EVENT_AUTO_G
 import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.MESSAGE_APPLICATION_GENERATED_ID_COLUMN;
 import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.MESSAGE_AUTO_GENERATED_ID_COLUMN;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
 
 @SpringBootTest(classes = SqlDialectIntegrationTest.Config.class)
 @RunWith(SpringRunner.class)
@@ -134,28 +134,28 @@ public class SqlDialectIntegrationTest {
 
   @Test
   public void testEventsPrimaryKeyColumn() throws SQLException {
-    assertPrimaryKeyColumnEquals("events", singleton(useDbId
+    assertPrimaryKeyColumnEquals("events", singletonList(useDbId
             ? EVENT_AUTO_GENERATED_ID_COLUMN
             : EVENT_APPLICATION_GENERATED_ID_COLUMN));
   }
 
   @Test
   public void testMessagePrimaryKeyColumn() throws SQLException {
-    assertPrimaryKeyColumnEquals("message", singleton(useDbId
+    assertPrimaryKeyColumnEquals("message", singletonList(useDbId
             ? MESSAGE_AUTO_GENERATED_ID_COLUMN
             : MESSAGE_APPLICATION_GENERATED_ID_COLUMN));
   }
 
   @Test
   public void testReceivedMessagePrimaryKeyColumn() throws SQLException {
-    assertPrimaryKeyColumnEquals("received_messages", new HashSet<>(asList("message_id", "consumer_id")));
+    assertPrimaryKeyColumnEquals("received_messages", asList("consumer_id", "message_id"));
   }
 
-  private void assertPrimaryKeyColumnEquals(String table, Set<String> expectedKeyColumns) throws SQLException {
+  private void assertPrimaryKeyColumnEquals(String table, List<String> expectedKeyColumns) throws SQLException {
     List<String> pkColumns = getDialect()
             .getPrimaryKeyColumns(dataSource, dataSourceUrl, new SchemaAndTable(EventuateSchema.DEFAULT_SCHEMA, table));
 
-    Assert.assertEquals(expectedKeyColumns, new HashSet<>(pkColumns));
+    Assert.assertEquals(expectedKeyColumns, pkColumns);
   }
 
   private void assertAllRowsHaveTheSameEventType(List<Map<String, Object>> rows, String eventType) {
