@@ -7,8 +7,13 @@ import org.postgresql.util.PGobject;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.BiFunction;
+
+import static java.util.Arrays.asList;
 
 public class PostgresDialect extends AbstractEventuateSqlDialect {
 
@@ -16,7 +21,7 @@ public class PostgresDialect extends AbstractEventuateSqlDialect {
 
   public PostgresDialect() {
     super(Collections.singleton("org.postgresql.Driver"),
-            Collections.unmodifiableSet(new HashSet<>(Arrays.asList("postgres", "postgresql", "pgsql", "pg"))),
+            Collections.unmodifiableSet(new HashSet<>(asList("postgres", "postgresql", "pgsql", "pg"))),
             "(ROUND(EXTRACT(EPOCH FROM CURRENT_TIMESTAMP) * 1000))");
   }
 
@@ -30,9 +35,9 @@ public class PostgresDialect extends AbstractEventuateSqlDialect {
                            EventuateSchema eventuateSchema,
                            String unqualifiedTable,
                            String column,
-                           EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor) {
+                           BiFunction<String, List<Object>, List<Map<String, Object>>> selectCallback) {
 
-    String columnType = getColumnType(eventuateSchema, unqualifiedTable, column, eventuateJdbcStatementExecutor);
+    String columnType = getColumnType(eventuateSchema, unqualifiedTable, column, selectCallback);
 
     return String.format("%s::%s", sqlPart, columnType);
   }
@@ -60,9 +65,9 @@ public class PostgresDialect extends AbstractEventuateSqlDialect {
   }
 
   private String getColumnType(EventuateSchema eventuateSchema,
-                               String unqualifiedTable,
-                               String column,
-                               EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor) {
+                                String unqualifiedTable,
+                                String column,
+                                BiFunction<String, List<Object>, List<Map<String, Object>>> selectCallback) {
 
     return columnTypeCache.computeIfAbsent(
             new ColumnCacheKey(eventuateSchema.getEventuateDatabaseSchema(), unqualifiedTable, column),
@@ -72,10 +77,14 @@ public class PostgresDialect extends AbstractEventuateSqlDialect {
               final String sql = String
                       .format("select data_type from %s.columns where table_name = ? and column_name = ?", informationSchema);
 
-              return (String) eventuateJdbcStatementExecutor
-                      .queryForList(sql, unqualifiedTable, column)
+              return (String) selectCallback.apply(sql, asList(unqualifiedTable, column))
                       .get(0)
                       .get("data_type");
             });
+  }
+
+  @Override
+  public String addReturningOfGeneratedIdToSql(String sql, String idColumn) {
+    return String.format("%s RETURNING %s", sql, idColumn);
   }
 }

@@ -1,11 +1,14 @@
 package io.eventuate.common.jdbc.sqldialect;
 
 import io.eventuate.common.jdbc.SchemaAndTable;
+import org.apache.commons.lang.NotImplementedException;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public abstract class AbstractEventuateSqlDialect implements EventuateSqlDialect {
@@ -35,12 +38,17 @@ public abstract class AbstractEventuateSqlDialect implements EventuateSqlDialect
     return String.format("%s limit %s", sql, limitExpression);
   }
 
+  @Override
+  public String addReturningOfGeneratedIdToSql(String sql, String idColumn) {
+    throw new NotImplementedException();
+  }
+
   public String getCurrentTimeInMillisecondsExpression() {
     return customCurrentTimeInMillisecondsExpression;
   }
 
   @Override
-  public String getPrimaryKeyColumn(DataSource dataSource, String dataSourceUrl, SchemaAndTable schemaAndTable) throws SQLException {
+  public List<String> getPrimaryKeyColumns(DataSource dataSource, String dataSourceUrl, SchemaAndTable schemaAndTable) throws SQLException {
     try (Connection connection = dataSource.getConnection()) {
       ResultSet resultSet = connection
               .getMetaData()
@@ -48,17 +56,13 @@ public abstract class AbstractEventuateSqlDialect implements EventuateSqlDialect
                       schemaAndTable.getSchema(),
                       schemaAndTable.getTableName());
 
-      if (resultSet.next()) {
-        String pk = resultSet.getString("COLUMN_NAME");
+      List<String> pkColumns = new ArrayList<>();
 
-        if (resultSet.next()) {
-          throw new RuntimeException(String.format("Table %s has more than one primary key", schemaAndTable));
-        }
-
-        return pk;
-      } else {
-        throw new RuntimeException(String.format("Cannot get primary key of table %s: result set is empty", schemaAndTable));
+      while (resultSet.next()) {
+        pkColumns.add(resultSet.getString("COLUMN_NAME"));
       }
+
+      return pkColumns;
     }
   }
 

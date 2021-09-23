@@ -1,6 +1,8 @@
 package io.eventuate.common.spring.jdbc.reactive;
 
 import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
+import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
+import io.eventuate.common.jdbc.sqldialect.PostgresDialect;
 import io.eventuate.common.reactive.jdbc.EventuateReactiveJdbcStatementExecutor;
 import io.eventuate.common.reactive.jdbc.EventuateReactiveRowMapper;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -13,9 +15,11 @@ import java.util.Map;
 
 public class EventuateSpringReactiveJdbcStatementExecutor implements EventuateReactiveJdbcStatementExecutor {
   private DatabaseClient databaseClient;
+  private EventuateSqlDialect sqlDialect;
 
-  public EventuateSpringReactiveJdbcStatementExecutor(DatabaseClient databaseClient) {
+  public EventuateSpringReactiveJdbcStatementExecutor(DatabaseClient databaseClient, EventuateSqlDialect sqlDialect) {
     this.databaseClient = databaseClient;
+    this.sqlDialect = sqlDialect;
   }
 
   public Mono<Integer> update(String sql, Object... params) {
@@ -27,7 +31,7 @@ public class EventuateSpringReactiveJdbcStatementExecutor implements EventuateRe
   }
 
   public Mono<Long> insertAndReturnId(String sql, String idColumn, Object... params) {
-    sql = String.format("%s%s", reformatParameters(sql, params), ";SELECT LAST_INSERT_ID();");
+    sql = sqlDialect.addReturningOfGeneratedIdToSql(reformatInsertParameters(sql, params, params), idColumn);
 
     DatabaseClient.GenericExecuteSpec genericExecuteSpec = bindParameters(databaseClient.sql(sql), params);
 
@@ -35,7 +39,14 @@ public class EventuateSpringReactiveJdbcStatementExecutor implements EventuateRe
             .fetch()
             .one()
             .doOnError(this::handleDuplicateKeyException)
-            .map(m -> ((BigInteger)(m.get("LAST_INSERT_ID()"))).longValue());
+            .map(m -> {
+              Object value = m.values().stream().findFirst().get();
+
+              if (value instanceof Long) return (Long)value;
+              if (value instanceof BigInteger) return ((BigInteger)value).longValue();
+
+              throw new IllegalStateException();
+            });
   }
 
 //    Following code does not work properly because of bug in r2dbc, but should work in 0.8.3. See:
@@ -76,10 +87,25 @@ public class EventuateSpringReactiveJdbcStatementExecutor implements EventuateRe
     return sql;
   }
 
+  private String reformatInsertParameters(String sql, Object[] params, Object[] values) {
+    for (int i = 1; i <= params.length; i++) {
+      //Hack for postgres, null binding does not work: [CIRCULAR REFERENCE:java.lang.IllegalArgumentException: Cannot encode null parameter of type java.lang.Object]
+      if (sqlDialect instanceof PostgresDialect && values[i - 1] == null) {
+        sql = sql.replaceFirst("\\?", "NULL");
+      } else {
+        sql = sql.replaceFirst("\\?", ":param" + i);
+      }
+    }
+
+    return sql;
+  }
+
   private DatabaseClient.GenericExecuteSpec bindParameters(DatabaseClient.GenericExecuteSpec genericExecuteSpec, Object[] params) {
     for (int i = 0; i < params.length; i++) {
       if (params[i] == null) {
-        genericExecuteSpec = genericExecuteSpec.bindNull(i, Object.class);
+        if (!(sqlDialect instanceof PostgresDialect)) {
+          genericExecuteSpec = genericExecuteSpec.bindNull(i, Object.class);
+        }
       }
       else {
         genericExecuteSpec = genericExecuteSpec.bind(i, params[i]);
@@ -90,7 +116,7 @@ public class EventuateSpringReactiveJdbcStatementExecutor implements EventuateRe
   }
 
   private void handleDuplicateKeyException(Throwable throwable) {
-    if (throwable.getMessage().contains("Duplicate entry")) {
+    if (throwable.getMessage().contains("Duplicate entry") || throwable.getMessage().contains("duplicate key")) {
       throw new EventuateDuplicateKeyException(throwable);
     }
 

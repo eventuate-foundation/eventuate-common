@@ -28,6 +28,8 @@ import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.EVENT_APPLIC
 import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.EVENT_AUTO_GENERATED_ID_COLUMN;
 import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.MESSAGE_APPLICATION_GENERATED_ID_COLUMN;
 import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.MESSAGE_AUTO_GENERATED_ID_COLUMN;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 @SpringBootTest(classes = SqlDialectIntegrationTest.Config.class)
 @RunWith(SpringRunner.class)
@@ -132,23 +134,28 @@ public class SqlDialectIntegrationTest {
 
   @Test
   public void testEventsPrimaryKeyColumn() throws SQLException {
-    assertPrimaryKeyColumnEquals("events", useDbId
+    assertPrimaryKeyColumnEquals("events", singletonList(useDbId
             ? EVENT_AUTO_GENERATED_ID_COLUMN
-            : EVENT_APPLICATION_GENERATED_ID_COLUMN);
+            : EVENT_APPLICATION_GENERATED_ID_COLUMN));
   }
 
   @Test
   public void testMessagePrimaryKeyColumn() throws SQLException {
-    assertPrimaryKeyColumnEquals("message", useDbId
+    assertPrimaryKeyColumnEquals("message", singletonList(useDbId
             ? MESSAGE_AUTO_GENERATED_ID_COLUMN
-            : MESSAGE_APPLICATION_GENERATED_ID_COLUMN);
+            : MESSAGE_APPLICATION_GENERATED_ID_COLUMN));
   }
 
-  private void assertPrimaryKeyColumnEquals(String table, String expectedKeyColumn) throws SQLException {
-    String pkColumn = getDialect()
-            .getPrimaryKeyColumn(dataSource, dataSourceUrl, new SchemaAndTable(EventuateSchema.DEFAULT_SCHEMA, table));
+  @Test
+  public void testReceivedMessagePrimaryKeyColumn() throws SQLException {
+    assertPrimaryKeyColumnEquals("received_messages", asList("consumer_id", "message_id"));
+  }
 
-    Assert.assertEquals(expectedKeyColumn, pkColumn);
+  private void assertPrimaryKeyColumnEquals(String table, List<String> expectedKeyColumns) throws SQLException {
+    List<String> pkColumns = getDialect()
+            .getPrimaryKeyColumns(dataSource, dataSourceUrl, new SchemaAndTable(EventuateSchema.DEFAULT_SCHEMA, table));
+
+    Assert.assertEquals(expectedKeyColumns, pkColumns);
   }
 
   private void assertAllRowsHaveTheSameEventType(List<Map<String, Object>> rows, String eventType) {

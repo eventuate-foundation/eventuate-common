@@ -163,7 +163,7 @@ public class EventuateCommonReactiveJdbcOperationsTest extends AbstractEventuate
   @Override
   protected void insertIntoEntitiesTable(String entityId, String entityType, EventuateSchema eventuateSchema) {
     String table = eventuateSchema.qualifyTable("entities");
-    String sql = String.format("insert into %s values (?, ?, ?);", table);
+    String sql = String.format("insert into %s values (?, ?, ?)", table);
 
     eventuateSpringReactiveJdbcStatementExecutor.update(sql, entityId, entityType, System.nanoTime()).block();
   }
