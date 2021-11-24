@@ -5,10 +5,10 @@ import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
 import io.eventuate.common.jdbc.EventuateSchema;
 import io.eventuate.common.jdbc.SchemaAndTable;
 import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
+import io.eventuate.common.jdbc.sqldialect.PostgresDialect;
 import io.eventuate.common.jdbc.sqldialect.SqlDialectSelector;
 import io.eventuate.common.spring.id.IdGeneratorConfiguration;
 import io.eventuate.common.spring.jdbc.sqldialect.SqlDialectConfiguration;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +28,12 @@ import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.EVENT_APPLIC
 import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.EVENT_AUTO_GENERATED_ID_COLUMN;
 import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.MESSAGE_APPLICATION_GENERATED_ID_COLUMN;
 import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.MESSAGE_AUTO_GENERATED_ID_COLUMN;
+import static java.lang.String.format;
+import static java.lang.System.nanoTime;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @SpringBootTest(classes = SqlDialectIntegrationTest.Config.class)
 @RunWith(SpringRunner.class)
@@ -55,6 +59,9 @@ public class SqlDialectIntegrationTest {
   @Value("${db.id.used:#{false}}")
   private boolean useDbId;
 
+  @Value("${spring.profiles.active}")
+  private String profile;
+
   @Autowired
   private DataSource dataSource;
 
@@ -71,6 +78,34 @@ public class SqlDialectIntegrationTest {
   private IdGenerator idGenerator;
 
   @Test
+  public void testPostgresColumnTypeAccess() {
+    if (!profile.contains("postgres")) {
+      return;
+    }
+
+    String schema = "column_type_test_schema_" + nanoTime();
+
+    jdbcTemplate.update(format("create schema %s", schema));
+
+    String sampleTable = "column_type_test_table_" + nanoTime();
+
+    jdbcTemplate.update(String.format("create table %s.%s(id text primary key)", schema, sampleTable));
+
+    PostgresDialect postgresDialect = (PostgresDialect) getDialect();
+
+    String columnType =
+            postgresDialect
+                    .getColumnType(
+                            new EventuateSchema(schema),
+                            sampleTable,
+                            "id",
+                            (sql, args) -> jdbcTemplate.queryForList(sql, args.toArray())
+                    );
+
+    assertEquals("text", columnType);
+  }
+
+  @Test
   public void testAddLimitToSimpleSelect() {
     final int LIMIT = 3;
 
@@ -82,8 +117,8 @@ public class SqlDialectIntegrationTest {
     List<Map<String, Object>> resultWithLimit = jdbcTemplate.queryForList(sqlWithLimit);
     List<Map<String, Object>> resultWithoutLimit = jdbcTemplate.queryForList(sqlWithoutLimit);
 
-    Assert.assertTrue(resultWithoutLimit.size() >= DEFAULT_DB_RECORDS);
-    Assert.assertEquals(LIMIT, resultWithLimit.size());
+    assertTrue(resultWithoutLimit.size() >= DEFAULT_DB_RECORDS);
+    assertEquals(LIMIT, resultWithLimit.size());
   }
 
   @Test
@@ -113,8 +148,8 @@ public class SqlDialectIntegrationTest {
     List<Map<String, Object>> resultWithLimit = jdbcTemplate.queryForList(sqlWithLimit, eventType);
     List<Map<String, Object>> resultWithoutLimit = jdbcTemplate.queryForList(sqlWithoutLimit, eventType);
 
-    Assert.assertEquals(SELECTABLE_RECORDS, resultWithoutLimit.size());
-    Assert.assertEquals(LIMIT, resultWithLimit.size());
+    assertEquals(SELECTABLE_RECORDS, resultWithoutLimit.size());
+    assertEquals(LIMIT, resultWithLimit.size());
 
     assertAllRowsHaveTheSameEventType(resultWithoutLimit, eventType);
     assertAllRowsHaveTheSameEventType(resultWithLimit, eventType);
@@ -128,8 +163,8 @@ public class SqlDialectIntegrationTest {
     Thread.sleep(100);
     Long javaTime2 = System.currentTimeMillis();
 
-    Assert.assertTrue(dbTime > javaTime1);
-    Assert.assertTrue(dbTime < javaTime2);
+    assertTrue(dbTime > javaTime1);
+    assertTrue(dbTime < javaTime2);
   }
 
   @Test
@@ -155,11 +190,11 @@ public class SqlDialectIntegrationTest {
     List<String> pkColumns = getDialect()
             .getPrimaryKeyColumns(dataSource, dataSourceUrl, new SchemaAndTable(EventuateSchema.DEFAULT_SCHEMA, table));
 
-    Assert.assertEquals(expectedKeyColumns, pkColumns);
+    assertEquals(expectedKeyColumns, pkColumns);
   }
 
   private void assertAllRowsHaveTheSameEventType(List<Map<String, Object>> rows, String eventType) {
-    Assert.assertTrue(rows.stream().allMatch(row -> row.get("event_type").equals(eventType)));
+    assertTrue(rows.stream().allMatch(row -> row.get("event_type").equals(eventType)));
   }
 
   private void prepareRandomData() {

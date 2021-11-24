@@ -64,7 +64,7 @@ public class PostgresDialect extends AbstractEventuateSqlDialect {
     throw new IllegalArgumentException(String.format("Unsupported java type %s for column %s", object.getClass(), column));
   }
 
-  private String getColumnType(EventuateSchema eventuateSchema,
+  public String getColumnType(EventuateSchema eventuateSchema,
                                 String unqualifiedTable,
                                 String column,
                                 BiFunction<String, List<Object>, List<Map<String, Object>>> selectCallback) {
@@ -72,12 +72,13 @@ public class PostgresDialect extends AbstractEventuateSqlDialect {
     return columnTypeCache.computeIfAbsent(
             new ColumnCacheKey(eventuateSchema.getEventuateDatabaseSchema(), unqualifiedTable, column),
             columnCacheKey -> {
-              String informationSchema = eventuateSchema.qualifyTable("information_schema");
+              final String sql =
+                      "select data_type " +
+                      "from information_schema.columns " +
+                      "where table_schema = ? and table_name = ? and column_name = ?";
 
-              final String sql = String
-                      .format("select data_type from %s.columns where table_name = ? and column_name = ?", informationSchema);
-
-              return (String) selectCallback.apply(sql, asList(unqualifiedTable, column))
+              return (String) selectCallback
+                      .apply(sql, asList(eventuateSchema.getEventuateDatabaseSchema(), unqualifiedTable, column))
                       .get(0)
                       .get("data_type");
             });
