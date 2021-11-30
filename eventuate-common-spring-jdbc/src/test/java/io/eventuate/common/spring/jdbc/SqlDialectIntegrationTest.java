@@ -59,7 +59,7 @@ public class SqlDialectIntegrationTest {
   @Value("${db.id.used:#{false}}")
   private boolean useDbId;
 
-  @Value("${spring.profiles.active}")
+  @Value("${spring.profiles.active:#{null}}")
   private String profile;
 
   @Autowired
@@ -79,7 +79,7 @@ public class SqlDialectIntegrationTest {
 
   @Test
   public void testPostgresColumnTypeAccess() {
-    if (!profile.contains("postgres")) {
+    if (profile == null || !profile.contains("postgres")) {
       return;
     }
 
