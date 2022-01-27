@@ -6,6 +6,6 @@ docker login -u ${DOCKER_USER_ID?} -p ${DOCKER_PASSWORD?}
 
 docker buildx build --platform linux/amd64,linux/arm64 \
   -t $MYSQL8_MULTI_ARCH_IMAGE \
-  -f Dockerfile-mysql/mysql8-multi-arch \
+  -f mysql/Dockerfile-mysql8-multi-arch \
   --push \
   mysql
