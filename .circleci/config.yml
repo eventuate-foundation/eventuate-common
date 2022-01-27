@@ -59,30 +59,35 @@ workflows:
     jobs:
       - build-multi-arch-images
       - build-and-test/build-and-test:
+          name: build-and-test-all-mysql8-multi-arch
+          script: ./build-and-test-all-mysql8-multi-arch.sh
+          requires:
+            - build-multi-arch-images
+      - build-and-test/build-and-test:
           name: build-and-test-mysql
           script: ./build-and-test-all-mysql.sh
           requires:
-            - build-multi-arch-images
+            - build-and-test-all-mysql8-multi-arch
       - build-and-test/build-and-test:
           name: build-and-test-mysql8
           script: ./build-and-test-all-mysql8.sh
           requires:
-            - build-multi-arch-images
+            - build-and-test-all-mysql8-multi-arch
       - build-and-test/build-and-test:
           name: build-and-test-mariadb
           script: ./build-and-test-all-mariadb.sh
           requires:
-            - build-multi-arch-images
+            - build-and-test-all-mysql8-multi-arch
       - build-and-test/build-and-test:
           name: build-and-test-mssql
           script: ./build-and-test-all-mssql.sh
           requires:
-            - build-multi-arch-images
+            - build-and-test-all-mysql8-multi-arch
       - build-and-test/build-and-test:
           name: build-and-test-postgres
           script: ./build-and-test-all-postgres.sh
           requires:
-            - build-multi-arch-images
+            - build-and-test-all-mysql8-multi-arch
       - build-and-test/build-and-test:
           name: deploy-artifacts
           context:
