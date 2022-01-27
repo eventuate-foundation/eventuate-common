@@ -9,8 +9,6 @@ orbs:
             type: string
         machine: true
         working_directory: ~/eventuate-common
-        environment:
-          MYSQL8_MULTI_ARCH_IMAGE: eventuateio/eventuate-mysql8:test-build-${CIRCLE_SHA1?}
         steps:
           - checkout
           - restore_cache:
@@ -25,7 +23,11 @@ orbs:
               paths:
                 - ~/.gradle
               key: eventuate-common-{{ checksum "gradle.properties" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
-          - run: <<parameters.script>>
+          - run:
+              name: run-script
+              command: |
+                export MYSQL8_MULTI_ARCH_IMAGE=eventuateio/eventuate-mysql8:test-build-${CIRCLE_SHA1?}
+                <<parameters.script>>
           - run:
               name: Save test results
               command: ./.circleci/save-containers-and-tests.sh
