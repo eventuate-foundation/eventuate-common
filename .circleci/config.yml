@@ -9,6 +9,8 @@ orbs:
             type: string
         machine: true
         working_directory: ~/eventuate-common
+        environment:
+          MYSQL8_MULTI_ARCH_IMAGE: eventuateio/eventuate-mysql8:test-build-${CIRCLE_SHA1?}
         steps:
           - checkout
           - restore_cache:
@@ -34,38 +36,53 @@ orbs:
               path: ~/junit
           - store_artifacts:
               path: ~/container-logs
+jobs:
+  build-multi-arch-images:
+    docker:
+      - image: cimg/base:stable
+    working_directory: ~/plantuml
+    environment:
+      MYSQL8_MULTI_ARCH_IMAGE: eventuateio/eventuate-mysql8:test-build-${CIRCLE_SHA1?}
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.11
+      - run:
+          name: docker buildx build
+          command: |
+            docker context create tls-env
+            docker buildx create tls-env --use
+            ./build-multi-arch-images.sh
 workflows:
   version: 2.1
   build-test-and-deploy:
     jobs:
-      - build-and-test/build-and-test:
-          name: build-and-test-mysql-mysql-8-multi-arch
-          script: ./install-buildx-and-build-and-test-all-mysql8-multi-arch.sh
+      - build-multi-arch-images
       - build-and-test/build-and-test:
           name: build-and-test-mysql
           script: ./build-and-test-all-mysql.sh
           requires:
-            - build-and-test-mysql-mysql-8-multi-arch
+            - build-multi-arch-images
       - build-and-test/build-and-test:
           name: build-and-test-mysql8
           script: ./build-and-test-all-mysql8.sh
           requires:
-            - build-and-test-mysql-mysql-8-multi-arch
+            - build-multi-arch-images
       - build-and-test/build-and-test:
           name: build-and-test-mariadb
           script: ./build-and-test-all-mariadb.sh
           requires:
-            - build-and-test-mysql-mysql-8-multi-arch
+            - build-multi-arch-images
       - build-and-test/build-and-test:
           name: build-and-test-mssql
           script: ./build-and-test-all-mssql.sh
           requires:
-            - build-and-test-mysql-mysql-8-multi-arch
+            - build-multi-arch-images
       - build-and-test/build-and-test:
           name: build-and-test-postgres
           script: ./build-and-test-all-postgres.sh
           requires:
-            - build-and-test-mysql-mysql-8-multi-arch
+            - build-multi-arch-images
       - build-and-test/build-and-test:
           name: deploy-artifacts
           context:
