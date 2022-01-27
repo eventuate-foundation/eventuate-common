@@ -29,8 +29,10 @@ db_id_migration_path=$(get_db_id_migration_path)
 
 echo db_id_migration_path=$db_id_migration_path
 
-if [ "${DATABASE}" == "mysql" ] || [ "${DATABASE}" == "mysql8" ] || [ "${DATABASE}" == "mariadb" ]; then
+if [ "${DATABASE}" == "mysql" ] || [ "${DATABASE}" == "mysql8" ]  || [ "${DATABASE}" == "mariadb" ]; then
   curl -s ${db_id_migration_path}/mysql/4.initialize-database-db-id.sql &> /dev/stdout | ./mysql-cli.sh -i
+elif [ "${DATABASE}" == "mysql8-multi-arch"  ]; then
+  curl -s ${db_id_migration_path}/mysql/4.initialize-database-db-id.sql &> /dev/stdout | ./mysql-cli-multi-arch.sh -i
 elif [ "${DATABASE}" == "postgres" ]; then
   curl -s ${db_id_migration_path}/postgres/5.initialize-database-db-id.sql &> /dev/stdout | ./postgres-cli.sh -i
 elif [ "${DATABASE}" == "mssql" ]; then

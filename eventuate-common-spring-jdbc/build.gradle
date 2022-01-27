@@ -13,4 +13,5 @@ dependencies {
 
 test {
     forkEvery 1
+    systemProperty 'db.id.used', dbIdUsed
 }
