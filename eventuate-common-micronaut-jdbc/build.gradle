@@ -21,3 +21,9 @@ dependencies {
     compile "io.micronaut:micronaut-validation"
     compile "io.micronaut:micronaut-runtime"
 }
+
+test {
+    systemProperty 'db.id.used', dbIdUsed
+    if (project.hasProperty("eventuateOutboxId"))
+      systemProperty 'eventuate.outbox.id', eventuateOutboxId
+}
