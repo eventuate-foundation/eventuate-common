@@ -13,4 +13,7 @@ dependencies {
 
 test {
     forkEvery 1
+    systemProperty 'db.id.used', dbIdUsed
+    if (project.hasProperty("eventuateOutboxId"))
+      systemProperty 'eventuate.outbox.id', eventuateOutboxId    
 }
