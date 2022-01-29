@@ -92,7 +92,7 @@ echo ""
 
 unset USE_DB_ID
 dockerUp
-./migration/db-id/migration.sh
+./migration/db-id/migration.sh --local
 testJdbc
 
 echo ""

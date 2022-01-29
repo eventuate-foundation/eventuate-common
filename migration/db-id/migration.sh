@@ -2,6 +2,12 @@
 
 set -e
 
+LOCAL=
+
+if [ "$1" == "--local" ]; then
+  LOCAL=true
+fi
+
 if [ -z "$DB_ID_MIGRATION_REPOSITORY" ] ; then
   export DB_ID_MIGRATION_REPOSITORY=https://raw.githubusercontent.com/eventuate-foundation/eventuate-common
 fi
@@ -29,8 +35,14 @@ db_id_migration_path=$(get_db_id_migration_path)
 
 echo db_id_migration_path=$db_id_migration_path
 
-if [ "${DATABASE}" == "mysql" ] || [ "${DATABASE}" == "mysql8" ] || [ "${DATABASE}" == "mariadb" ]; then
-  curl -s ${db_id_migration_path}/mysql/4.initialize-database-db-id.sql &> /dev/stdout | ./mysql-cli.sh -i
+if [ "${DATABASE}" == "mysql" ] || [ "${DATABASE}" == "mysql8" ] || [ "${DATABASE}" == "mariadb" ] || [ "${DATABASE}" == "mysql8-multi-arch"  ]; then
+
+  if [ -z "$LOCAL" ]; then
+    curl -s ${db_id_migration_path}/mysql/4.initialize-database-db-id.sql &> /dev/stdout | ./mysql-cli.sh -i
+  else
+    cat mysql/4.initialize-database-db-id.sql | ./mysql-cli.sh -i
+  fi
+
 elif [ "${DATABASE}" == "postgres" ]; then
   curl -s ${db_id_migration_path}/postgres/5.initialize-database-db-id.sql &> /dev/stdout | ./postgres-cli.sh -i
 elif [ "${DATABASE}" == "mssql" ]; then
