@@ -6,7 +6,6 @@ docker login -u ${DOCKER_USER_ID?} -p ${DOCKER_PASSWORD?}
 # https://github.com/docker/buildx/issues/493#issuecomment-754834977
 # https://github.com/tonistiigi/binfmt#installing-emulators
 
-docker run --privileged --rm tonistiigi/binfmt --uninstall qemu-aarch64
 docker run --privileged --rm tonistiigi/binfmt --install arm64,arm
 
 ./mysql/build-docker-mysql-8-multi-arch.sh
