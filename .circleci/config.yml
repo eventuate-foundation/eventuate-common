@@ -23,7 +23,10 @@ orbs:
               paths:
                 - ~/.gradle
               key: eventuate-common-{{ checksum "gradle.properties" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
-          - run: <<parameters.script>>
+          - run:
+              command: |
+                . set-multi-arch-image-env-vars.sh
+                <<parameters.script>>
           - run:
               name: Save test results
               command: ./.circleci/save-containers-and-tests.sh
@@ -34,25 +37,53 @@ orbs:
               path: ~/junit
           - store_artifacts:
               path: ~/container-logs
+jobs:
+  build-multi-arch-images:
+    docker:
+      - image: cimg/base:stable
+    working_directory: ~/plantuml
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.11
+      - run:
+          name: docker buildx build
+          command: |
+            . set-multi-arch-image-env-vars.sh
+            docker context create tls-env
+            docker buildx create tls-env --use
+            ./mysql/build-docker-mysql-8-multi-arch.sh
+            ./zookeeper/build-docker-zookeeper-multi-arch.sh
 workflows:
   version: 2.1
   build-test-and-deploy:
     jobs:
+      - build-multi-arch-images
       - build-and-test/build-and-test:
           name: build-and-test-mysql
           script: ./build-and-test-all-mysql.sh
+          requires:
+            - build-multi-arch-images
       - build-and-test/build-and-test:
           name: build-and-test-mysql8
           script: ./build-and-test-all-mysql8.sh
+          requires:
+            - build-multi-arch-images
       - build-and-test/build-and-test:
           name: build-and-test-mariadb
           script: ./build-and-test-all-mariadb.sh
+          requires:
+            - build-multi-arch-images
       - build-and-test/build-and-test:
           name: build-and-test-mssql
           script: ./build-and-test-all-mssql.sh
+          requires:
+            - build-multi-arch-images
       - build-and-test/build-and-test:
           name: build-and-test-postgres
           script: ./build-and-test-all-postgres.sh
+          requires:
+            - build-multi-arch-images
       - build-and-test/build-and-test:
           name: deploy-artifacts
           context:
