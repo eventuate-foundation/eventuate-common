@@ -52,8 +52,7 @@ jobs:
             . set-multi-arch-image-env-vars.sh
             docker context create tls-env
             docker buildx create tls-env --use
-            ./mysql/build-docker-mysql-8-multi-arch.sh
-            ./zookeeper/build-docker-zookeeper-multi-arch.sh
+            ./build-multi-arch-images.sh
 workflows:
   version: 2.1
   build-test-and-deploy:
