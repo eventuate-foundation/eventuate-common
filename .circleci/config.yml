@@ -72,7 +72,9 @@ jobs:
     steps:
       - checkout
       - run:
-          command: ./deploy-multi-arch.sh
+          command: |
+            . set-multi-arch-image-env-vars.sh
+            ./deploy-multi-arch.sh
 workflows:
   version: 2.1
   build-test-and-deploy:
