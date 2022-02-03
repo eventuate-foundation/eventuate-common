@@ -46,7 +46,7 @@ jobs:
   build-multi-arch-images:
     docker:
       - image: cimg/base:stable
-    working_directory: ~/plantuml
+    working_directory: ~/eventuate-common
     steps:
       - checkout
       - setup_remote_docker:
@@ -57,12 +57,50 @@ jobs:
             . set-multi-arch-image-env-vars.sh
             docker context create tls-env
             docker buildx create tls-env --use
+
+            # failed to solve: process "/dev/.buildkit_qemu_emulator
+            # https://github.com/docker/buildx/issues/493#issuecomment-754834977
+            # https://github.com/tonistiigi/binfmt#installing-emulators
+
+            docker run --privileged --rm tonistiigi/binfmt --install arm64,arm
+
             ./build-multi-arch-images.sh
+  deploy-multi-arch:
+    docker:
+      - image: cimg/base:stable
+    working_directory: ~/eventuate-common
+    steps:
+      - checkout
+      - run:
+          command: ./deploy-multi-arch.sh
 workflows:
   version: 2.1
   build-test-and-deploy:
     jobs:
+      - build-and-test/build-and-test:
+          name: build-and-test-mysql
+          script: ./build-and-test-all-mysql.sh
+      - build-and-test/build-and-test:
+          name: build-and-test-mysql8
+          script: ./build-and-test-all-mysql8.sh
+      - build-and-test/build-and-test:
+          name: build-and-test-mariadb
+          script: ./build-and-test-all-mariadb.sh
+      - build-and-test/build-and-test:
+          name: build-and-test-mssql
+          script: ./build-and-test-all-mssql.sh
+      - build-and-test/build-and-test:
+          name: build-and-test-postgres
+          script: ./build-and-test-all-postgres.sh
       - build-multi-arch-images
+          context:
+            - publish
+          requires:
+            - build-and-test-mysql
+            - build-and-test-mysql8
+            - build-and-test-mariadb
+            - build-and-test-mssql
+            - build-and-test-postgres
       - build-and-test/build-and-test:
           name: test-mysql8-zookeeper-multi-arch-intel
           script: ./build-and-test-all-mysql8-multi-arch.sh
@@ -75,43 +113,16 @@ workflows:
           requires:
             - build-multi-arch-images
       - build-and-test/build-and-test:
-          name: build-and-test-mysql
-          script: ./build-and-test-all-mysql.sh
-          requires:
-            - test-mysql8-zookeeper-multi-arch-intel
-            - test-mysql8-zookeeper-multi-arch-arm
-      - build-and-test/build-and-test:
-          name: build-and-test-mysql8
-          script: ./build-and-test-all-mysql8.sh
-          requires:
-            - test-mysql8-zookeeper-multi-arch-intel
-            - test-mysql8-zookeeper-multi-arch-arm
-      - build-and-test/build-and-test:
-          name: build-and-test-mariadb
-          script: ./build-and-test-all-mariadb.sh
-          requires:
-            - test-mysql8-zookeeper-multi-arch-intel
-            - test-mysql8-zookeeper-multi-arch-arm
-      - build-and-test/build-and-test:
-          name: build-and-test-mssql
-          script: ./build-and-test-all-mssql.sh
-          requires:
-            - test-mysql8-zookeeper-multi-arch-intel
-            - test-mysql8-zookeeper-multi-arch-arm
-      - build-and-test/build-and-test:
-          name: build-and-test-postgres
-          script: ./build-and-test-all-postgres.sh
-          requires:
-            - test-mysql8-zookeeper-multi-arch-intel
-            - test-mysql8-zookeeper-multi-arch-arm
-      - build-and-test/build-and-test:
           name: deploy-artifacts
           context:
             - publish
           requires:
-            - build-and-test-mysql
-            - build-and-test-mysql8
-            - build-and-test-mariadb
-            - build-and-test-mssql
-            - build-and-test-postgres
+            - test-mysql8-zookeeper-multi-arch-intel
+            - test-mysql8-zookeeper-multi-arch-arm
           script: ./deploy-artifacts.sh
+      - deploy-multi-arch
+          context:
+            - publish
+          requires:
+            - test-mysql8-zookeeper-multi-arch-intel
+            - test-mysql8-zookeeper-multi-arch-arm
