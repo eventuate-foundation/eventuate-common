@@ -92,7 +92,7 @@ workflows:
       - build-and-test/build-and-test:
           name: build-and-test-postgres
           script: ./build-and-test-all-postgres.sh
-      - build-multi-arch-images
+      - build-multi-arch-images:
           context:
             - publish
           requires:
@@ -120,7 +120,7 @@ workflows:
             - test-mysql8-zookeeper-multi-arch-intel
             - test-mysql8-zookeeper-multi-arch-arm
           script: ./deploy-artifacts.sh
-      - deploy-multi-arch
+      - deploy-multi-arch:
           context:
             - publish
           requires:
