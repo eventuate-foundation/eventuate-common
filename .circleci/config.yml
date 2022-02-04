@@ -93,6 +93,7 @@ workflows:
           script: |
             docker context create tls-env
             docker buildx create tls-env --use
+            export DOCKER_HOST_NAME=$(hostname)
             ./build-and-test-all-mysql8-multi-arch-locally.sh
           skip_multi_arch_env_vars: "true"
       - build-and-test/build-and-test:
@@ -101,6 +102,7 @@ workflows:
           script: |
             docker context create tls-env
             docker buildx create tls-env --use
+            export DOCKER_HOST_NAME=$(hostname)
             ./build-and-test-all-mysql8-multi-arch-locally.sh
           skip_multi_arch_env_vars: "true"
       - build-and-test/build-and-test:
