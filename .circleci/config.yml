@@ -93,7 +93,7 @@ workflows:
           script: |
             docker context create tls-env
             docker buildx create tls-env --use
-            #docker run --privileged --rm tonistiigi/binfmt --install arm64,arm
+            docker run --privileged --rm tonistiigi/binfmt --install arm64,arm
             export DOCKER_HOST_NAME=$(hostname)
             ./build-and-test-all-mysql8-multi-arch-locally.sh
           skip_multi_arch_env_vars: "true"
@@ -103,7 +103,7 @@ workflows:
           script: |
             docker context create tls-env
             docker buildx create tls-env --use
-            #docker run --privileged --rm tonistiigi/binfmt --install amd64
+            docker run --privileged --rm tonistiigi/binfmt --install amd64
             export DOCKER_HOST_NAME=$(hostname)
             ./build-and-test-all-mysql8-multi-arch-locally.sh
           skip_multi_arch_env_vars: "true"
