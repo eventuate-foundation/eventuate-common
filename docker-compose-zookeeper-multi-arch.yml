@@ -1,6 +1,6 @@
 version: '3'
 services:
   zookeeper:
-    image: localhost:5002/eventuate-zookeeper:multi-arch-local-build
+    image: ${ZOOKEEPER_MULTI_ARCH_IMAGE:-localhost:5002/eventuate-zookeeper:multi-arch-local-build}
     ports:
       - 2181:2181

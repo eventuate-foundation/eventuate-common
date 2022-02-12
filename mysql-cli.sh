@@ -7,7 +7,7 @@ if [ -z "$DATABASE" ] ; then
 fi
 
 if [ "${DATABASE}" == "mysql8-multi-arch" ] ; then
-  mysqlimage=localhost:5002/eventuate-mysql8:multi-arch-local-build
+  mysqlimage=${MYSQL8_MULTI_ARCH_IMAGE:-localhost:5002/eventuate-mysql8:multi-arch-local-build}
   HOST=mysql8
 else
   if [ "${DATABASE}" == "mysql" ] ; then
