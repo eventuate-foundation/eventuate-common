@@ -27,7 +27,7 @@ orbs:
                 - eventuate-common-
           - run:
               command: |
-                ./gradlew testClasses aggregateJavaDocs
+                echo "Test"; ./gradlew testClasses aggregateJavaDocs
           - save_cache:
               paths:
                 - ~/.gradle
