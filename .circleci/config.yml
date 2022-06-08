@@ -93,6 +93,7 @@ workflows:
           script: |
             docker context create tls-env
             docker buildx create tls-env --use
+            echo "Test"
             docker run --privileged --rm tonistiigi/binfmt --install arm64,arm
             export DOCKER_HOST_NAME=$(hostname)
             ./build-and-test-all-mysql8-multi-arch-locally.sh
