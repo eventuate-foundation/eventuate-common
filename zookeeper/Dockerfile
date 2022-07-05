@@ -10,7 +10,7 @@ COPY zoo.cfg /usr/local/apache-zookeeper-3.5.6-bin/conf/
 
 EXPOSE 2181 2888 3888
 
-WORKDIR /usr/local/zookeeper-3.5.6
+WORKDIR /usr/local/apache-zookeeper-3.5.6-bin
 
 VOLUME ["/usr/local/apache-zookeeper-3.5.6-bin/conf", "/usr/local/zookeeper-data", "/usr/local/zookeeper-conf"]
 
