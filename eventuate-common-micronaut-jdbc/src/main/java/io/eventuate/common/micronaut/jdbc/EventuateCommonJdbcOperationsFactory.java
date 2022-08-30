@@ -1,9 +1,6 @@
 package io.eventuate.common.micronaut.jdbc;
 
-import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
-import io.eventuate.common.jdbc.EventuateJdbcOperationsUtils;
-import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
-import io.eventuate.common.jdbc.EventuateTransactionTemplate;
+import io.eventuate.common.jdbc.*;
 import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
 import io.eventuate.common.jdbc.sqldialect.SqlDialectSelector;
 import io.micronaut.context.annotation.Factory;
@@ -19,11 +16,17 @@ public class EventuateCommonJdbcOperationsFactory {
   @Singleton
   public EventuateCommonJdbcOperations eventuateCommonJdbcOperations(EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor,
                                                                      SqlDialectSelector sqlDialectSelector,
-                                                                     @Value("${datasources.default.driver-class-name}") String driver) {
+                                                                     @Value("${datasources.default.driver-class-name}") String driver, OutboxPartitioningSpec outboxPartitioningSpec) {
     EventuateSqlDialect eventuateSqlDialect = sqlDialectSelector.getDialect(driver);
 
     return new EventuateCommonJdbcOperations(new EventuateJdbcOperationsUtils(eventuateSqlDialect),
-            eventuateJdbcStatementExecutor, eventuateSqlDialect);
+            eventuateJdbcStatementExecutor, eventuateSqlDialect, outboxPartitioningSpec);
+  }
+
+  @Singleton
+  @Requires(missingBeans = OutboxPartitioningSpec.class)
+  public OutboxPartitioningSpec outboxPartitioningSpec() {
+    return OutboxPartitioningSpec.DEFAULT;
   }
 
   @Singleton

@@ -3,9 +3,11 @@ package io.eventuate.common.spring.jdbc;
 import io.eventuate.common.jdbc.EventuateCommonJdbcOperations;
 import io.eventuate.common.jdbc.EventuateJdbcOperationsUtils;
 import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
+import io.eventuate.common.jdbc.OutboxPartitioningSpec;
 import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
 import io.eventuate.common.jdbc.sqldialect.SqlDialectSelector;
 import io.eventuate.common.spring.jdbc.sqldialect.SqlDialectConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +19,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
         SqlDialectConfiguration.class,
         EventuateTransactionTemplateConfiguration.class})
 public class EventuateCommonJdbcOperationsConfiguration {
+
+
+  @Autowired(required = false)
+  private OutboxPartitioningSpec outboxPartitioningSpec = OutboxPartitioningSpec.DEFAULT;
 
   @Bean
   public EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor(JdbcTemplate jdbcTemplate) {
@@ -30,6 +36,6 @@ public class EventuateCommonJdbcOperationsConfiguration {
     EventuateSqlDialect eventuateSqlDialect = sqlDialectSelector.getDialect(driver);
 
     return new EventuateCommonJdbcOperations(new EventuateJdbcOperationsUtils(eventuateSqlDialect),
-            eventuateJdbcStatementExecutor, eventuateSqlDialect);
+            eventuateJdbcStatementExecutor, eventuateSqlDialect, outboxPartitioningSpec);
   }
 }

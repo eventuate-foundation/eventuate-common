@@ -3,6 +3,8 @@ package io.eventuate.common.reactive.jdbc;
 import io.eventuate.common.id.IdGenerator;
 import io.eventuate.common.jdbc.EventuateJdbcOperationsUtils;
 import io.eventuate.common.jdbc.EventuateSchema;
+import io.eventuate.common.jdbc.OutboxPartitionValues;
+import io.eventuate.common.jdbc.OutboxPartitioningSpec;
 import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
 import io.eventuate.common.json.mapper.JSonMapper;
 import reactor.core.publisher.Mono;
@@ -18,6 +20,9 @@ import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.EVENT_AUTO_G
 import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.MESSAGE_AUTO_GENERATED_ID_COLUMN;
 
 public class EventuateCommonReactiveJdbcOperations {
+
+
+  private static final OutboxPartitioningSpec TODO_OUTBOX_PARTITION_SPEC = OutboxPartitioningSpec.DEFAULT; // TODO
 
   private EventuateJdbcOperationsUtils eventuateJdbcOperationsUtils;
   private EventuateReactiveJdbcStatementExecutor reactiveJdbcStatementExecutor;
@@ -128,13 +133,17 @@ public class EventuateCommonReactiveJdbcOperations {
                                               Map<String, String> headers,
                                               EventuateSchema eventuateSchema,
                                               boolean published) {
+
+    String messageKey = headers.get("PARTITION_ID");
+    OutboxPartitionValues outboxPartitionValues = TODO_OUTBOX_PARTITION_SPEC.outboxTableValues(destination, messageKey);
+
     if (idGenerator.databaseIdRequired()) {
       return insertIntoMessageTableDatabaseId(idGenerator,
-              payload, destination, headers, published, eventuateSchema);
+              payload, destination, headers, published, eventuateSchema, outboxPartitionValues);
     }
     else {
       return insertIntoMessageTableApplicationId(idGenerator,
-              payload, destination, headers, published, eventuateSchema);
+              payload, destination, headers, published, eventuateSchema, outboxPartitionValues);
     }
   }
 
@@ -143,7 +152,7 @@ public class EventuateCommonReactiveJdbcOperations {
                                                            String destination,
                                                            Map<String, String> headers,
                                                            boolean published,
-                                                           EventuateSchema eventuateSchema) {
+                                                           EventuateSchema eventuateSchema, OutboxPartitionValues outboxPartitionValues) {
 
     headers = new HashMap<>(headers);
 
@@ -154,8 +163,8 @@ public class EventuateCommonReactiveJdbcOperations {
     String serializedHeaders = JSonMapper.toJson(headers);
 
     return reactiveJdbcStatementExecutor
-            .update(eventuateJdbcOperationsUtils.insertIntoMessageTableApplicationIdSql(eventuateSchema, this::columnToJson),
-                    messageId, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published))
+            .update(eventuateJdbcOperationsUtils.insertIntoMessageTableApplicationIdSql(eventuateSchema, this::columnToJson, outboxPartitionValues.outboxTableSuffix),
+                    messageId, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published), outboxPartitionValues.messagePartition)
             .map(rowsUpdated -> messageId);
   }
 
@@ -164,12 +173,12 @@ public class EventuateCommonReactiveJdbcOperations {
                                                         String destination,
                                                         Map<String, String> headers,
                                                         boolean published,
-                                                        EventuateSchema eventuateSchema) {
+                                                        EventuateSchema eventuateSchema, OutboxPartitionValues outboxPartitionValues) {
     String serializedHeaders = JSonMapper.toJson(headers);
 
     return reactiveJdbcStatementExecutor
-            .insertAndReturnId(eventuateJdbcOperationsUtils.insertIntoMessageTableDbIdSql(eventuateSchema, this::columnToJson),
-                    MESSAGE_AUTO_GENERATED_ID_COLUMN, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published))
+            .insertAndReturnId(eventuateJdbcOperationsUtils.insertIntoMessageTableDbIdSql(eventuateSchema, this::columnToJson, outboxPartitionValues.outboxTableSuffix),
+                    MESSAGE_AUTO_GENERATED_ID_COLUMN, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published), outboxPartitionValues.messagePartition)
             .map(id -> idGenerator.genId(id).asString());
   }
 

@@ -1,4 +1,4 @@
-USE eventuate;
+USE ${EVENTUATE_DATABASE};
 
 CREATE TABLE new_message (
   dbid BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -7,14 +7,15 @@ CREATE TABLE new_message (
   headers LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   payload LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   published SMALLINT DEFAULT 0,
+  message_partition SMALLINT,
   creation_time BIGINT
 );
 
-INSERT INTO new_message (id, dbid, destination, headers, payload, published, creation_time)
-    VALUES ('', ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000), 'CDC-IGNORED', '{}', '\"ID-GENERATION-STARTING-VALUE\"', 1, ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000));
+INSERT INTO new_message (id, dbid, destination, headers, payload, published, message_partition, creation_time)
+    VALUES ('', ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000), 'CDC-IGNORED', '{}', '\"ID-GENERATION-STARTING-VALUE\"', 1, null, ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000));
 
-INSERT INTO new_message (id, destination, headers, payload, published, creation_time)
-    SELECT id, destination, headers, payload, published, creation_time FROM message ORDER BY id;
+INSERT INTO new_message (id, destination, headers, payload, published, message_partition, creation_time)
+    SELECT id, destination, headers, payload, published, message_partition, creation_time FROM message ORDER BY id;
 
 DROP TABLE message;
 

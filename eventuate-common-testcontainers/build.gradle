@@ -1,0 +1,12 @@
+dependencies {
+    implementation "org.testcontainers:testcontainers:$testContainersVersion"
+    implementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+}
+
+
+task writeProperties(type: WriteProperties) {
+    outputFile "${project.buildDir}/generated/eventuate.common.version.properties"
+    property 'version', version
+}
+
+processResources.from(writeProperties)

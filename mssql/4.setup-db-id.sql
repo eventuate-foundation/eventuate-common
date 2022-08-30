@@ -8,6 +8,7 @@ CREATE TABLE eventuate.new_message (
   headers NVARCHAR(MAX) NOT NULL,
   payload NVARCHAR(MAX) NOT NULL,
   published SMALLINT DEFAULT 0,
+  message_partition SMALLINT,
   creation_time BIGINT
 );
 GO
@@ -15,15 +16,15 @@ GO
 SET IDENTITY_INSERT eventuate.new_message ON;
 GO
 
-INSERT INTO eventuate.new_message (id, dbid, destination, headers, payload, published, creation_time)
-    VALUES ('', (DATEDIFF_BIG(ms, '1970-01-01', GETUTCDATE())), 'CDC-IGNORED', '{}', '\"ID-GENERATION-STARTING-VALUE\"', 1, (DATEDIFF_BIG(ms, '1970-01-01', GETUTCDATE())));
+INSERT INTO eventuate.new_message (id, dbid, destination, headers, payload, published, message_partition, creation_time)
+    VALUES ('', (DATEDIFF_BIG(ms, '1970-01-01', GETUTCDATE())), 'CDC-IGNORED', '{}', '\"ID-GENERATION-STARTING-VALUE\"', 1, null, (DATEDIFF_BIG(ms, '1970-01-01', GETUTCDATE())));
 GO
 
 SET IDENTITY_INSERT eventuate.new_message OFF;
 GO
 
-INSERT INTO eventuate.new_message (id, destination, headers, payload, published, creation_time)
-    SELECT id, destination, headers, payload, published, creation_time FROM eventuate.message ORDER BY id;
+INSERT INTO eventuate.new_message (id, destination, headers, payload, published, message_partition, creation_time)
+    SELECT id, destination, headers, payload, published, message_partition, creation_time FROM eventuate.message ORDER BY id;
 GO
 
 DROP TABLE eventuate.message;

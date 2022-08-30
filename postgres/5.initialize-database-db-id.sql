@@ -9,13 +9,14 @@ CREATE TABLE eventuate.new_message (
   headers TEXT NOT NULL,
   payload TEXT NOT NULL,
   published SMALLINT DEFAULT 0,
+  message_partition SMALLINT,
   creation_time BIGINT
 );
 
 ALTER SEQUENCE eventuate.message_table_id_sequence OWNED BY eventuate.new_message.dbid;
 
-INSERT INTO eventuate.new_message (id, destination, headers, payload, published, creation_time)
-    SELECT id, destination, headers, payload, published, creation_time FROM eventuate.message ORDER BY id;
+INSERT INTO eventuate.new_message (id, destination, headers, payload, published, message_partition, creation_time)
+    SELECT id, destination, headers, payload, published, message_partition, creation_time FROM eventuate.message ORDER BY id;
 
 DROP TABLE eventuate.message;
 

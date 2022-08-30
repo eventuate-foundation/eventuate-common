@@ -27,21 +27,22 @@ public class EventuateJdbcOperationsUtils {
             " VALUES ('', ?, ?, ?, ?, ?, ?, ?)", eventuateSchema.qualifyTable("events"));
   }
 
-  public String insertIntoMessageTableApplicationIdSql(EventuateSchema eventuateSchema, SqlJsonConverter jsonConverter) {
+  public String insertIntoMessageTableApplicationIdSql(EventuateSchema eventuateSchema, SqlJsonConverter jsonConverter, String outboxTableSuffix) {
     return insertIntoMessageTable(eventuateSchema,
-            "insert into %s(id, destination, headers, payload, creation_time, published) values(?, ?, %s, %s, %s, ?)",
-            jsonConverter);
+            "insert into %s%s(id, destination, headers, payload, creation_time, published, message_partition) values(?, ?, %s, %s, %s, ?, ?)",
+            jsonConverter, outboxTableSuffix);
   }
 
-  public String insertIntoMessageTableDbIdSql(EventuateSchema eventuateSchema, SqlJsonConverter jsonConverter) {
+  public String insertIntoMessageTableDbIdSql(EventuateSchema eventuateSchema, SqlJsonConverter jsonConverter, String outboxTableSuffix) {
     return insertIntoMessageTable(eventuateSchema,
-            "insert into %s(id, destination, headers, payload, creation_time, published) values('', ?, %s, %s, %s, ?)",
-            jsonConverter);
+            "insert into %s%s(id, destination, headers, payload, creation_time, published, message_partition) values('', ?, %s, %s, %s, ?, ?)",
+            jsonConverter, outboxTableSuffix);
   }
 
-  public String insertIntoMessageTable(EventuateSchema eventuateSchema, String sql, SqlJsonConverter jsonConverter) {
+  public String insertIntoMessageTable(EventuateSchema eventuateSchema, String sql, SqlJsonConverter jsonConverter, String outboxTableSuffix) {
     return String.format(sql,
             eventuateSchema.qualifyTable("message"),
+            outboxTableSuffix,
             jsonConverter.convert(eventuateSchema, "headers"),
             jsonConverter.convert(eventuateSchema, "payload"),
             eventuateSqlDialect.getCurrentTimeInMillisecondsExpression());

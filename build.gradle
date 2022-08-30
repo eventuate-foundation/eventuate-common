@@ -59,7 +59,7 @@ gradle.projectsEvaluated {
 
 dockerCompose {
     removeOrphans = true
-    environment.put "DOCKER_IMAGE_TAG", dockerImageTag
+    environment.put "DOCKER_IMAGE_TAG", version
     environment.put "USE_DB_ID", useDbId
     environment.put "USE_JSON_PAYLOAD_AND_HEADERS", useJsonPayloadAndHeaders
 

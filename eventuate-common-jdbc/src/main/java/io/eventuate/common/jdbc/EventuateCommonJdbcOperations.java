@@ -15,14 +15,16 @@ public class EventuateCommonJdbcOperations {
 
   private EventuateJdbcOperationsUtils eventuateJdbcOperationsUtils;
   private EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor;
+  private OutboxPartitioningSpec outboxPartitioningSpec;
   private EventuateSqlDialect eventuateSqlDialect;
-
   public EventuateCommonJdbcOperations(EventuateJdbcOperationsUtils eventuateJdbcOperationsUtils,
                                        EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor,
-                                       EventuateSqlDialect eventuateSqlDialect) {
+                                       EventuateSqlDialect eventuateSqlDialect,
+                                       OutboxPartitioningSpec outboxPartitioningSpec) {
     this.eventuateJdbcOperationsUtils = eventuateJdbcOperationsUtils;
     this.eventuateSqlDialect = eventuateSqlDialect;
     this.eventuateJdbcStatementExecutor = eventuateJdbcStatementExecutor;
+    this.outboxPartitioningSpec = outboxPartitioningSpec;
   }
 
   public EventuateSqlDialect getEventuateSqlDialect() {
@@ -122,11 +124,14 @@ public class EventuateCommonJdbcOperations {
                                        EventuateSchema eventuateSchema,
                                        boolean published) {
 
+    String messageKey = headers.get("PARTITION_ID");
+    OutboxPartitionValues outboxPartitionValues = outboxPartitioningSpec.outboxTableValues(destination, messageKey);
+
     if (idGenerator.databaseIdRequired()) {
-      return insertIntoMessageTableDatabaseId(idGenerator, payload, destination, headers, published, eventuateSchema);
+      return insertIntoMessageTableDatabaseId(idGenerator, payload, destination, headers, published, eventuateSchema, outboxPartitionValues);
     }
     else {
-      return insertIntoMessageTableApplicationId(idGenerator, payload, destination, headers, published, eventuateSchema);
+      return insertIntoMessageTableApplicationId(idGenerator, payload, destination, headers, published, eventuateSchema, outboxPartitionValues);
     }
   }
 
@@ -135,7 +140,7 @@ public class EventuateCommonJdbcOperations {
                                                      String destination,
                                                      Map<String, String> headers,
                                                      boolean published,
-                                                     EventuateSchema eventuateSchema) {
+                                                     EventuateSchema eventuateSchema, OutboxPartitionValues outboxPartitionValues) {
 
     headers = new HashMap<>(headers);
 
@@ -145,8 +150,8 @@ public class EventuateCommonJdbcOperations {
 
     String serializedHeaders = JSonMapper.toJson(headers);
 
-    eventuateJdbcStatementExecutor.update(eventuateJdbcOperationsUtils.insertIntoMessageTableApplicationIdSql(eventuateSchema, this::columnToJson),
-            messageId, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published));
+    eventuateJdbcStatementExecutor.update(eventuateJdbcOperationsUtils.insertIntoMessageTableApplicationIdSql(eventuateSchema, this::columnToJson, outboxPartitionValues.outboxTableSuffix),
+            messageId, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published), outboxPartitionValues.messagePartition);
 
     return messageId;
   }
@@ -156,12 +161,13 @@ public class EventuateCommonJdbcOperations {
                                                   String destination,
                                                   Map<String, String> headers,
                                                   boolean published,
-                                                  EventuateSchema eventuateSchema) {
+                                                  EventuateSchema eventuateSchema, OutboxPartitionValues outboxPartitionValues) {
 
     String serializedHeaders = JSonMapper.toJson(headers);
 
-    long databaseId = eventuateJdbcStatementExecutor.insertAndReturnGeneratedId(eventuateJdbcOperationsUtils.insertIntoMessageTableDbIdSql(eventuateSchema, this::columnToJson),
-            MESSAGE_AUTO_GENERATED_ID_COLUMN, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published));
+
+    long databaseId = eventuateJdbcStatementExecutor.insertAndReturnGeneratedId(eventuateJdbcOperationsUtils.insertIntoMessageTableDbIdSql(eventuateSchema, this::columnToJson, outboxPartitionValues.outboxTableSuffix),
+            MESSAGE_AUTO_GENERATED_ID_COLUMN, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published), outboxPartitionValues.messagePartition);
 
     return idGenerator.genId(databaseId).asString();
   }
