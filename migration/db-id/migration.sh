@@ -38,9 +38,9 @@ echo db_id_migration_path=$db_id_migration_path
 if [ "${DATABASE}" == "mysql" ] || [ "${DATABASE}" == "mysql8" ] || [ "${DATABASE}" == "mariadb" ] || [ "${DATABASE}" == "mysql8-multi-arch"  ]; then
 
   if [ -z "$LOCAL" ]; then
-    curl -s ${db_id_migration_path}/mysql/4.initialize-database-db-id.sql &> /dev/stdout | ./mysql-cli.sh -i
+    curl -s ${db_id_migration_path}/mysql/5.initialize-database-db-id.sql &> /dev/stdout | EVENTUATE_DATABASE=eventuate envsubst '$EVENTUATE_DATABASE,$EVENTUATE_OUTBOX_SUFFIX' | ./mysql-cli.sh -i
   else
-    cat mysql/4.initialize-database-db-id.sql | ./mysql-cli.sh -i
+    cat mysql/5.initialize-database-db-id.sql | EVENTUATE_DATABASE=eventuate envsubst '$EVENTUATE_DATABASE,$EVENTUATE_OUTBOX_SUFFIX' | ./mysql-cli.sh -i
   fi
 
 elif [ "${DATABASE}" == "postgres" ]; then

@@ -75,7 +75,7 @@ public abstract class AbstractLeadershipTest <SELECTOR extends EventuateLeaderSe
 
     Eventually.eventually(() -> Mockito.verify(leaderSelectedCallback).run(Mockito.any()));
 
-    Mockito.verifyZeroInteractions(leaderRemovedCallback);
+    Mockito.verifyNoInteractions(leaderRemovedCallback);
     leadershipController.stop();
 
     Eventually.eventually(() -> {

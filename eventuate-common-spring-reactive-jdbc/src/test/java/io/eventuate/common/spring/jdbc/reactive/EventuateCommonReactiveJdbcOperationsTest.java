@@ -13,6 +13,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,7 +42,7 @@ public class EventuateCommonReactiveJdbcOperationsTest extends AbstractEventuate
 
   @Configuration
   @EnableAutoConfiguration
-  @Import(EventuateCommonReactiveDatabaseConfiguration.class)
+  @Import({DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class, EventuateCommonReactiveDatabaseConfiguration.class})
   public static class Config {
     @Bean
     public EventuateTransactionTemplate eventuateTransactionTemplate(TransactionTemplate transactionTemplate) {

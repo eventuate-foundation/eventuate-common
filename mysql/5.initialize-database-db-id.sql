@@ -15,13 +15,13 @@ INSERT INTO new_message (id, dbid, destination, headers, payload, published, mes
     VALUES ('', ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000), 'CDC-IGNORED', '{}', '\"ID-GENERATION-STARTING-VALUE\"', 1, null, ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000));
 
 INSERT INTO new_message (id, destination, headers, payload, published, message_partition, creation_time)
-    SELECT id, destination, headers, payload, published, message_partition, creation_time FROM message ORDER BY id;
+    SELECT id, destination, headers, payload, published, message_partition, creation_time FROM message${EVENTUATE_OUTBOX_SUFFIX} ORDER BY id;
 
-DROP TABLE message;
+DROP TABLE message${EVENTUATE_OUTBOX_SUFFIX};
 
-ALTER TABLE new_message RENAME TO message;
+ALTER TABLE new_message RENAME TO message${EVENTUATE_OUTBOX_SUFFIX};
 
-CREATE INDEX message_published_idx ON message(published, dbid);
+CREATE INDEX message${EVENTUATE_OUTBOX_SUFFIX}_published_idx ON message${EVENTUATE_OUTBOX_SUFFIX}(published, dbid);
 
 create table new_events (
   id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,

@@ -60,7 +60,7 @@ unset USE_DB_ID
 unset DB_ID_USED
 
 echo ""
-echo "TESTING REGULAR DATABASE"
+echo "==== TESTING REGULAR DATABASE"
 echo ""
 
 dockerUp
@@ -72,7 +72,7 @@ export USE_DB_ID=true
 export DB_ID_USED=true
 
 echo ""
-echo "TESTING DATABASE WITH DBID WITH APPLICATION ID GENERATION"
+echo "==== TESTING DATABASE WITH DBID WITH APPLICATION ID GENERATION"
 echo ""
 
 testJdbc
@@ -81,13 +81,13 @@ export EVENTUATE_OUTBOX_ID=1
 
 
 echo ""
-echo "TESTING DATABASE WITH DBID WITH DATABASE ID GENERATION"
+echo "==== TESTING DATABASE WITH DBID WITH DATABASE ID GENERATION"
 echo ""
 
 testJdbc
 
 echo ""
-echo "TESTING DBID MIGRATION"
+echo "==== TESTING DBID MIGRATION"
 echo ""
 
 unset USE_DB_ID
@@ -96,7 +96,7 @@ dockerUp
 testJdbc
 
 echo ""
-echo "TESTING DATABASE WITH JSON SUPPORT"
+echo "==== TESTING DATABASE WITH JSON SUPPORT"
 echo ""
 
 unset DB_ID_USED

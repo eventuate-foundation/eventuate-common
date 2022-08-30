@@ -20,6 +20,10 @@ public class EventuateMySqlContainer extends GenericContainer<EventuateMySqlCont
     }
 
     private void withConfiguration() {
+        String eventuateOutboxId = System.getProperty("eventuate.outbox.id");
+        if (eventuateOutboxId != null)
+            withEnv("USE_DB_ID", "true");
+
         withEnv("MYSQL_ROOT_PASSWORD", "rootpassword");
         withEnv("MYSQL_USER", "mysqluser");
         withEnv("MYSQL_PASSWORD", "mysqlpw");

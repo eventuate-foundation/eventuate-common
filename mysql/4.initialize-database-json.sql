@@ -1,4 +1,4 @@
 USE ${EVENTUATE_DATABASE};
 
-ALTER TABLE eventuate.message MODIFY payload JSON;
-ALTER TABLE eventuate.message MODIFY headers JSON;
+ALTER TABLE eventuate.message${EVENTUATE_OUTBOX_SUFFIX} MODIFY payload JSON;
+ALTER TABLE eventuate.message${EVENTUATE_OUTBOX_SUFFIX} MODIFY headers JSON;
