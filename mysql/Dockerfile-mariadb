@@ -1,6 +1,6 @@
 FROM mariadb:10.3.8
 
-RUN apt-get update && apt-get install -y netcat-traditional && apt-get clean
+RUN apt-get update && apt-get install -y netcat-traditional gettext && apt-get clean
 
 COPY replication-mariadb.cnf /etc/mysql/conf.d/replication.cnf
 
