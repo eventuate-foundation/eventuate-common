@@ -23,7 +23,7 @@ public class EventuateSpringReactiveJdbcStatementExecutor implements EventuateRe
   }
 
   public Mono<Integer> update(String sql, Object... params) {
-    sql = reformatParameters(sql, params);
+    sql = reformatInsertParameters(sql, params, params);
 
     DatabaseClient.GenericExecuteSpec genericExecuteSpec = bindParameters(databaseClient.sql(sql), params);
 
@@ -101,14 +101,18 @@ public class EventuateSpringReactiveJdbcStatementExecutor implements EventuateRe
   }
 
   private DatabaseClient.GenericExecuteSpec bindParameters(DatabaseClient.GenericExecuteSpec genericExecuteSpec, Object[] params) {
+    int skippedParameters = 0;
     for (int i = 0; i < params.length; i++) {
       if (params[i] == null) {
         if (!(sqlDialect instanceof PostgresDialect)) {
           genericExecuteSpec = genericExecuteSpec.bindNull(i, Object.class);
+        } else {
+          // ??
+          // skippedParameters++;
         }
       }
       else {
-        genericExecuteSpec = genericExecuteSpec.bind(i, params[i]);
+        genericExecuteSpec = genericExecuteSpec.bind(i - skippedParameters, params[i]);
       }
     }
 
