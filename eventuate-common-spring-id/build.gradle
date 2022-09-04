@@ -2,7 +2,7 @@
 dependencies {
     compile project (":eventuate-common-id")
 
-    compile "org.springframework.boot:spring-boot-starter"
+    compile "org.springframework.boot:spring-boot-starter:$springBootVersion"
 
-    testCompile "org.springframework.boot:spring-boot-starter-test"
+    testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
 }

@@ -1,5 +1,5 @@
 
 dependencies {
     compile project (":eventuate-common-jdbc")
-    compile "org.springframework.boot:spring-boot-starter"
+    compile "org.springframework.boot:spring-boot-starter:$springBootVersion"
 }
