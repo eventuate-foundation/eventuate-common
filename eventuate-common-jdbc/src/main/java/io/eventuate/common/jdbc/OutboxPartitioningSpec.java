@@ -39,4 +39,12 @@ public class OutboxPartitioningSpec {
         else
             return IntStream.range(0, outboxTables).mapToObj(Integer::toString).collect(Collectors.toList());
     }
+
+    public OutboxPartitioningSpec withOutboxTables(int outboxTables) {
+        return new OutboxPartitioningSpec(outboxTables, this.outboxTablePartitions);
+    }
+
+    public OutboxPartitioningSpec withTablePartitions(int outboxTables) {
+        return new OutboxPartitioningSpec(this.outboxTables, outboxTablePartitions);
+    }
 }
