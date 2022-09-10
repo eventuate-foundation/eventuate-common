@@ -3,6 +3,8 @@ package io.eventuate.common.spring.jdbc;
 import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
 import io.eventuate.common.jdbc.EventuateJdbcStatementExecutor;
 import io.eventuate.common.jdbc.EventuateRowMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -10,6 +12,7 @@ import org.springframework.jdbc.support.KeyHolder;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -20,9 +23,12 @@ public class EventuateSpringJdbcStatementExecutor implements EventuateJdbcStatem
   public EventuateSpringJdbcStatementExecutor(JdbcTemplate jdbcTemplate) {
     this.jdbcTemplate = jdbcTemplate;
   }
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
   public long insertAndReturnGeneratedId(String sql, String idColumn, Object... params) {
+    if (logger.isDebugEnabled())
+      logger.debug("insertAndReturnGeneratedId {} {} {}", sql, idColumn, Arrays.asList(params));
     try {
       KeyHolder holder = new GeneratedKeyHolder();
       jdbcTemplate.update(connection -> {

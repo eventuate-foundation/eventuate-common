@@ -79,12 +79,12 @@ public class ApplicationIdGenerator implements IdGenerator {
   }
 
   @Override
-  public synchronized Int128 genId(Long databaseId) {
+  public synchronized Int128 genId(Long databaseId, Integer partitionOffset) {
     return genIdInternal();
   }
 
   @Override
   public Optional<Int128> incrementIdIfPossible(Int128 anchorId) {
-    return Optional.of(genId(null));
+    return Optional.of(genId(null, null));
   }
 }

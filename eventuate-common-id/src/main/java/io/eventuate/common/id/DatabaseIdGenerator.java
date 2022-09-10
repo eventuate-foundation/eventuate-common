@@ -23,13 +23,13 @@ public class DatabaseIdGenerator implements IdGenerator {
   }
 
   @Override
-  public Int128 genId(Long databaseId) {
+  public Int128 genId(Long databaseId, Integer partitionOffset) {
 
     if (databaseId == null) {
       throw new IllegalArgumentException("database id is required");
     }
 
-    return new Int128(databaseId, serviceId);
+    return new Int128(databaseId, serviceId + (partitionOffset == null ? 0 : partitionOffset));
   }
 
   @Override

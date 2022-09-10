@@ -23,7 +23,7 @@ public class OutboxPartitioningSpec {
     public OutboxPartitionValues outboxTableValues(String destination, String messageKey) {
         Integer hash = abs(Objects.hash(destination, messageKey));
 
-        String outboxTableSuffix = nullOrOne(outboxTables) || messageKey == null ? "" : Integer.toString(hash % outboxTables);
+        Integer outboxTableSuffix = nullOrOne(outboxTables) || messageKey == null ? null : hash % outboxTables;
         Integer messagePartition = nullOrOne(outboxTablePartitions) || messageKey == null ? null : hash % outboxTablePartitions;
 
         return new OutboxPartitionValues(outboxTableSuffix, messagePartition);
@@ -33,11 +33,12 @@ public class OutboxPartitioningSpec {
         return x == null || x == 1;
     }
 
-    public List<String> outboxTableSuffixes() {
+    public List<OutboxTableSuffix> outboxTableSuffixes() {
         if (nullOrOne(outboxTables))
-            return Collections.singletonList("");
-        else
-            return IntStream.range(0, outboxTables).mapToObj(Integer::toString).collect(Collectors.toList());
+            return Collections.singletonList(new OutboxTableSuffix(null));
+        else {
+            return IntStream.range(0, outboxTables).mapToObj(OutboxTableSuffix::new).collect(Collectors.toList());
+        }
     }
 
     public OutboxPartitioningSpec withOutboxTables(int outboxTables) {

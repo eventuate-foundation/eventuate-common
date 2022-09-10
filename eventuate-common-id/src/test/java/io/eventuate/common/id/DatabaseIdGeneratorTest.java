@@ -7,6 +7,8 @@ import java.util.Optional;
 
 public class DatabaseIdGeneratorTest {
 
+  private final long SERVICE_ID = DatabaseIdGenerator.SERVICE_ID_MAX_VALUE / 2;
+
   @Test(expected = IllegalArgumentException.class)
   public void shouldThrowAnExceptionOnNegativeInstanceId() {
     new DatabaseIdGenerator(-1L);
@@ -19,11 +21,20 @@ public class DatabaseIdGeneratorTest {
 
   @Test
   public void shouldGenerateAnId() {
-    IdGenerator idGenerator = new DatabaseIdGenerator(DatabaseIdGenerator.SERVICE_ID_MAX_VALUE / 2);
+    IdGenerator idGenerator = new DatabaseIdGenerator(SERVICE_ID);
 
-    Int128 id = idGenerator.genId(Long.MAX_VALUE);
+    Int128 id = idGenerator.genId(Long.MAX_VALUE, null);
+    Assert.assertEquals(SERVICE_ID, id.getLo());
+    Assert.assertEquals(Long.MAX_VALUE, id.getHi());
+  }
 
-    Assert.assertEquals(DatabaseIdGenerator.SERVICE_ID_MAX_VALUE / 2, id.getLo());
+  @Test
+  public void shouldGenerateAnIdWithPartitionOffset() {
+    IdGenerator idGenerator = new DatabaseIdGenerator(SERVICE_ID);
+    int partitionOffset = 1;
+
+    Int128 id = idGenerator.genId(Long.MAX_VALUE, partitionOffset);
+    Assert.assertEquals(SERVICE_ID + partitionOffset, id.getLo());
     Assert.assertEquals(Long.MAX_VALUE, id.getHi());
   }
 

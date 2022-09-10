@@ -79,10 +79,10 @@ public class EventuateCommonJdbcOperations {
                       metadata.orElse(null),
                       eventuateJdbcOperationsUtils.booleanToInt(published));
 
-      return idGenerator.genId(databaseId).asString();
+      return idGenerator.genId(databaseId, null).asString();
     }
     else {
-      String eventId = idGenerator.genId(null).asString();
+      String eventId = idGenerator.genId().asString();
 
       eventuateJdbcStatementExecutor
               .update(eventuateJdbcOperationsUtils.insertIntoEventsTableApplicationIdSql(eventuateSchema),
@@ -144,13 +144,13 @@ public class EventuateCommonJdbcOperations {
 
     headers = new HashMap<>(headers);
 
-    String messageId = idGenerator.genId(null).asString();
+    String messageId = idGenerator.genId(null, outboxPartitionValues.outboxTableSuffix.suffix).asString();
 
     headers.put("ID", messageId);
 
     String serializedHeaders = JSonMapper.toJson(headers);
 
-    eventuateJdbcStatementExecutor.update(eventuateJdbcOperationsUtils.insertIntoMessageTableApplicationIdSql(eventuateSchema, this::columnToJson, outboxPartitionValues.outboxTableSuffix),
+    eventuateJdbcStatementExecutor.update(eventuateJdbcOperationsUtils.insertIntoMessageTableApplicationIdSql(eventuateSchema, this::columnToJson, outboxPartitionValues.outboxTableSuffix.suffixAsString),
             messageId, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published), outboxPartitionValues.messagePartition);
 
     return messageId;
@@ -166,10 +166,10 @@ public class EventuateCommonJdbcOperations {
     String serializedHeaders = JSonMapper.toJson(headers);
 
 
-    long databaseId = eventuateJdbcStatementExecutor.insertAndReturnGeneratedId(eventuateJdbcOperationsUtils.insertIntoMessageTableDbIdSql(eventuateSchema, this::columnToJson, outboxPartitionValues.outboxTableSuffix),
+    long databaseId = eventuateJdbcStatementExecutor.insertAndReturnGeneratedId(eventuateJdbcOperationsUtils.insertIntoMessageTableDbIdSql(eventuateSchema, this::columnToJson, outboxPartitionValues.outboxTableSuffix.suffixAsString),
             MESSAGE_AUTO_GENERATED_ID_COLUMN, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published), outboxPartitionValues.messagePartition);
 
-    return idGenerator.genId(databaseId).asString();
+    return idGenerator.genId(databaseId, outboxPartitionValues.outboxTableSuffix.suffix).asString();
   }
 
   protected String columnToJson(EventuateSchema eventuateSchema, String column) {

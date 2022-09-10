@@ -4,7 +4,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class OutboxPartitionValues {
-    public final String outboxTableSuffix;
+    public final OutboxTableSuffix outboxTableSuffix;
     public final Integer messagePartition;
 
     @Override
@@ -15,24 +15,24 @@ public class OutboxPartitionValues {
 
         OutboxPartitionValues that = (OutboxPartitionValues) o;
 
-        return new EqualsBuilder().append(outboxTableSuffix, that.outboxTableSuffix).append(messagePartition, that.messagePartition).isEquals();
+        return new EqualsBuilder().append(outboxTableSuffix.suffix, that.outboxTableSuffix.suffix).append(messagePartition, that.messagePartition).isEquals();
     }
 
     @Override
     public String toString() {
         return "OutboxPartitionValues{" +
-                "outboxTableSuffix='" + outboxTableSuffix + '\'' +
+                "outboxTableSuffix='" + outboxTableSuffix.suffix + '\'' +
                 ", messagePartition=" + messagePartition +
                 '}';
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(outboxTableSuffix).append(messagePartition).toHashCode();
+        return new HashCodeBuilder(17, 37).append(outboxTableSuffix.suffix).append(messagePartition).toHashCode();
     }
 
-    public OutboxPartitionValues(String outboxTableSuffix, Integer messagePartition) {
-        this.outboxTableSuffix = outboxTableSuffix;
+    public OutboxPartitionValues(Integer outboxTableSuffix, Integer messagePartition) {
+        this.outboxTableSuffix = new OutboxTableSuffix(outboxTableSuffix);
         this.messagePartition = messagePartition;
     }
 }
