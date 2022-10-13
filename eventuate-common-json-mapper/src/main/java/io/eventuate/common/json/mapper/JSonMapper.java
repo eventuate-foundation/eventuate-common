@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.io.IOException;
 
@@ -20,6 +21,7 @@ public class JSonMapper {
     objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     objectMapper.registerModule(new Int128Module());
     objectMapper.registerModule(new Jdk8Module().configureAbsentsAsNulls(true));
+    objectMapper.registerModule(new JavaTimeModule());
   }
 
   public static String toJson(Object x) {
