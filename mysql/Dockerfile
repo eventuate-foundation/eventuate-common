@@ -1,4 +1,4 @@
-FROM mysql:5.7.40
+FROM mysql:5.7.40-debian
 
 RUN apt-get update && apt-get install -y netcat-traditional gettext && apt-get clean
 COPY replication.cnf /etc/mysql/conf.d
