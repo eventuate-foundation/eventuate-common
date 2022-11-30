@@ -5,7 +5,7 @@ import org.testcontainers.images.builder.ImageFromDockerfile;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-public abstract class AbstractEventuateMySqlContainer extends EventuateDatabaseContainer<EventuateMySqlContainer> {
+public abstract class AbstractEventuateMySqlContainer<T extends AbstractEventuateMySqlContainer<T>> extends EventuateDatabaseContainer<T> {
     public AbstractEventuateMySqlContainer(String dockerImageName) {
         super(dockerImageName);
     }

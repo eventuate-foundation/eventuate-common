@@ -5,7 +5,7 @@ import org.testcontainers.images.builder.ImageFromDockerfile;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-public abstract class AbstractEventuatePostgresContainer extends EventuateDatabaseContainer<EventuatePostgresContainer> {
+public abstract class AbstractEventuatePostgresContainer<T extends AbstractEventuatePostgresContainer<T>> extends EventuateDatabaseContainer<T> {
     public AbstractEventuatePostgresContainer(String dockerImageName) {
         super(dockerImageName);
     }
