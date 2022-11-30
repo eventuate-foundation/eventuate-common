@@ -146,6 +146,8 @@ public class EventuateCommonJdbcOperations {
 
     String messageId = idGenerator.genId(null, outboxPartitionValues.outboxTableSuffix.suffix).asString();
 
+    verifyNoID(headers);
+
     headers.put("ID", messageId);
 
     String serializedHeaders = JSonMapper.toJson(headers);
@@ -156,6 +158,11 @@ public class EventuateCommonJdbcOperations {
     return messageId;
   }
 
+  private void verifyNoID(Map<String, String> headers) {
+    if (headers.containsKey("ID"))
+      throw new RuntimeException("ID should not be already set");
+  }
+
   private String insertIntoMessageTableDatabaseId(IdGenerator idGenerator,
                                                   String payload,
                                                   String destination,
@@ -163,8 +170,9 @@ public class EventuateCommonJdbcOperations {
                                                   boolean published,
                                                   EventuateSchema eventuateSchema, OutboxPartitionValues outboxPartitionValues) {
 
-    String serializedHeaders = JSonMapper.toJson(headers);
+    verifyNoID(headers);
 
+    String serializedHeaders = JSonMapper.toJson(headers);
 
     long databaseId = eventuateJdbcStatementExecutor.insertAndReturnGeneratedId(eventuateJdbcOperationsUtils.insertIntoMessageTableDbIdSql(eventuateSchema, this::columnToJson, outboxPartitionValues.outboxTableSuffix.suffixAsString),
             MESSAGE_AUTO_GENERATED_ID_COLUMN, destination, serializedHeaders, payload, eventuateJdbcOperationsUtils.booleanToInt(published), outboxPartitionValues.messagePartition);

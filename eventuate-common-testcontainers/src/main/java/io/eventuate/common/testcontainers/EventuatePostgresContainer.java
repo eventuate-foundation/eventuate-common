@@ -6,14 +6,14 @@ import java.nio.file.Path;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-public class EventuateMySqlContainer extends AbstractEventuateMySqlContainer {
+public class EventuatePostgresContainer extends AbstractEventuatePostgresContainer {
 
-    public EventuateMySqlContainer() {
-        super(ContainerUtil.findImage("eventuateio/eventuate-mysql8", "eventuate.common.version.properties"));
+    public EventuatePostgresContainer() {
+        super(ContainerUtil.findImage("eventuateio/eventuate-postgres", "eventuate.common.version.properties"));
         withConfiguration();
     }
 
-    public EventuateMySqlContainer(Path path) {
+    public EventuatePostgresContainer(Path path) {
         super(new ImageFromDockerfile().withDockerfile(path));
         withConfiguration();
     }

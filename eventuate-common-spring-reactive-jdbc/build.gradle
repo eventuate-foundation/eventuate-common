@@ -9,6 +9,10 @@ dependencies {
     testCompile project (":eventuate-common-spring-jdbc")
     testCompile project (":eventuate-common-jdbc-tests")
     testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+
+    testImplementation project(":eventuate-common-testcontainers")
+    testImplementation "org.testcontainers:testcontainers:$testContainersVersion"
+
 }
 
 test {

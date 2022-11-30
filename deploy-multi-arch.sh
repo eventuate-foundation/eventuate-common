@@ -31,3 +31,4 @@ retag() {
 
 retag "eventuateio/eventuate-mysql8"
 retag "eventuateio/eventuate-zookeeper"
+retag "eventuateio/eventuate-postgres"

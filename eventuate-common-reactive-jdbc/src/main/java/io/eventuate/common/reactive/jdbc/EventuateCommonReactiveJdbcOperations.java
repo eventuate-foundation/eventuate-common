@@ -147,12 +147,19 @@ public class EventuateCommonReactiveJdbcOperations {
     }
   }
 
+  private void verifyNoID(Map<String, String> headers) {
+    if (headers.containsKey("ID"))
+      throw new RuntimeException("ID should not be already set");
+  }
+
   private Mono<String> insertIntoMessageTableApplicationId(IdGenerator idGenerator,
                                                            String payload,
                                                            String destination,
                                                            Map<String, String> headers,
                                                            boolean published,
                                                            EventuateSchema eventuateSchema, OutboxPartitionValues outboxPartitionValues) {
+
+    verifyNoID(headers);
 
     headers = new HashMap<>(headers);
 
@@ -174,6 +181,8 @@ public class EventuateCommonReactiveJdbcOperations {
                                                         Map<String, String> headers,
                                                         boolean published,
                                                         EventuateSchema eventuateSchema, OutboxPartitionValues outboxPartitionValues) {
+    verifyNoID(headers);
+
     String serializedHeaders = JSonMapper.toJson(headers);
 
     return reactiveJdbcStatementExecutor
