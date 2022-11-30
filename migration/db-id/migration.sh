@@ -43,7 +43,7 @@ if [ "${DATABASE}" == "mysql" ] || [ "${DATABASE}" == "mysql8" ] || [ "${DATABAS
     cat mysql/5.initialize-database-db-id.sql | EVENTUATE_DATABASE=eventuate envsubst '$EVENTUATE_DATABASE,$EVENTUATE_OUTBOX_SUFFIX' | ./mysql-cli.sh -i
   fi
 
-elif [ "${DATABASE}" == "postgres" ]; then
+elif [ "${DATABASE}" == "postgres" ] || [ "${DATABASE}" == "postgres-multi-arch" ]; then
   curl -s ${db_id_migration_path}/postgres/5.initialize-database-db-id.sql &> /dev/stdout | ./postgres-cli.sh -i
 elif [ "${DATABASE}" == "mssql" ]; then
   rm -rf ${DB_ID_MIGRATION_DIR}

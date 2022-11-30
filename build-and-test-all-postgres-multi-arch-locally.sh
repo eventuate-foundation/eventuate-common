@@ -11,3 +11,5 @@ docker pull localhost:5002/eventuate-postgres:multi-arch-local-build
 docker pull localhost:5002/eventuate-zookeeper:multi-arch-local-build
 
 ./_build-and-test-all.sh
+
+./gradlew vanillapostgresComposeUp vanillapostgresComposeDown

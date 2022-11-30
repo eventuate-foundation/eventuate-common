@@ -74,6 +74,12 @@ dockerCompose {
         removeContainers = project.ext.removeContainers.toBoolean()
     }
 
+    vanillamysql8 {
+        projectName = null
+        useComposeFiles = ["docker-compose-vanilla-mysql8-multi-arch.yml"]
+        removeContainers = project.ext.removeContainers.toBoolean()
+    }
+
     mysql8multiarch {
         projectName = null
         useComposeFiles = ["docker-compose-mysql8-multi-arch.yml", "docker-compose-zookeeper-multi-arch.yml"]
@@ -95,6 +101,12 @@ dockerCompose {
     postgres {
         projectName = null
         useComposeFiles = ["docker-compose-postgres.yml", "docker-compose-zookeeper.yml"]
+        removeContainers = project.ext.removeContainers.toBoolean()
+    }
+
+    vanillapostgres {
+        projectName = null
+        useComposeFiles = ["docker-compose-vanilla-postgres-multi-arch.yml"]
         removeContainers = project.ext.removeContainers.toBoolean()
     }
 

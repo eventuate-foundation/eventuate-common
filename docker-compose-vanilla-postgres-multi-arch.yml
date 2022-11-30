@@ -1,0 +1,11 @@
+version: '3'
+services:
+  postgres:
+    image: ${VANILLA_POSTGRES_MULTI_ARCH_IMAGE:-localhost:5002/eventuate-vanilla-postgres:multi-arch-local-build}
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: eventuate
+      POSTGRES_PASSWORD: eventuate
+      USE_DB_ID: ${USE_DB_ID}
+      USE_JSON_PAYLOAD_AND_HEADERS: ${USE_JSON_PAYLOAD_AND_HEADERS}

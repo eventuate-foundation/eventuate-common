@@ -30,5 +30,7 @@ retag() {
 }
 
 retag "eventuateio/eventuate-mysql8"
-retag "eventuateio/eventuate-zookeeper"
 retag "eventuateio/eventuate-postgres"
+retag "eventuateio/eventuate-vanilla-mysql8"
+retag "eventuateio/eventuate-zookeeper"
+retag "eventuateio/eventuate-vanilla-postgres"

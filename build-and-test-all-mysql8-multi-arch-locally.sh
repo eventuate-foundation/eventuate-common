@@ -9,3 +9,5 @@ docker pull localhost:5002/eventuate-mysql8:multi-arch-local-build
 docker pull localhost:5002/eventuate-zookeeper:multi-arch-local-build
 
 ./_build-and-test-all.sh
+
+ ./gradlew vanillamysql8ComposeUp vanillamysq8ComposeDown

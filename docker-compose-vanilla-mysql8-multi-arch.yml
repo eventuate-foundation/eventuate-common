@@ -1,0 +1,12 @@
+version: '3'
+services:
+  mysql8:
+    image: ${VANILLA_MYSQL8_MULTI_ARCH_IMAGE:-localhost:5002/eventuate-vanilla-mysql8:multi-arch-local-build}
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_USER=mysqluser
+      - MYSQL_PASSWORD=mysqlpw
+      - USE_DB_ID=${USE_DB_ID}
+      - USE_JSON_PAYLOAD_AND_HEADERS=${USE_JSON_PAYLOAD_AND_HEADERS}
