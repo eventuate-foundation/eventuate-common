@@ -26,9 +26,48 @@ public abstract class AbstractEventuatePostgresContainer<T extends AbstractEvent
 
     @Override
     public void registerProperties(BiConsumer<String, Supplier<Object>> registry) {
-        registry.accept("spring.datasource.url",
-                () -> String.format("jdbc:postgresql://localhost:%s/eventuate", getFirstMappedPort()));
+        registry.accept("spring.datasource.url", this::getJdbcUrl);
         registry.accept("spring.datasource.username", () -> "postgresuser");
         registry.accept("spring.datasource.password", () -> "postgrespw");
+    }
+
+    @Override
+    public DatabaseCredentials getCredentials() {
+        return new DatabaseCredentials("postgresuser", "postgrespw");
+    }
+
+    @Override
+    public String getJdbcUrl() {
+        return String.format("jdbc:postgresql://localhost:%s/eventuate", getFirstMappedPort());
+    }
+
+    @Override
+    public String getDatabaseName() {
+        return "eventuate";
+    }
+
+    @Override
+    public DatabaseCredentials getAdminCredentials() {
+        return getCredentials();
+    }
+
+    @Override
+    public String getDriverClassName() {
+        return "org.postgresql.Driver";
+    }
+
+    @Override
+    public String getEventuateDatabaseSchema() {
+        return "public";
+    }
+
+    @Override
+    public String getMonitoringSchema() {
+        return "public";
+    }
+
+    @Override
+    public String getCdcReaderType() {
+        return "postgres-wal";
     }
 }

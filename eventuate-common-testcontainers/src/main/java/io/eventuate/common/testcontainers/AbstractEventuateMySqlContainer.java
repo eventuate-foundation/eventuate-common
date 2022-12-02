@@ -27,9 +27,48 @@ public abstract class AbstractEventuateMySqlContainer<T extends AbstractEventuat
 
     @Override
     public void registerProperties(BiConsumer<String, Supplier<Object>> registry) {
-        registry.accept("spring.datasource.url",
-                () -> String.format("jdbc:mysql://localhost:%s/eventuate", getFirstMappedPort()));
+        registry.accept("spring.datasource.url", this::getJdbcUrl);
         registry.accept("spring.datasource.username", () -> "mysqluser");
         registry.accept("spring.datasource.password", () -> "mysqlpw");
+    }
+
+    @Override
+    public DatabaseCredentials getCredentials() {
+        return new DatabaseCredentials("mysqluser", "mysqlpw");
+    }
+
+    @Override
+    public String getJdbcUrl() {
+        return String.format("jdbc:mysql://localhost:%s/eventuate", getFirstMappedPort());
+    }
+
+    @Override
+    public String getDatabaseName() {
+        return "eventuate";
+    }
+
+    @Override
+    public DatabaseCredentials getAdminCredentials() {
+        return new DatabaseCredentials("root", "rootpassword");
+    }
+
+    @Override
+    public String getDriverClassName() {
+        return "com.mysql.cj.jdbc.Driver";
+    }
+
+    @Override
+    public String getEventuateDatabaseSchema() {
+        return "none";
+    }
+
+    @Override
+    public String getMonitoringSchema() {
+        return "eventuate";
+    }
+
+    @Override
+    public String getCdcReaderType() {
+        return "mysql-binlog";
     }
 }

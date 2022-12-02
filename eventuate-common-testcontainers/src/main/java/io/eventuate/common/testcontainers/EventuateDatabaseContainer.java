@@ -17,4 +17,13 @@ public abstract class EventuateDatabaseContainer<T extends EventuateDatabaseCont
     protected EventuateDatabaseContainer(ImageFromDockerfile withDockerfile) {
         super(withDockerfile);
     }
+
+    public abstract DatabaseCredentials getCredentials();
+    public abstract String getJdbcUrl();
+    public abstract String getDatabaseName();
+    public abstract DatabaseCredentials getAdminCredentials();
+    public abstract String getDriverClassName();
+    public abstract String getEventuateDatabaseSchema();
+    public abstract String getMonitoringSchema(); 
+    public abstract String getCdcReaderType();
 }
