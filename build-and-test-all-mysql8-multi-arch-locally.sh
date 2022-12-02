@@ -3,6 +3,7 @@
 export DATABASE=mysql8-multi-arch
 
 ./mysql/build-docker-mysql-8-multi-arch.sh
+./mysql/build-docker-vanilla-mysql-8-multi-arch.sh
 ./zookeeper/build-docker-zookeeper-multi-arch.sh
 
 docker pull localhost:5002/eventuate-mysql8:multi-arch-local-build
