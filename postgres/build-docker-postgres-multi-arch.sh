@@ -9,9 +9,3 @@ docker buildx build --platform ${BUILDX_TARGET_PLATFORMS:-linux/amd64,linux/arm6
   -f $SCRIPT_DIR/Dockerfile \
   ${BUILDX_PUSH_OPTIONS:---output=type=image,push=true,registry.insecure=true} \
   $SCRIPT_DIR
-
-docker buildx build --platform ${BUILDX_TARGET_PLATFORMS:-linux/amd64,linux/arm64} \
-  -t ${VANILLA_POSTGRES_MULTI_ARCH_IMAGE:-${DOCKER_HOST_NAME:-host.docker.internal}:5002/eventuate-vanilla-postgres:multi-arch-local-build} \
-  -f $SCRIPT_DIR/Dockerfile-vanilla \
-  ${BUILDX_PUSH_OPTIONS:---output=type=image,push=true,registry.insecure=true} \
-  $SCRIPT_DIR

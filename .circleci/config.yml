@@ -48,29 +48,37 @@ orbs:
               path: ~/junit
           - store_artifacts:
               path: ~/container-logs
+  build-multi-arch-image:
+    jobs:
+      build:
+        parameters:
+          script:
+            description: the script to execute
+            type: string
+        docker:
+          - image: cimg/base:stable
+        working_directory: ~/eventuate-common
+        steps:
+          - checkout
+          - setup_remote_docker:
+              version: 20.10.11
+          - run:
+              name: docker buildx build
+              command: |
+                . set-multi-arch-image-env-vars.sh
+                docker context create tls-env
+                docker buildx create tls-env --use
+                
+                # failed to solve: process "/dev/.buildkit_qemu_emulator
+                # https://github.com/docker/buildx/issues/493#issuecomment-754834977
+                # https://github.com/tonistiigi/binfmt#installing-emulators
+                
+                docker run --privileged --rm tonistiigi/binfmt:qemu-v6.2.0 --install arm64,arm
+                
+                docker login -u ${DOCKER_USER_ID?} -p ${DOCKER_PASSWORD?}
+                
+                <<parameters.script>>
 jobs:
-  build-multi-arch-images:
-    docker:
-      - image: cimg/base:stable
-    working_directory: ~/eventuate-common
-    steps:
-      - checkout
-      - setup_remote_docker:
-          version: 20.10.11
-      - run:
-          name: docker buildx build
-          command: |
-            . set-multi-arch-image-env-vars.sh
-            docker context create tls-env
-            docker buildx create tls-env --use
-
-            # failed to solve: process "/dev/.buildkit_qemu_emulator
-            # https://github.com/docker/buildx/issues/493#issuecomment-754834977
-            # https://github.com/tonistiigi/binfmt#installing-emulators
-
-            docker run --privileged --rm tonistiigi/binfmt:qemu-v6.2.0 --install arm64,arm
-
-            ./build-multi-arch-images.sh
   deploy-multi-arch:
     docker:
       - image: cimg/base:stable
@@ -136,7 +144,65 @@ workflows:
       - build-and-test/build-and-test:
           name: build-and-test-postgres
           script: ./build-and-test-all-postgres.sh
-      - build-multi-arch-images:
+      - build-multi-arch-image/build:
+          name: build-multi-arch-image-zookeeper
+          script: ./zookeeper/build-docker-zookeeper-multi-arch.sh
+          context:
+            - publish
+          requires:
+            - build-and-test-mysql
+            - build-and-test-mysql8-intel
+            - build-and-test-mysql8-arm
+            - build-and-test-postgres-intel
+            - build-and-test-postgres-arm
+            - build-and-test-mariadb
+            - build-and-test-mssql
+            - build-and-test-postgres
+      - build-multi-arch-image/build:
+          name: build-multi-arch-image-mysql
+          script: ./mysql/build-docker-mysql-8-multi-arch.sh
+          context:
+            - publish
+          requires:
+            - build-and-test-mysql
+            - build-and-test-mysql8-intel
+            - build-and-test-mysql8-arm
+            - build-and-test-postgres-intel
+            - build-and-test-postgres-arm
+            - build-and-test-mariadb
+            - build-and-test-mssql
+            - build-and-test-postgres
+      - build-multi-arch-image/build:
+          name: build-multi-arch-image-vanilla-mysql
+          script: ./mysql/build-docker-vanilla-mysql-8-multi-arch.sh
+          context:
+            - publish
+          requires:
+            - build-and-test-mysql
+            - build-and-test-mysql8-intel
+            - build-and-test-mysql8-arm
+            - build-and-test-postgres-intel
+            - build-and-test-postgres-arm
+            - build-and-test-mariadb
+            - build-and-test-mssql
+            - build-and-test-postgres
+      - build-multi-arch-image/build:
+          name: build-multi-arch-image-postgres
+          script: ./mysql/build-docker-postgres-multi-arch.sh
+          context:
+            - publish
+          requires:
+            - build-and-test-mysql
+            - build-and-test-mysql8-intel
+            - build-and-test-mysql8-arm
+            - build-and-test-postgres-intel
+            - build-and-test-postgres-arm
+            - build-and-test-mariadb
+            - build-and-test-mssql
+            - build-and-test-postgres
+      - build-multi-arch-image/build:
+          name: build-multi-arch-image-vanilla-postgres
+          script: ./mysql/build-docker-vanilla-postgres-multi-arch.sh
           context:
             - publish
           requires:
@@ -152,24 +218,32 @@ workflows:
           name: test-mysql8-zookeeper-multi-arch-intel
           script: ./build-and-test-all-mysql8-multi-arch.sh
           requires:
-            - build-multi-arch-images
+            - build-multi-arch-image-zookeeper
+            - build-multi-arch-image-mysql
+            - build-multi-arch-image-vanilla-mysql
       - build-and-test/build-and-test:
           name: test-mysql8-zookeeper-multi-arch-arm
           script: ./build-and-test-all-mysql8-multi-arch.sh
           resource_class: arm.medium
           requires:
-            - build-multi-arch-images
+            - build-multi-arch-image-zookeeper
+            - build-multi-arch-image-mysql
+            - build-multi-arch-image-vanilla-mysql
       - build-and-test/build-and-test:
           name: test-postgres-zookeeper-multi-arch-intel
           script: ./build-and-test-all-postgres-multi-arch.sh
           requires:
-            - build-multi-arch-images
+            - build-multi-arch-image-zookeeper
+            - build-multi-arch-image-postgres
+            - build-multi-arch-image-vanilla-postgres
       - build-and-test/build-and-test:
           name: test-postgres-zookeeper-multi-arch-arm
           script: ./build-and-test-all-postgres-multi-arch.sh
           resource_class: arm.medium
           requires:
-            - build-multi-arch-images
+            - build-multi-arch-image-zookeeper
+            - build-multi-arch-image-postgres
+            - build-multi-arch-image-vanilla-postgres
       - build-and-test/build-and-test:
           name: deploy-artifacts
           context:
