@@ -4,7 +4,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.testcontainers.utility.DockerImageName;
 
-public abstract class EventuateDatabaseContainer<T extends GenericContainer<T>> extends GenericContainer<T> implements PropertyProvidingContainer {
+public abstract class EventuateDatabaseContainer<T extends EventuateDatabaseContainer<T>> extends GenericContainer<T> implements PropertyProvidingContainer {
 
     protected EventuateDatabaseContainer(DockerImageName dockerImageName) {
         super(dockerImageName);

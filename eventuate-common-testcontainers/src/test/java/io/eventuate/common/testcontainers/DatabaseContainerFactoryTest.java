@@ -13,7 +13,12 @@ public class DatabaseContainerFactoryTest {
 
     @Test
     public void databasesShouldBecomeHealthy() {
+    }
 
+    @Test
+    public void typeSignaturesShouldSupportChaining() {
+        EventuateDatabaseContainer<?> db1 = DatabaseContainerFactory.makeDatabaseContainer().withEnv("X", "Y").withEnv("X", "Z");
+        EventuateDatabaseContainer<?> db2 = DatabaseContainerFactory.makeVanillaDatabaseContainer().withEnv("X", "Y").withEnv("X", "Z");
     }
 
 

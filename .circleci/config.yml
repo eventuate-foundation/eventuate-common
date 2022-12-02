@@ -114,6 +114,7 @@ workflows:
             docker buildx create tls-env --use
             docker run --privileged --rm tonistiigi/binfmt:qemu-v6.2.0 --install amd64
             export DOCKER_HOST_NAME=$(hostname)
+            export BUILDX_TARGET_PLATFORMS=linux/arm64
             ./build-and-test-all-mysql8-multi-arch-locally.sh
           skip_multi_arch_env_vars: "true"
       - build-and-test/build-and-test:

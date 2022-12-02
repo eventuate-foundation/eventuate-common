@@ -7,7 +7,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 
 public class DatabaseContainerFactory {
-  public static EventuateDatabaseContainer makeDatabaseContainer() {
+  public static EventuateDatabaseContainer<? extends EventuateDatabaseContainer<?>> makeDatabaseContainer() {
     return isPostgres() ? makePostgresContainer() : makeMySqlContainer();
   }
 
@@ -19,7 +19,7 @@ public class DatabaseContainerFactory {
     return configurePostgres(new EventuatePostgresContainer());
   }
 
-  public static EventuateDatabaseContainer makeVanillaDatabaseContainer() {
+  public static EventuateDatabaseContainer<? extends EventuateDatabaseContainer<?>> makeVanillaDatabaseContainer() {
     return isPostgres() ? makeVanillaPostgresContainer() : makeVanillaMySqlContainer();
   }
 
@@ -31,13 +31,13 @@ public class DatabaseContainerFactory {
     return configurePostgres(new EventuateVanillaPostgresContainer());
   }
 
-  public static EventuateDatabaseContainer makeDatabaseContainerFromDockerFile() {
+  public static EventuateDatabaseContainer<? extends EventuateDatabaseContainer<?>> makeDatabaseContainerFromDockerFile() {
     return isPostgres() ?
             configurePostgres(new EventuatePostgresContainer(asPath("../postgres/Dockerfile")))
             : configureMySql(new EventuateMySqlContainer(asPath("../mysql/Dockerfile-mysql8")));
   }
 
-  public static EventuateDatabaseContainer makeVanillaDatabaseContainerFromDockerFile() {
+  public static EventuateDatabaseContainer<? extends EventuateDatabaseContainer<?>> makeVanillaDatabaseContainerFromDockerFile() {
     return isPostgres() ? makeVanillaPostgresContainerFromDockerfile()
             : makeVanillaMySqlContainerFromDockerfile();
   }
