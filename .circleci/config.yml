@@ -188,7 +188,7 @@ workflows:
             - build-and-test-postgres
       - build-multi-arch-image/build:
           name: build-multi-arch-image-postgres
-          script: ./mysql/build-docker-postgres-multi-arch.sh
+          script: ./postgres/build-docker-postgres-multi-arch.sh
           context:
             - publish
           requires:
@@ -202,7 +202,7 @@ workflows:
             - build-and-test-postgres
       - build-multi-arch-image/build:
           name: build-multi-arch-image-vanilla-postgres
-          script: ./mysql/build-docker-vanilla-postgres-multi-arch.sh
+          script: ./postgres/build-docker-vanilla-postgres-multi-arch.sh
           context:
             - publish
           requires:
