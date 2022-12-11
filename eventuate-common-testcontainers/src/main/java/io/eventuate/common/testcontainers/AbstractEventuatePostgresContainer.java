@@ -25,8 +25,13 @@ public abstract class AbstractEventuatePostgresContainer<T extends AbstractEvent
     }
 
     @Override
+    protected int getPort() {
+        return 5432;
+    }
+
+    @Override
     public void registerProperties(BiConsumer<String, Supplier<Object>> registry) {
-        registry.accept("spring.datasource.url", this::getJdbcUrl);
+        registry.accept("spring.datasource.url", this::getLocalJdbcUrl);
         registry.accept("spring.datasource.username", () -> "postgresuser");
         registry.accept("spring.datasource.password", () -> "postgrespw");
     }
@@ -37,8 +42,13 @@ public abstract class AbstractEventuatePostgresContainer<T extends AbstractEvent
     }
 
     @Override
-    public String getJdbcUrl() {
+    public String getLocalJdbcUrl() {
         return String.format("jdbc:postgresql://localhost:%s/eventuate", getFirstMappedPort());
+    }
+
+    @Override
+    public String getJdbcUrl() {
+        return String.format("jdbc:postgresql://%s:5432/eventuate", getFirstNetworkAlias());
     }
 
     @Override

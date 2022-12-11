@@ -1,10 +1,9 @@
 package io.eventuate.common.testcontainers;
 
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.testcontainers.utility.DockerImageName;
 
-public abstract class EventuateDatabaseContainer<T extends EventuateDatabaseContainer<T>> extends GenericContainer<T> implements PropertyProvidingContainer {
+public abstract class EventuateDatabaseContainer<T extends EventuateDatabaseContainer<T>> extends EventuateGenericContainer<T> implements PropertyProvidingContainer {
 
     protected EventuateDatabaseContainer(DockerImageName dockerImageName) {
         super(dockerImageName);
@@ -19,7 +18,9 @@ public abstract class EventuateDatabaseContainer<T extends EventuateDatabaseCont
     }
 
     public abstract DatabaseCredentials getCredentials();
+    public abstract String getLocalJdbcUrl();
     public abstract String getJdbcUrl();
+
     public abstract String getDatabaseName();
     public abstract DatabaseCredentials getAdminCredentials();
     public abstract String getDriverClassName();

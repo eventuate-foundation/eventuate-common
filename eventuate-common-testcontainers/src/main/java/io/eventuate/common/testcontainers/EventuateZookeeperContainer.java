@@ -1,13 +1,12 @@
 package io.eventuate.common.testcontainers;
 
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.nio.file.Path;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-public class EventuateZookeeperContainer extends GenericContainer<EventuateZookeeperContainer> implements PropertyProvidingContainer {
+public class EventuateZookeeperContainer extends EventuateGenericContainer<EventuateZookeeperContainer> implements PropertyProvidingContainer {
 
     public EventuateZookeeperContainer() {
         super(ContainerUtil.findImage("eventuateio/eventuate-zookeeper", "eventuate.common.version.properties"));
@@ -21,6 +20,11 @@ public class EventuateZookeeperContainer extends GenericContainer<EventuateZooke
 
     private void withConfiguration() {
         withExposedPorts(2181);
+    }
+
+    @Override
+    protected int getPort() {
+        return 2181;
     }
 
     @Override

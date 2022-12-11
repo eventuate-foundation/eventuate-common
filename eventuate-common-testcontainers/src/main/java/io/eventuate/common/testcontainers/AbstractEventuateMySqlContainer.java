@@ -26,8 +26,13 @@ public abstract class AbstractEventuateMySqlContainer<T extends AbstractEventuat
     }
 
     @Override
+    protected int getPort() {
+        return 3306;
+    }
+
+    @Override
     public void registerProperties(BiConsumer<String, Supplier<Object>> registry) {
-        registry.accept("spring.datasource.url", this::getJdbcUrl);
+        registry.accept("spring.datasource.url", this::getLocalJdbcUrl);
         registry.accept("spring.datasource.username", () -> "mysqluser");
         registry.accept("spring.datasource.password", () -> "mysqlpw");
     }
@@ -38,8 +43,12 @@ public abstract class AbstractEventuateMySqlContainer<T extends AbstractEventuat
     }
 
     @Override
-    public String getJdbcUrl() {
+    public String getLocalJdbcUrl() {
         return String.format("jdbc:mysql://localhost:%s/eventuate", getFirstMappedPort());
+    }
+
+    public String getJdbcUrl() {
+        return String.format("jdbc:mysql://%s:3306/eventuate", getFirstNetworkAlias());
     }
 
     @Override
