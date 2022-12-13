@@ -68,7 +68,7 @@ public abstract class AbstractEventuateMySqlContainer<T extends AbstractEventuat
 
     @Override
     public String getEventuateDatabaseSchema() {
-        return "none";
+        return "eventuate";
     }
 
     @Override
