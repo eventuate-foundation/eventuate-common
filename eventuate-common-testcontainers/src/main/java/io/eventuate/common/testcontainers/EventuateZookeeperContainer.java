@@ -1,5 +1,6 @@
 package io.eventuate.common.testcontainers;
 
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.nio.file.Path;
@@ -20,6 +21,7 @@ public class EventuateZookeeperContainer extends EventuateGenericContainer<Event
 
     private void withConfiguration() {
         withExposedPorts(2181);
+        waitingFor(Wait.forHealthcheck());
     }
 
     @Override

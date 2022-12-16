@@ -6,3 +6,5 @@ COPY 0.configure-root-user.sh /docker-entrypoint-initdb.d
 RUN touch /docker-entrypoint-initdb.d/6.configure-users.sql
 
 RUN chown mysql -R /docker-entrypoint-initdb.d
+
+HEALTHCHECK --interval=2s --retries=30 CMD /healthcheck.sh

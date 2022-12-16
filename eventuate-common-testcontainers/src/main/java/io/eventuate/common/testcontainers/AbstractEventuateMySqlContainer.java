@@ -35,6 +35,7 @@ public abstract class AbstractEventuateMySqlContainer<T extends AbstractEventuat
         registry.accept("spring.datasource.url", this::getLocalJdbcUrl);
         registry.accept("spring.datasource.username", () -> "mysqluser");
         registry.accept("spring.datasource.password", () -> "mysqlpw");
+        registry.accept("spring.datasource.driver-class-name", () -> "com.mysql.cj.jdbc.Driver");
     }
 
     @Override

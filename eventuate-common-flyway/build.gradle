@@ -1,0 +1,9 @@
+dependencies {
+    testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+    testImplementation "org.flywaydb:flyway-core:$flywayVersion"
+    testImplementation "org.flywaydb:flyway-mysql:$flywayVersion"
+    testImplementation project(":eventuate-common-spring-jdbc")
+    testImplementation project(":eventuate-common-testcontainers")
+    testImplementation "org.testcontainers:testcontainers:$testContainersVersion"
+
+}

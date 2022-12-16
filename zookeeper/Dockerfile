@@ -17,4 +17,4 @@ VOLUME ["/usr/local/apache-zookeeper-3.5.6-bin/conf", "/usr/local/zookeeper-data
 COPY run-zk.sh .
 ENTRYPOINT ["./run-zk.sh"]
 CMD ["start-foreground"]
-HEALTHCHECK --start-period=20s --interval=15s CMD (echo ruok | nc localhost 2181) || exit 1
+HEALTHCHECK --interval=3s --retries=30 CMD (echo ruok | nc localhost 2181) || exit 1

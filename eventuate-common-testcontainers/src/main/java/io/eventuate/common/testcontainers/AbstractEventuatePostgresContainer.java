@@ -34,6 +34,8 @@ public abstract class AbstractEventuatePostgresContainer<T extends AbstractEvent
         registry.accept("spring.datasource.url", this::getLocalJdbcUrl);
         registry.accept("spring.datasource.username", () -> "postgresuser");
         registry.accept("spring.datasource.password", () -> "postgrespw");
+        registry.accept("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
+
     }
 
     @Override
