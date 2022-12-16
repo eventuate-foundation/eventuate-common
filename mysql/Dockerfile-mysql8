@@ -2,6 +2,8 @@ FROM mysql/mysql-server:8.0.27-1.2.6-server
 
 COPY replication.cnf /etc/my.cnf
 
+HEALTHCHECK --interval=2s --retries=60 CMD /healthcheck.sh
+
 RUN microdnf install gettext \
       && microdnf clean all
 
