@@ -1,8 +1,10 @@
 package io.eventuate.common.testcontainers;
 
+import org.jetbrains.annotations.NotNull;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -17,6 +19,11 @@ public class EventuateZookeeperContainer extends EventuateGenericContainer<Event
     public EventuateZookeeperContainer(Path path) {
         super(new ImageFromDockerfile().withDockerfile(path));
         withConfiguration();
+    }
+
+    @NotNull
+    static EventuateZookeeperContainer makeFromDockerfile() {
+        return new EventuateZookeeperContainer(FileSystems.getDefault().getPath("../zookeeper/Dockerfile"));
     }
 
     private void withConfiguration() {
