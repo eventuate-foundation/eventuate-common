@@ -1,7 +1,6 @@
 package io.eventuate.common.testcontainers;
 
 import org.jetbrains.annotations.NotNull;
-import org.testcontainers.containers.wait.strategy.Wait;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -12,11 +11,11 @@ public class DatabaseContainerFactory {
   }
 
   private static EventuateMySqlContainer makeMySqlContainer() {
-    return configureMySql(new EventuateMySqlContainer());
+    return new EventuateMySqlContainer();
   }
 
   private static EventuatePostgresContainer makePostgresContainer() {
-    return configurePostgres(new EventuatePostgresContainer());
+    return new EventuatePostgresContainer();
   }
 
   public static EventuateDatabaseContainer<? extends EventuateDatabaseContainer<?>> makeVanillaDatabaseContainer() {
@@ -24,17 +23,17 @@ public class DatabaseContainerFactory {
   }
 
   protected static EventuateVanillaMySqlContainer makeVanillaMySqlContainer() {
-    return configureMySql(new EventuateVanillaMySqlContainer());
+    return new EventuateVanillaMySqlContainer();
   }
 
   public static EventuateVanillaPostgresContainer makeVanillaPostgresContainer() {
-    return configurePostgres(new EventuateVanillaPostgresContainer());
+    return new EventuateVanillaPostgresContainer();
   }
 
   public static EventuateDatabaseContainer<? extends EventuateDatabaseContainer<?>> makeDatabaseContainerFromDockerFile() {
     return isPostgres() ?
-            configurePostgres(new EventuatePostgresContainer(asPath("../postgres/Dockerfile")))
-            : configureMySql(new EventuateMySqlContainer(asPath("../mysql/Dockerfile-mysql8")));
+            new EventuatePostgresContainer(asPath("../postgres/Dockerfile"))
+            : new EventuateMySqlContainer(asPath("../mysql/Dockerfile-mysql8"));
   }
 
   public static EventuateDatabaseContainer<? extends EventuateDatabaseContainer<?>> makeVanillaDatabaseContainerFromDockerFile() {
@@ -43,32 +42,16 @@ public class DatabaseContainerFactory {
   }
 
   public static EventuateVanillaMySqlContainer makeVanillaMySqlContainerFromDockerfile() {
-    return configureMySql(new EventuateVanillaMySqlContainer(asPath("../mysql/Dockerfile-vanilla-mysql8")));
+    return new EventuateVanillaMySqlContainer(asPath("../mysql/Dockerfile-vanilla-mysql8"));
   }
 
   public static EventuateVanillaPostgresContainer makeVanillaPostgresContainerFromDockerfile() {
-    return configurePostgres(new EventuateVanillaPostgresContainer(asPath("../postgres/Dockerfile-vanilla")));
+    return new EventuateVanillaPostgresContainer(asPath("../postgres/Dockerfile-vanilla"));
   }
 
   @NotNull
   private static Path asPath(String first) {
     return FileSystems.getDefault().getPath(first);
-  }
-
-  private static <T extends EventuateDatabaseContainer<T>> T configureMySql(T mysqlContainer) {
-    return  mysqlContainer
-            // This needs to be changed - eventuate is hardwired
-            .withEnv("MYSQL_DATABASE", "eventuate")
-            .withReuse(true)
-            .waitingFor(Wait.forHealthcheck());
-  }
-
-  private static <T extends EventuateDatabaseContainer<T>> T configurePostgres(T postgresContainer) {
-    return  postgresContainer
-            // What's the right thing to do here
-            .withEnv("POSTGRES_DB", "eventuate")
-            .withReuse(true)
-            .waitingFor(Wait.forLogMessage(".*database system is ready to accept connections.*", 2));
   }
 
 

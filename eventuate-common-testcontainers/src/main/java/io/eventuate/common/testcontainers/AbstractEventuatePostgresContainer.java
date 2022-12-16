@@ -1,5 +1,6 @@
 package io.eventuate.common.testcontainers;
 
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.util.function.BiConsumer;
@@ -18,10 +19,11 @@ public abstract class AbstractEventuatePostgresContainer<T extends AbstractEvent
         String eventuateOutboxId = System.getProperty("eventuate.outbox.id");
         if (eventuateOutboxId != null)
             withEnv("USE_DB_ID", "true");
-
+        withEnv("POSTGRES_DB", "eventuate");
         withEnv("POSTGRES_USER", "postgresuser");
         withEnv("POSTGRES_PASSWORD", "postgrespw");
         withExposedPorts(5432);
+        waitingFor(Wait.forLogMessage(".*database system is ready to accept connections.*", 2));
     }
 
     @Override
@@ -35,6 +37,7 @@ public abstract class AbstractEventuatePostgresContainer<T extends AbstractEvent
         registry.accept("spring.datasource.username", () -> "postgresuser");
         registry.accept("spring.datasource.password", () -> "postgrespw");
         registry.accept("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
+        registry.accept("eventuate.database.schema", this::getEventuateDatabaseSchema);
 
     }
 
@@ -66,16 +69,6 @@ public abstract class AbstractEventuatePostgresContainer<T extends AbstractEvent
     @Override
     public String getDriverClassName() {
         return "org.postgresql.Driver";
-    }
-
-    @Override
-    public String getEventuateDatabaseSchema() {
-        return "public";
-    }
-
-    @Override
-    public String getMonitoringSchema() {
-        return "public";
     }
 
     @Override

@@ -1,6 +1,7 @@
 dependencies {
     implementation "org.testcontainers:testcontainers:$testContainersVersion"
     implementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+    testImplementation project(":eventuate-common-spring-jdbc")
 }
 
 

@@ -1,5 +1,6 @@
 package io.eventuate.common.testcontainers;
 
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.util.function.BiConsumer;
@@ -19,10 +20,12 @@ public abstract class AbstractEventuateMySqlContainer<T extends AbstractEventuat
         if (eventuateOutboxId != null)
             withEnv("USE_DB_ID", "true");
 
+        withEnv("MYSQL_DATABASE", "eventuate");
         withEnv("MYSQL_ROOT_PASSWORD", "rootpassword");
         withEnv("MYSQL_USER", "mysqluser");
         withEnv("MYSQL_PASSWORD", "mysqlpw");
         withExposedPorts(3306);
+        waitingFor(Wait.forHealthcheck());
     }
 
     @Override
@@ -36,6 +39,7 @@ public abstract class AbstractEventuateMySqlContainer<T extends AbstractEventuat
         registry.accept("spring.datasource.username", () -> "mysqluser");
         registry.accept("spring.datasource.password", () -> "mysqlpw");
         registry.accept("spring.datasource.driver-class-name", () -> "com.mysql.cj.jdbc.Driver");
+        registry.accept("eventuate.database.schema", this::getEventuateDatabaseSchema);
     }
 
     @Override

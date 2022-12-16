@@ -16,4 +16,13 @@ public class EventuateVanillaPostgresContainer extends AbstractEventuatePostgres
         withConfiguration();
     }
 
+    @Override
+    public String getEventuateDatabaseSchema() {
+        return "public";
+    }
+
+    @Override
+    public String getMonitoringSchema() {
+        return "public";
+    }
 }
