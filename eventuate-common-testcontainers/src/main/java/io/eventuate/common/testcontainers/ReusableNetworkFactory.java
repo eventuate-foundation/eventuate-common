@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ReusableNetworkFactory {
   // Hack from https://github.com/testcontainers/testcontainers-java/issues/3081#issuecomment-831119692
-  static Network createNetwork(String networkName) {
+   public static Network createNetwork(String networkName) {
     Network network = Network.newNetwork();
     ReflectionTestUtils.setField(network, "name", networkName);
     List<com.github.dockerjava.api.model.Network> networks =
