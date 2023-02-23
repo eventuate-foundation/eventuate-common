@@ -77,10 +77,11 @@ public class PostgresDialect extends AbstractEventuateSqlDialect {
                       "from information_schema.columns " +
                       "where table_schema = ? and table_name = ? and column_name = ?";
 
-              return (String) selectCallback
-                      .apply(sql, asList(eventuateSchema.getEventuateDatabaseSchema(), unqualifiedTable, column))
-                      .get(0)
-                      .get("data_type");
+              List<Object> queryArgs = asList(eventuateSchema.isEmpty() ? "public" : eventuateSchema.getEventuateDatabaseSchema(), unqualifiedTable, column);
+              List<Map<String, Object>> results = selectCallback.apply(sql, queryArgs);
+              if (results.isEmpty())
+                throw new RuntimeException("Could not retrieve metadata for " + queryArgs);
+              return (String) results.get(0).get("data_type");
             });
   }
 
