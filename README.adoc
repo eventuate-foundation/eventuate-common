@@ -1,0 +1,6 @@
+= An Eventuate project
+
+image::https://eventuate.io/i/logo.gif[]
+
+This project is part of http://eventuate.io[Eventuate], which is a microservices collaboration platform.
+
