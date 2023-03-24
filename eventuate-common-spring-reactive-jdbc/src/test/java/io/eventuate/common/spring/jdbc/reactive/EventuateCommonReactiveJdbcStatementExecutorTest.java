@@ -1,6 +1,7 @@
 package io.eventuate.common.spring.jdbc.reactive;
 
-import org.junit.Assert;
+import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,57 +13,113 @@ import java.util.Map;
 
 import static io.eventuate.common.reactive.jdbc.EventuateReactiveDatabases.MYSQL;
 import static io.eventuate.common.reactive.jdbc.EventuateReactiveDatabases.POSTGRES;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 @SpringBootTest(classes = EventuateCommonReactiveDatabaseConfiguration.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class EventuateCommonReactiveJdbcStatementExecutorTest {
   @Autowired
-  private EventuateSpringReactiveJdbcStatementExecutor eventuateSpringReactiveJdbcStatementExecutor;
+  private EventuateSpringReactiveJdbcStatementExecutor executor;
 
   @Value("${eventuate.reactive.db.driver}")
   public String driver;
 
   @Test
   public void testInsert() {
-    eventuateSpringReactiveJdbcStatementExecutor.update("drop table if exists eventuate.order_test").block();
+    String[] columns = {"a", "b", "c", "d"};
+    String[] values = {"a", "b", "c", "d"};
 
-    String createTableSql =
-            "create table eventuate.order_test(id " + testTableIdDefinition() + " PRIMARY KEY, a VARCHAR(10), b VARCHAR(10), c VARCHAR(10), d VARCHAR(10))";
+    createTestTable(columns);
 
-    eventuateSpringReactiveJdbcStatementExecutor.update(
-            createTableSql).block();
+    Long id = insert("insert into eventuate.order_test (a, b, c, d) values('a', 'b', 'c', 'd')");
 
-    Long id = eventuateSpringReactiveJdbcStatementExecutor
-            .insertAndReturnId("insert into eventuate.order_test (a, b, c, d) values('a', 'b', 'c', 'd')", "id")
-            .block();
+    assertColumnValuesEquals(id, columns, values, query(id));
+  }
 
-    Map<String, Object> row = eventuateSpringReactiveJdbcStatementExecutor.query("select * from eventuate.order_test where id = ?", id).blockFirst();
 
-    Assert.assertEquals(id, row.get("id"));
-    Assert.assertEquals("a", row.get("a"));
-    Assert.assertEquals("b", row.get("b"));
-    Assert.assertEquals("c", row.get("c"));
-    Assert.assertEquals("d", row.get("d"));
+  @Test
+  public void testInsertWithNull() {
+    String[] columns = {"a", "b", "c", "d"};
+    Object[] values = {"a", null, "c", "d"};
+
+    createTestTable(columns);
+
+    Long id = insert("insert into eventuate.order_test (a, b, c, d) values(?, ?, ?, ?)", values);
+
+    assertColumnValuesEquals(id, columns, values, query(id));
+  }
+
+
+  @Test
+  public void testInsertSingleNullColumn() {
+    String[] columns = {"a"};
+    Object[] values = {null};
+
+    createTestTable(columns);
+
+    Long id = insert("insert into eventuate.order_test (a) values(?)", values);
+
+    assertColumnValuesEquals(id, columns, values, query(id));
   }
 
   @Test
-  public void testInsertNull() {
-    eventuateSpringReactiveJdbcStatementExecutor.update("drop table if exists eventuate.order_test").block();
+  public void testInsertDuplicate() {
+    String[] columns = {"a"};
 
-    eventuateSpringReactiveJdbcStatementExecutor.update(
-            "create table eventuate.order_test(id " + testTableIdDefinition() + " PRIMARY KEY, a VARCHAR(10))").block();
+    createTestTable(columns);
 
-    Long id = eventuateSpringReactiveJdbcStatementExecutor
-            .insertAndReturnId("insert into eventuate.order_test (a) values(?)", "id", (Object)null)
-            .block();
+    Long id = insert("insert into eventuate.order_test (a) values('a')");
 
-    Map<String, Object> row = eventuateSpringReactiveJdbcStatementExecutor.query("select * from eventuate.order_test where id = ?", id).blockFirst();
+    try {
+      insert("insert into eventuate.order_test (id, a) values(?, 'a')", id);
+      fail("expected EventuateDuplicateKeyException");
+    } catch (EventuateDuplicateKeyException e) {
+      // expected
+    }
 
-    Assert.assertEquals(id, row.get("id"));
-    Assert.assertNull(row.get("a"));
   }
 
-  private String testTableIdDefinition() {
+
+  private void createTestTable(String... dataColumns) {
+    executor.update("drop table if exists eventuate.order_test").block();
+
+    StringBuffer sb = new StringBuffer("create table eventuate.order_test(id ");
+    sb.append(idColumnType());
+    sb.append(" PRIMARY KEY");
+
+    for (String dataColumn : dataColumns) {
+      sb.append(", ");
+      sb.append(dataColumn);
+      sb.append(" VARCHAR(10)");
+    }
+    sb.append(")");
+
+    executor.update(sb.toString()).block();
+
+  }
+
+  @Nullable
+  private Long insert(String sql, Object... args) {
+
+    return executor
+            .insertAndReturnId(sql, "id", args)
+            .block();
+  }
+
+  @Nullable
+  private Map<String, Object> query(Long id) {
+    return executor.query("select * from eventuate.order_test where id = ?", id).blockFirst();
+  }
+
+  private void assertColumnValuesEquals(Long id, String[] columns, Object[] values, Map<String, Object> row) {
+    assertEquals(id, row.get("id"));
+    for (int i = 0; i < columns.length; i++) {
+      assertEquals(values[i], row.get(columns[i]));
+    }
+  }
+
+  private String idColumnType() {
     switch (driver)
     {
       case POSTGRES : return "BIGSERIAL";

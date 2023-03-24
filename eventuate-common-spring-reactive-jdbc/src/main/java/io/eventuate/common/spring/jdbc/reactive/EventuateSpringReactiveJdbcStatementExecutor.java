@@ -104,11 +104,10 @@ public class EventuateSpringReactiveJdbcStatementExecutor implements EventuateRe
     int skippedParameters = 0;
     for (int i = 0; i < params.length; i++) {
       if (params[i] == null) {
-        if (!(sqlDialect instanceof PostgresDialect)) {
-          genericExecuteSpec = genericExecuteSpec.bindNull(i, Object.class);
+        if (sqlDialect instanceof PostgresDialect) {
+          skippedParameters++;
         } else {
-          // ??
-          // skippedParameters++;
+          genericExecuteSpec = genericExecuteSpec.bindNull(i - skippedParameters, Object.class);
         }
       }
       else {
