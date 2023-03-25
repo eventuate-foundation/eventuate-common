@@ -254,6 +254,16 @@ workflows:
             - test-postgres-zookeeper-multi-arch-intel
             - test-postgres-zookeeper-multi-arch-arm
           script: ./deploy-artifacts.sh
+      - build-and-test/build-and-test:
+          name: deploy-docker-images
+          context:
+            - publish
+          requires:
+            - test-mysql8-zookeeper-multi-arch-intel
+            - test-mysql8-zookeeper-multi-arch-arm
+            - test-postgres-zookeeper-multi-arch-intel
+            - test-postgres-zookeeper-multi-arch-arm
+          script: ./deploy-docker-images.sh
       - deploy-multi-arch:
           context:
             - publish
