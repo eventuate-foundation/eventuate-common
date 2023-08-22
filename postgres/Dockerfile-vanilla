@@ -1,4 +1,4 @@
-FROM postgres:12
+FROM postgres:12.16-bullseye
 
 RUN  apt-get update \
     && apt-get install postgresql-12-wal2json \
