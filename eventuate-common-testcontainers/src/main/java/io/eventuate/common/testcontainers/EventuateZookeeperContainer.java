@@ -16,6 +16,11 @@ public class EventuateZookeeperContainer extends EventuateGenericContainer<Event
         withConfiguration();
     }
 
+    public EventuateZookeeperContainer(String image) {
+        super(image);
+        withConfiguration();
+    }
+
     public EventuateZookeeperContainer(Path path) {
         super(new ImageFromDockerfile().withDockerfile(path));
         withConfiguration();

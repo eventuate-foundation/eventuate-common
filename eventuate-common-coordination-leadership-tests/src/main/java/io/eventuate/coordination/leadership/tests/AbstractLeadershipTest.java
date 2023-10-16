@@ -6,10 +6,6 @@ import io.eventuate.coordination.leadership.LeadershipController;
 import io.eventuate.util.test.async.Eventually;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractLeadershipTest <SELECTOR extends EventuateLeaderSelector> {
 
@@ -17,25 +13,25 @@ public abstract class AbstractLeadershipTest <SELECTOR extends EventuateLeaderSe
 
   @Test
   public void testThatCallbackInvokedOnce1() {
-    LeaderSelectorTestingWrap<SELECTOR> leaderSelectorTestingWrap = createAndStartLeaderSelector();
+    SelectorUnderTest<SELECTOR> selector = createAndStartLeaderSelector();
 
-    leaderSelectorTestingWrap.eventuallyAssertIsLeaderAndCallbackIsInvokedOnce();
-    leaderSelectorTestingWrap.stop();
-    leaderSelectorTestingWrap.eventuallyAssertIsNotLeaderAndCallbackIsInvokedOnce();
+    selector.eventuallyAssertIsLeaderAndCallbackIsInvokedOnce();
+    selector.stop();
+    selector.eventuallyAssertIsNotLeaderAndCallbackIsInvokedOnce();
   }
 
   @Test
   public void testThatLeaderIsChangedWhenStopped() {
-    LeaderSelectorTestingWrap<SELECTOR> leaderSelectorTestingWrap1 = createAndStartLeaderSelector();
-    LeaderSelectorTestingWrap<SELECTOR> leaderSelectorTestingWrap2 = createAndStartLeaderSelector();
+    SelectorUnderTest<SELECTOR> selector1 = createAndStartLeaderSelector();
+    SelectorUnderTest<SELECTOR> selector2 = createAndStartLeaderSelector();
 
-    eventuallyAssertLeadershipIsAssignedOnlyForOneSelector(leaderSelectorTestingWrap1, leaderSelectorTestingWrap2);
+    eventuallyAssertLeadershipIsAssignedOnlyForOneSelector(selector1, selector2);
 
-    LeaderSelectorTestingWrap<SELECTOR> instanceWhichBecameLeaderFirst =
-            leaderSelectorTestingWrap1.isLeader() ? leaderSelectorTestingWrap1 : leaderSelectorTestingWrap2;
+    SelectorUnderTest<SELECTOR> instanceWhichBecameLeaderFirst =
+            selector1.isLeader() ? selector1 : selector2;
 
-    LeaderSelectorTestingWrap<SELECTOR> instanceWhichBecameLeaderLast =
-            leaderSelectorTestingWrap2.isLeader() ? leaderSelectorTestingWrap1 : leaderSelectorTestingWrap2;
+    SelectorUnderTest<SELECTOR> instanceWhichBecameLeaderLast =
+            selector2.isLeader() ? selector1 : selector2;
 
     instanceWhichBecameLeaderFirst.stop();
 
@@ -46,70 +42,42 @@ public abstract class AbstractLeadershipTest <SELECTOR extends EventuateLeaderSe
 
   @Test
   public void testThatOnlyOneLeaderIsWorkingInTheSameTime() throws Exception {
-    LeaderSelectorTestingWrap<SELECTOR> leaderSelectorTestingWrap1 = createAndStartLeaderSelector();
-    LeaderSelectorTestingWrap<SELECTOR> leaderSelectorTestingWrap2 = createAndStartLeaderSelector();
+    SelectorUnderTest<SELECTOR> selector1 = createAndStartLeaderSelector();
+    SelectorUnderTest<SELECTOR> selector2 = createAndStartLeaderSelector();
 
-    eventuallyAssertLeadershipIsAssignedOnlyForOneSelector(leaderSelectorTestingWrap1, leaderSelectorTestingWrap2);
+    eventuallyAssertLeadershipIsAssignedOnlyForOneSelector(selector1, selector2);
 
     Thread.sleep(3000);
 
-    eventuallyAssertLeadershipIsAssignedOnlyForOneSelector(leaderSelectorTestingWrap1, leaderSelectorTestingWrap2);
+    eventuallyAssertLeadershipIsAssignedOnlyForOneSelector(selector1, selector2);
 
-    leaderSelectorTestingWrap1.stop();
-    leaderSelectorTestingWrap2.stop();
+    selector1.stop();
+    selector2.stop();
   }
 
   @Test
   public void testRestart() {
-    LeaderSelectedCallback leaderSelectedCallback = Mockito.mock(LeaderSelectedCallback.class);
-    Runnable leaderRemovedCallback = Mockito.mock(Runnable.class);
+    SelectorUnderTest<SELECTOR> selector = createAndStartLeaderSelector();
 
-    Mockito.doAnswer(invocation -> {
-      leadershipController = (LeadershipController)invocation.getArguments()[0];
-      return null;
-    }).when(leaderSelectedCallback).run(Mockito.any());
-
-    SELECTOR leaderSelector = createLeaderSelector(leaderSelectedCallback, leaderRemovedCallback);
-
-    leaderSelector.start();
-
-    Eventually.eventually(() -> Mockito.verify(leaderSelectedCallback).run(Mockito.any()));
-
-    Mockito.verifyNoInteractions(leaderRemovedCallback);
-    leadershipController.stop();
-
-    Eventually.eventually(() -> {
-      Mockito.verify(leaderRemovedCallback).run();
-      Mockito.verify(leaderSelectedCallback, Mockito.times(2)).run(Mockito.any());
-    });
+    selector.eventuallyAssertIsLeaderAndCallbackIsInvokedOnce();
+    selector.relinquish();
+    selector.eventuallyAssertIsLeaderAndCallbackIsInvokedTwice();
   }
 
-  protected void eventuallyAssertLeadershipIsAssignedOnlyForOneSelector(LeaderSelectorTestingWrap<SELECTOR> selectorLeaderSelectorTestingWrap1,
-                                                                        LeaderSelectorTestingWrap<SELECTOR> selectorLeaderSelectorTestingWrap2) {
+
+  protected void eventuallyAssertLeadershipIsAssignedOnlyForOneSelector(SelectorUnderTest<SELECTOR> selector1,
+                                                                        SelectorUnderTest<SELECTOR> selector2) {
     Eventually.eventually(() -> {
-      boolean leader1Condition = selectorLeaderSelectorTestingWrap1.isLeader() && !selectorLeaderSelectorTestingWrap2.isLeader();
-      boolean leader2Condition = selectorLeaderSelectorTestingWrap2.isLeader() && !selectorLeaderSelectorTestingWrap1.isLeader();
+      boolean leader1Condition = selector1.isLeader() && !selector2.isLeader();
+      boolean leader2Condition = selector2.isLeader() && !selector1.isLeader();
       Assert.assertTrue(leader1Condition || leader2Condition);
     });
   }
 
-  protected LeaderSelectorTestingWrap<SELECTOR> createAndStartLeaderSelector() {
-    AtomicInteger invocationCounter = new AtomicInteger(0);
-    AtomicBoolean leaderFlag = new AtomicBoolean(false);
-
-    SELECTOR selector = createLeaderSelector((leadershipController) -> {
-      leaderFlag.set(true);
-      invocationCounter.incrementAndGet();
-      try {
-        Thread.sleep(Long.MAX_VALUE);
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
-      }
-    }, () -> leaderFlag.set(false));
-
+  protected SelectorUnderTest<SELECTOR> createAndStartLeaderSelector() {
+    SelectorUnderTest<SELECTOR> selector = new SelectorUnderTest<>(this::createLeaderSelector);
     selector.start();
-
-    return new LeaderSelectorTestingWrap<>(selector, invocationCounter, leaderFlag);
+    return selector;
   }
 
   protected abstract SELECTOR createLeaderSelector(LeaderSelectedCallback leaderSelectedCallback, Runnable leaderRemovedCallback);

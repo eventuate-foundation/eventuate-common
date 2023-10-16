@@ -5,6 +5,9 @@ dependencies {
     compile "org.slf4j:slf4j-api:1.7.18"
 
     testCompile project(":eventuate-common-coordination-leadership-tests")
+    testCompile "org.testcontainers:testcontainers:$testContainersVersion"
+
+    testCompile project(":eventuate-common-testcontainers")
     testCompile "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
     testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
 }
