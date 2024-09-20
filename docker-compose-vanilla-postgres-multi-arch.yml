@@ -1,4 +1,3 @@
-version: '3'
 services:
   postgres:
     image: ${VANILLA_POSTGRES_MULTI_ARCH_IMAGE:-localhost:5002/eventuate-vanilla-postgres:multi-arch-local-build}

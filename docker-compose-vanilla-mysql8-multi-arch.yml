@@ -1,4 +1,3 @@
-version: '3'
 services:
   mysql8:
     image: ${VANILLA_MYSQL8_MULTI_ARCH_IMAGE:-localhost:5002/eventuate-vanilla-mysql8:multi-arch-local-build}
