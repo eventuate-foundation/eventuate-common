@@ -13,9 +13,6 @@ buildscript {
     }
 }
 
-plugins {
-    id "com.github.hierynomus.license" version "0.12.1"
-}
 
 apply plugin: 'docker-compose'
 apply plugin: "io.eventuate.plugins.gradle.publish.EventuatePublish"
@@ -23,13 +20,6 @@ apply plugin: "io.eventuate.plugins.gradle.publish.EventuatePublishDockerImages"
 
 allprojects {
     group = "io.eventuate.common"
-}
-
-projects {
-
-    license {
-        header rootProject.file('src/license/HEADER')
-    }
 }
 
 subprojects {
@@ -43,7 +33,7 @@ subprojects {
 
     if (!project.name.endsWith("-bom"))
         dependencies {
-            testCompile "junit:junit:4.12"
+            testImplementation "junit:junit:4.12"
         }
 }
 

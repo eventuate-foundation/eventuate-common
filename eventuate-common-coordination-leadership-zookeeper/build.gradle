@@ -1,15 +1,15 @@
 
 dependencies {
-    compile 'org.apache.curator:curator-recipes:2.11.0'
-    compile project(":eventuate-common-coordination-leadership")
-    compile "org.slf4j:slf4j-api:1.7.18"
+    api 'org.apache.curator:curator-recipes:2.11.0'
+    api project(":eventuate-common-coordination-leadership")
+    api "org.slf4j:slf4j-api:1.7.18"
 
-    testCompile project(":eventuate-common-coordination-leadership-tests")
-    testCompile "org.testcontainers:testcontainers:$testContainersVersion"
+    testImplementation project(":eventuate-common-coordination-leadership-tests")
+    testImplementation "org.testcontainers:testcontainers:$testContainersVersion"
 
-    testCompile project(":eventuate-common-testcontainers")
-    testCompile "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
-    testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+    testImplementation project(":eventuate-common-testcontainers")
+    testImplementation "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
+    testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
 }
 
 test {

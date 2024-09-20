@@ -1,10 +1,10 @@
 
 dependencies {
-    compile project(":eventuate-common-coordination-leadership")
+    api project(":eventuate-common-coordination-leadership")
 
-    compile "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
-    compile "junit:junit:4.11"
-    compile "org.mockito:mockito-core:4.7.0"
+    api "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
+    api "junit:junit:4.11"
+    api "org.mockito:mockito-core:4.7.0"
 
 }
 

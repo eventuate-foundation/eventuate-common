@@ -1,14 +1,14 @@
 
 dependencies {
-    compile project (":eventuate-common-common-spring-jdbc")
+    api project (":eventuate-common-common-spring-jdbc")
 
-    testCompile project (":eventuate-common-spring-id")
-    testCompile project (":eventuate-common-jdbc-tests")
+    testImplementation project (":eventuate-common-spring-id")
+    testImplementation project (":eventuate-common-jdbc-tests")
 
-    compile "org.springframework.boot:spring-boot-starter:$springBootVersion"
-    compile "org.springframework.boot:spring-boot-starter-jdbc:$springBootVersion"
+    api "org.springframework.boot:spring-boot-starter:$springBootVersion"
+    api "org.springframework.boot:spring-boot-starter-jdbc:$springBootVersion"
 
-    testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+    testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
 
     testImplementation project(":eventuate-common-testcontainers")
     testImplementation "org.testcontainers:testcontainers:$testContainersVersion"

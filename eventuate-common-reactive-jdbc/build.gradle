@@ -1,9 +1,9 @@
 
 dependencies {
-    compile project (":eventuate-common-jdbc")
+    api project (":eventuate-common-jdbc")
 
-    compile "dev.miku:r2dbc-mysql:$r2dbcMysqlVersion"
-    compile "org.postgresql:r2dbc-postgresql:$r2dbcPostgresVersion"
+    api "dev.miku:r2dbc-mysql:$r2dbcMysqlVersion"
+    api "org.postgresql:r2dbc-postgresql:$r2dbcPostgresVersion"
 }
 
 test {

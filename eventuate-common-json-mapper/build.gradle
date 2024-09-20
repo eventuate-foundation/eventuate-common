@@ -1,10 +1,10 @@
 
 dependencies {
-    compile project (":eventuate-common-id")
+    api project (":eventuate-common-id")
 
-    compile "commons-lang:commons-lang:2.6"
-    compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jacksonVersion"
+    api "commons-lang:commons-lang:2.6"
+    api "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    api "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jacksonVersion"
 }
 
 test {

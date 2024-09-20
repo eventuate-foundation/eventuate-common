@@ -1,5 +1,5 @@
 
 dependencies {
-    compile project (":eventuate-common-jdbc")
-    compile "junit:junit:4.12"
+    api project (":eventuate-common-jdbc")
+    api "junit:junit:4.12"
 }

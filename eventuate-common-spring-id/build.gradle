@@ -1,8 +1,8 @@
 
 dependencies {
-    compile project (":eventuate-common-id")
+    api project (":eventuate-common-id")
 
-    compile "org.springframework.boot:spring-boot-starter:$springBootVersion"
+    api "org.springframework.boot:spring-boot-starter:$springBootVersion"
 
-    testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+    testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
 }
