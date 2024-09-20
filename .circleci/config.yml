@@ -94,9 +94,6 @@ workflows:
   build-test-and-deploy:
     jobs:
       - build-and-test/build-and-test:
-          name: build-and-test-mysql
-          script: ./build-and-test-all-mysql.sh
-      - build-and-test/build-and-test:
           name: build-and-test-mysql8-intel
           script: |
             docker context create tls-env
@@ -136,9 +133,6 @@ workflows:
             ./build-and-test-all-postgres-multi-arch-locally.sh
           skip_multi_arch_env_vars: "true"
       - build-and-test/build-and-test:
-          name: build-and-test-mariadb
-          script: ./build-and-test-all-mariadb.sh
-      - build-and-test/build-and-test:
           name: build-and-test-mssql
           script: ./build-and-test-all-mssql.sh
       - build-and-test/build-and-test:
@@ -150,40 +144,34 @@ workflows:
           context:
             - publish
           requires:
-            - build-and-test-mysql
             - build-and-test-mysql8-intel
             - build-and-test-mysql8-arm
             - build-and-test-postgres-intel
             - build-and-test-postgres-arm
-            - build-and-test-mariadb
             - build-and-test-mssql
             - build-and-test-postgres
       - build-multi-arch-image/build:
-          name: build-multi-arch-image-mysql
+          name: build-multi-arch-image-mysql8
           script: ./mysql/build-docker-mysql-8-multi-arch.sh
           context:
             - publish
           requires:
-            - build-and-test-mysql
             - build-and-test-mysql8-intel
             - build-and-test-mysql8-arm
             - build-and-test-postgres-intel
             - build-and-test-postgres-arm
-            - build-and-test-mariadb
             - build-and-test-mssql
             - build-and-test-postgres
       - build-multi-arch-image/build:
-          name: build-multi-arch-image-vanilla-mysql
+          name: build-multi-arch-image-vanilla-mysql8
           script: ./mysql/build-docker-vanilla-mysql-8-multi-arch.sh
           context:
             - publish
           requires:
-            - build-and-test-mysql
             - build-and-test-mysql8-intel
             - build-and-test-mysql8-arm
             - build-and-test-postgres-intel
             - build-and-test-postgres-arm
-            - build-and-test-mariadb
             - build-and-test-mssql
             - build-and-test-postgres
       - build-multi-arch-image/build:
@@ -192,12 +180,10 @@ workflows:
           context:
             - publish
           requires:
-            - build-and-test-mysql
             - build-and-test-mysql8-intel
             - build-and-test-mysql8-arm
             - build-and-test-postgres-intel
             - build-and-test-postgres-arm
-            - build-and-test-mariadb
             - build-and-test-mssql
             - build-and-test-postgres
       - build-multi-arch-image/build:
@@ -206,12 +192,10 @@ workflows:
           context:
             - publish
           requires:
-            - build-and-test-mysql
             - build-and-test-mysql8-intel
             - build-and-test-mysql8-arm
             - build-and-test-postgres-intel
             - build-and-test-postgres-arm
-            - build-and-test-mariadb
             - build-and-test-mssql
             - build-and-test-postgres
       - build-and-test/build-and-test:
@@ -219,16 +203,16 @@ workflows:
           script: ./build-and-test-all-mysql8-multi-arch.sh
           requires:
             - build-multi-arch-image-zookeeper
-            - build-multi-arch-image-mysql
-            - build-multi-arch-image-vanilla-mysql
+            - build-multi-arch-image-mysql8
+            - build-multi-arch-image-vanilla-mysql8
       - build-and-test/build-and-test:
           name: test-mysql8-zookeeper-multi-arch-arm
           script: ./build-and-test-all-mysql8-multi-arch.sh
           resource_class: arm.medium
           requires:
             - build-multi-arch-image-zookeeper
-            - build-multi-arch-image-mysql
-            - build-multi-arch-image-vanilla-mysql
+            - build-multi-arch-image-mysql8
+            - build-multi-arch-image-vanilla-mysql8
       - build-and-test/build-and-test:
           name: test-postgres-zookeeper-multi-arch-intel
           script: ./build-and-test-all-postgres-multi-arch.sh

@@ -62,12 +62,6 @@ dockerCompose {
     environment.put "USE_DB_ID", useDbId
     environment.put "USE_JSON_PAYLOAD_AND_HEADERS", useJsonPayloadAndHeaders
 
-    mysql {
-        projectName = null
-        useComposeFiles = ["docker-compose-mysql.yml", "docker-compose-zookeeper.yml"]
-        removeContainers = project.ext.removeContainers.toBoolean()
-    }
-
     mysql8 {
         projectName = null
         useComposeFiles = ["docker-compose-mysql8.yml", "docker-compose-zookeeper.yml"]
@@ -92,12 +86,6 @@ dockerCompose {
         removeContainers = project.ext.removeContainers.toBoolean()
     }
 
-    mariadb {
-        projectName = null
-        useComposeFiles = ["docker-compose-mariadb.yml", "docker-compose-zookeeper.yml"]
-        removeContainers = project.ext.removeContainers.toBoolean()
-    }
-
     postgres {
         projectName = null
         useComposeFiles = ["docker-compose-postgres.yml", "docker-compose-zookeeper.yml"]
@@ -118,7 +106,7 @@ dockerCompose {
 
     publish {
       projectName = null
-      useComposeFiles = ["docker-compose-mysql.yml", "docker-compose-mssql.yml", "docker-compose-mariadb.yml"]
+      useComposeFiles = ["docker-compose-mssql.yml"]
       removeContainers = project.ext.removeContainers.toBoolean()
     }
 }
