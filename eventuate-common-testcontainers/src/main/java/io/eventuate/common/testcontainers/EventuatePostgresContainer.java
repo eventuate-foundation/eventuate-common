@@ -24,6 +24,10 @@ public class EventuatePostgresContainer extends AbstractEventuatePostgresContain
         return new EventuatePostgresContainer(FileSystems.getDefault().getPath("../postgres/Dockerfile"));
     }
 
+    static EventuatePostgresContainer make() {
+      return new EventuatePostgresContainer();
+    }
+
     @Override
     public String getEventuateDatabaseSchema() {
         return "eventuate";

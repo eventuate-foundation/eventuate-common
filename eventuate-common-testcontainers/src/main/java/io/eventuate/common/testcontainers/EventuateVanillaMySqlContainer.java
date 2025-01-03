@@ -16,4 +16,12 @@ public class EventuateVanillaMySqlContainer extends AbstractEventuateMySqlContai
         withConfiguration();
     }
 
+    protected static EventuateVanillaMySqlContainer make() {
+      return new EventuateVanillaMySqlContainer();
+    }
+
+    public static EventuateVanillaMySqlContainer makeFromDockerfile() {
+      return new EventuateVanillaMySqlContainer(ContainerUtil.asPath("../mysql/Dockerfile-vanilla-mysql8"));
+    }
+
 }

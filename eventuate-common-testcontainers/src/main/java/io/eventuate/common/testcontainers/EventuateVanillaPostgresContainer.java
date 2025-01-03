@@ -16,6 +16,14 @@ public class EventuateVanillaPostgresContainer extends AbstractEventuatePostgres
         withConfiguration();
     }
 
+    public static EventuateVanillaPostgresContainer make() {
+      return new EventuateVanillaPostgresContainer();
+    }
+
+    public static EventuateVanillaPostgresContainer makeFromDockerfile() {
+      return new EventuateVanillaPostgresContainer(ContainerUtil.asPath("../postgres/Dockerfile-vanilla"));
+    }
+
     @Override
     public String getEventuateDatabaseSchema() {
         return "public";
@@ -25,4 +33,5 @@ public class EventuateVanillaPostgresContainer extends AbstractEventuatePostgres
     public String getMonitoringSchema() {
         return "public";
     }
+
 }

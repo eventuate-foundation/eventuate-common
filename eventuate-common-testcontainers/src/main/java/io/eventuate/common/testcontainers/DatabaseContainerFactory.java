@@ -1,69 +1,44 @@
 package io.eventuate.common.testcontainers;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 
 public class DatabaseContainerFactory {
-  public static EventuateDatabaseContainer<? extends EventuateDatabaseContainer<?>> makeDatabaseContainer() {
-    return isPostgres() ? makePostgresContainer() : makeMySqlContainer();
+
+  private static final List<DatabaseContainerType> dataContainerTypes =
+      Arrays.asList(MsSqlDatabaseType.TYPE, PostgresDatabaseType.TYPE, MySqlDatabaseType.TYPE);
+
+  private static DatabaseContainerType findDatabaseContainerType() {
+    return dataContainerTypes.stream().filter(type -> type.supports(DatabaseContainerFactory::isProfileActive))
+        .findFirst().orElseThrow(() -> new RuntimeException("No available database container type found"));
   }
 
-  private static EventuateMySqlContainer makeMySqlContainer() {
-    return new EventuateMySqlContainer();
-  }
-
-  private static EventuatePostgresContainer makePostgresContainer() {
-    return new EventuatePostgresContainer();
-  }
-
-  public static EventuateDatabaseContainer<? extends EventuateDatabaseContainer<?>> makeVanillaDatabaseContainer() {
-    return isPostgres() ? makeVanillaPostgresContainer() : makeVanillaMySqlContainer();
-  }
-
-  protected static EventuateVanillaMySqlContainer makeVanillaMySqlContainer() {
-    return new EventuateVanillaMySqlContainer();
-  }
-
-  public static EventuateVanillaPostgresContainer makeVanillaPostgresContainer() {
-    return new EventuateVanillaPostgresContainer();
-  }
-
-  public static EventuateDatabaseContainer<? extends EventuateDatabaseContainer<?>> makeDatabaseContainerFromDockerFile() {
-    return isPostgres() ?
-            new EventuatePostgresContainer(asPath("../postgres/Dockerfile"))
-            : new EventuateMySqlContainer(asPath("../mysql/Dockerfile-mysql8"));
-  }
-
-  public static EventuateDatabaseContainer<? extends EventuateDatabaseContainer<?>> makeVanillaDatabaseContainerFromDockerFile() {
-    return isPostgres() ? makeVanillaPostgresContainerFromDockerfile()
-            : makeVanillaMySqlContainerFromDockerfile();
-  }
-
-  public static EventuateVanillaMySqlContainer makeVanillaMySqlContainerFromDockerfile() {
-    return new EventuateVanillaMySqlContainer(asPath("../mysql/Dockerfile-vanilla-mysql8"));
-  }
-
-  public static EventuateVanillaPostgresContainer makeVanillaPostgresContainerFromDockerfile() {
-    return new EventuateVanillaPostgresContainer(asPath("../postgres/Dockerfile-vanilla"));
-  }
-
-  @NotNull
-  private static Path asPath(String first) {
-    return FileSystems.getDefault().getPath(first);
-  }
-
-
-  public static boolean isPostgres() {
-    return contains(System.getenv("SPRING_PROFILES_ACTIVE"), "postgres") || contains(System.getProperty("spring.profiles.active"), "postgres");
+  private static boolean isProfileActive(String name) {
+    return contains(System.getenv("SPRING_PROFILES_ACTIVE"), name) || contains(System.getProperty("spring.profiles.active"), name);
   }
 
   private static boolean contains(String value, String substring) {
     return value != null && value.contains(substring);
   }
 
+  public static EventuateDatabaseContainer<? extends EventuateDatabaseContainer<?>> makeDatabaseContainer() {
+    return findDatabaseContainerType().make();
+  }
+
+  public static EventuateDatabaseContainer<? extends EventuateDatabaseContainer<?>> makeVanillaDatabaseContainer() {
+    return findDatabaseContainerType().makeVanillaContainer();
+  }
+
+  public static EventuateDatabaseContainer<? extends EventuateDatabaseContainer<?>> makeDatabaseContainerFromDockerFile() {
+    return findDatabaseContainerType().makeFromDockerfile();
+  }
+
+  public static EventuateDatabaseContainer<? extends EventuateDatabaseContainer<?>> makeVanillaDatabaseContainerFromDockerFile() {
+    return findDatabaseContainerType().makeVanillaContainerFromDockerfile();
+  }
+
+
   public static String getDatabaseType() {
-    return isPostgres() ? "postgres" : "mysql";
+    return findDatabaseContainerType().getDatabaseType();
   }
 }

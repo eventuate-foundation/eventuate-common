@@ -6,10 +6,10 @@ import org.junit.Test;
 public class DatabaseContainerFactoryTest {
 
     @ClassRule
-    public static EventuateDatabaseContainer vanillaPostgres = DatabaseContainerFactory.makeVanillaPostgresContainerFromDockerfile();
+    public static EventuateDatabaseContainer vanillaPostgres = EventuateVanillaPostgresContainer.makeFromDockerfile();
 
     @ClassRule
-    public static EventuateDatabaseContainer vanillaMySql = DatabaseContainerFactory.makeVanillaMySqlContainerFromDockerfile();
+    public static EventuateDatabaseContainer vanillaMySql = EventuateVanillaMySqlContainer.makeFromDockerfile();
 
     @Test
     public void databasesShouldBecomeHealthy() {
