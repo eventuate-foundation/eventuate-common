@@ -1,5 +1,5 @@
 
-CREATE TABLE eventuate.received_messages (
+CREATE TABLE received_messages (
                                              consumer_id VARCHAR(767),
                                              message_id VARCHAR(767),
                                              published SMALLINT DEFAULT 0,

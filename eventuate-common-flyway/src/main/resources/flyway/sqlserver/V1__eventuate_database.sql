@@ -4,7 +4,7 @@ create table cdc_monitoring (
 );
 GO
 
-CREATE TABLE eventuate.offset_store(
+CREATE TABLE offset_store(
                                        client_name VARCHAR(255) NOT NULL PRIMARY KEY,
                                        serialized_offset VARCHAR(255)
 );
