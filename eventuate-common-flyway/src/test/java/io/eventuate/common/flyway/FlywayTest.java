@@ -15,7 +15,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@SpringBootTest(classes = FlywayTest.Config.class)
+@SpringBootTest
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource(properties="spring.flyway.locations=classpath:flyway/{vendor}")
 public class FlywayTest {
