@@ -75,11 +75,11 @@ spring.datasource.driver-class-name=
   }
 
   private @NotNull String getLocalJdbcUrlWithoutDatabase() {
-    return String.format("jdbc:sqlserver://localhost:%s", getFirstMappedPort());
+    return String.format("jdbc:sqlserver://localhost:%s;encrypt=true;trustServerCertificate=true", getFirstMappedPort());
   }
 
   public String getJdbcUrl() {
-    return String.format("jdbc:sqlserver://%s:%s;databaseName=eventuate", getFirstNetworkAlias(), DB_PORT);
+    return String.format("jdbc:sqlserver://%s:%s;databaseName=eventuate;encrypt=true;trustServerCertificate=true", getFirstNetworkAlias(), DB_PORT);
   }
 
   @Override
