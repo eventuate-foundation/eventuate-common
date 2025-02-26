@@ -1,4 +1,4 @@
-FROM amazoncorretto:17.0.1-al2
+FROM amazoncorretto:17.0.14-al2023
 
 RUN mkdir -p /usr/local/zookeeper-conf /usr/local/zookeeper-data && \
   yum install -y wget tar gzip nc && \
