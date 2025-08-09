@@ -1,0 +1,11 @@
+
+dependencies {
+    api project (":eventuate-common-jdbc")
+
+    api "io.asyncer:r2dbc-mysql:1.4.1"
+    api "io.r2dbc:r2dbc-postgresql:0.8.13.RELEASE"
+}
+
+test {
+    forkEvery 1
+}

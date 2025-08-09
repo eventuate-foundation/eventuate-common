@@ -23,8 +23,17 @@ allprojects {
 }
 
 subprojects {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    java {
+        if (project.name.endsWith("-spring-boot-3")) {
+            toolchain {
+                languageVersion.set(JavaLanguageVersion.of(17));
+            }
+        } else {
+            toolchain {
+                languageVersion.set(JavaLanguageVersion.of(8));
+            }
+        }
+    }
 
     repositories {
         mavenCentral()
