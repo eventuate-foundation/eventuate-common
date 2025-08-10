@@ -17,6 +17,7 @@ buildscript {
 apply plugin: 'docker-compose'
 apply plugin: "io.eventuate.plugins.gradle.publish.EventuatePublish"
 apply plugin: "io.eventuate.plugins.gradle.publish.EventuatePublishDockerImages"
+apply plugin: "io.eventuate.plugins.gradle.publish.PublishMultiArchContainerImages"
 
 allprojects {
     group = "io.eventuate.common"
@@ -113,4 +114,12 @@ dockerCompose {
 
 configurations.all {
     resolutionStrategy.cacheDynamicVersionsFor 10, 'minutes'
+}
+
+publishMultiArch {
+    image "eventuateio/eventuate-mysql8"
+    image "eventuateio/eventuate-postgres"
+    image "eventuateio/eventuate-vanilla-mysql8"
+    image "eventuateio/eventuate-zookeeper"
+    image "eventuateio/eventuate-vanilla-postgres"
 }

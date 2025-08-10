@@ -77,17 +77,6 @@ orbs:
                 docker login -u ${DOCKER_USER_ID?} -p ${DOCKER_PASSWORD?}
                 
                 <<parameters.script>>
-jobs:
-  deploy-multi-arch:
-    docker:
-      - image: cimg/base:stable
-    working_directory: ~/eventuate-common
-    steps:
-      - checkout
-      - run:
-          command: |
-            . set-multi-arch-image-env-vars.sh
-            ./deploy-multi-arch.sh
 workflows:
   version: 2.1
   build-test-and-deploy:
@@ -247,7 +236,8 @@ workflows:
             - test-postgres-zookeeper-multi-arch-intel
             - test-postgres-zookeeper-multi-arch-arm
           script: ./deploy-docker-images.sh
-      - deploy-multi-arch:
+      - build-and-test/build-and-test:
+          name: deploy-multi-arch
           context:
             - publish
           requires:
