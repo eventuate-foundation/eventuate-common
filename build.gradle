@@ -11,6 +11,9 @@ buildscript {
         classpath "com.avast.gradle:gradle-docker-compose-plugin:$dockerComposePluginVersion"
         classpath "io.eventuate.plugins.gradle:eventuate-plugins-gradle-publish:$eventuatePluginsGradleVersion"
     }
+    configurations.all {
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    }
 }
 
 
