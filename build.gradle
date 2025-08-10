@@ -114,6 +114,7 @@ dockerCompose {
 
 configurations.all {
     resolutionStrategy.cacheDynamicVersionsFor 10, 'minutes'
+    resolutionStrategy.cacheChangingVersionsFor 10, 'minutes'
 }
 
 publishMultiArch {
