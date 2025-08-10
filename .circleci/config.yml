@@ -245,3 +245,4 @@ workflows:
             - test-mysql8-zookeeper-multi-arch-arm
             - test-postgres-zookeeper-multi-arch-intel
             - test-postgres-zookeeper-multi-arch-arm
+          script: ./deploy-multi-arch.sh
