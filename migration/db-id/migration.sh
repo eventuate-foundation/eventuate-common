@@ -48,7 +48,7 @@ elif [ "${DATABASE}" == "postgres" ] || [ "${DATABASE}" == "postgres-multi-arch"
 elif [ "${DATABASE}" == "mssql" ]; then
   rm -rf ${DB_ID_MIGRATION_DIR}
   migration_file=${DB_ID_MIGRATION_DIR}/migration.sql
-  migration_tool=docker compose-mssql-migration-tool.yml
+  migration_tool=docker-compose-mssql-migration-tool.yml
   migration_entrypoint=${DB_ID_MIGRATION_DIR}/entrypoint.sh
 
   curl ${db_id_migration_path}/mssql/4.setup-db-id.sql --output ${migration_file} --create-dirs
