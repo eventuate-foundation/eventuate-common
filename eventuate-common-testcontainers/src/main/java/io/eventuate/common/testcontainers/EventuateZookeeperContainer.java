@@ -47,7 +47,7 @@ public class EventuateZookeeperContainer extends EventuateGenericContainer<Event
     }
 
     public String getZookeeperConnect() {
-        return String.format("%s:%d", getHost(), getMappedPort(2181));
+        return "%s:%d".formatted(getHost(), getMappedPort(2181));
     }
 
 }

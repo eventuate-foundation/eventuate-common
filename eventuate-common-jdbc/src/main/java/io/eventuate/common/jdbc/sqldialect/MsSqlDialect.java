@@ -11,7 +11,7 @@ public class MsSqlDialect extends AbstractEventuateSqlDialect {
 
   @Override
   public String addLimitToSql(String sql, String limitExpression) {
-    String newSql = sql.replaceFirst("(?i:select)", String.format("select top (%s)", limitExpression));
+    String newSql = sql.replaceFirst("(?i:select)", "select top (%s)".formatted(limitExpression));
     if (newSql.equals(sql))
       throw new IllegalArgumentException("Didn't replace in " + newSql);
     return newSql;

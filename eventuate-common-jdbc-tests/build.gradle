@@ -1,5 +1,9 @@
 
 dependencies {
     api project (":eventuate-common-jdbc")
-    api "junit:junit:4.12"
+
+    implementation "org.junit.jupiter:junit-jupiter:5.13.4"
+}
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
 }

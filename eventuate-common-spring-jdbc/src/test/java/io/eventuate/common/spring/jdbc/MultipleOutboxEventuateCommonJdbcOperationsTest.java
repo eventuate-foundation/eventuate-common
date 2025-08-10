@@ -6,8 +6,7 @@ import io.eventuate.common.jdbc.EventuateSchema;
 import io.eventuate.common.jdbc.OutboxPartitioningSpec;
 import io.eventuate.common.testcontainers.EventuateMySqlContainer;
 import io.eventuate.common.testcontainers.PropertyProvidingContainer;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
@@ -15,17 +14,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.nio.file.FileSystems;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(classes = MultipleOutboxEventuateCommonJdbcOperationsTest.Config.class)
-@RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleOutboxEventuateCommonJdbcOperationsTest {
 
     public static final int OUTBOX_TABLES = 8;

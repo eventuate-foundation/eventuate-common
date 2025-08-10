@@ -4,7 +4,7 @@ import io.eventuate.coordination.leadership.EventuateLeaderSelector;
 import io.eventuate.coordination.leadership.LeaderSelectedCallback;
 import io.eventuate.coordination.leadership.LeadershipController;
 import io.eventuate.util.test.async.Eventually;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -41,15 +41,15 @@ public class SelectorUnderTest<SELECTOR extends EventuateLeaderSelector> {
 
   public void eventuallyAssertIsLeaderAndCallbackIsInvokedOnce() {
     Eventually.eventually(() -> {
-      Assert.assertTrue("should be leader", isLeader());
-      Assert.assertEquals(1, getInvocationCount());
+      Assertions.assertTrue(isLeader(), "should be leader");
+      Assertions.assertEquals(1, getInvocationCount());
     });
   }
 
   public void eventuallyAssertIsNotLeaderAndCallbackIsInvokedOnce() {
     Eventually.eventually(() -> {
-      Assert.assertFalse("should not be leader", isLeader());
-      Assert.assertEquals(1, getInvocationCount());
+      Assertions.assertFalse(isLeader(), "should not be leader");
+      Assertions.assertEquals(1, getInvocationCount());
     });
   }
 
@@ -74,15 +74,15 @@ public class SelectorUnderTest<SELECTOR extends EventuateLeaderSelector> {
   }
 
   public void relinquish() {
-    Assert.assertTrue("should be leader", isLeader());
+    Assertions.assertTrue(isLeader(), "should be leader");
     sleepLatch.countDown();
     leadershipController.stop();
   }
 
   public void eventuallyAssertIsLeaderAndCallbackIsInvokedTwice() {
     Eventually.eventually(() -> {
-      Assert.assertTrue("should be leader", isLeader());
-      Assert.assertEquals(2, getInvocationCount());
+      Assertions.assertTrue(isLeader(), "should be leader");
+      Assertions.assertEquals(2, getInvocationCount());
     });
 
   }

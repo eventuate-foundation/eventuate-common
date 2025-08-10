@@ -1,18 +1,18 @@
 package io.eventuate.common.id;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationIdGeneratorTest {
 
   private ApplicationIdGenerator idGen;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     idGen = new ApplicationIdGenerator();
   }

@@ -16,4 +16,5 @@ test {
     if (System.getenv("CIRCLECI") != null && System.getProperty("os.arch").toLowerCase().contains("aarch64")) {
         exclude '**/EventuateVanillaMsSqlContainerTest.class'
     }
+    useJUnitPlatform()
 }

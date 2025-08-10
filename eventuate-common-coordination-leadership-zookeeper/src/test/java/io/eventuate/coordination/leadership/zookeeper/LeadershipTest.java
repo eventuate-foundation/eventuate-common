@@ -7,20 +7,17 @@ import io.eventuate.coordination.leadership.tests.AbstractLeadershipTest;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.UUID;
 
 @SpringBootTest(classes = LeadershipTest.Config.class)
-@RunWith(SpringJUnit4ClassRunner.class)
 public class LeadershipTest extends AbstractLeadershipTest<ZkLeaderSelector> {
 
   @Configuration
@@ -43,9 +40,9 @@ public class LeadershipTest extends AbstractLeadershipTest<ZkLeaderSelector> {
 
   private String lockId;
 
-  @Before
+  @BeforeEach
   public void init() {
-    lockId = String.format("/zk/lock/test/%s", UUID.randomUUID());
+    lockId = "/zk/lock/test/%s".formatted(UUID.randomUUID());
   }
 
   @Override

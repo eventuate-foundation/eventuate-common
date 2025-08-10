@@ -1,7 +1,7 @@
 package io.eventuate.common.testcontainers;
 
 import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class EventuateZookeeperContainerTest {
 

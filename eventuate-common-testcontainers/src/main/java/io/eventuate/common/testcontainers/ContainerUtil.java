@@ -18,12 +18,12 @@ public class ContainerUtil {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return String.format("%s:%s", imageBaseName, props.getProperty("version"));
+        return "%s:%s".formatted(imageBaseName, props.getProperty("version"));
     }
 
     static void registerPortProperty(GenericContainer<?> container, BiConsumer<String, Supplier<Object>> registry, String name) {
         registry.accept(name,
-                () -> String.format("localhost:%s", container.getFirstMappedPort()));
+                () -> "localhost:%s".formatted(container.getFirstMappedPort()));
     }
 
     @NotNull

@@ -19,6 +19,7 @@ dependencies {
     annotationProcessor "io.micronaut.configuration:micronaut-openapi"
     api "io.micronaut:micronaut-inject"
     api "io.micronaut:micronaut-validation"
+    implementation "jakarta.inject:jakarta.inject-api:2.0.1"
     api "io.micronaut:micronaut-runtime"
 
     testAnnotationProcessor "io.micronaut:micronaut-inject-java"

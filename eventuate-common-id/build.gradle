@@ -1,9 +1,11 @@
 
 dependencies {
     api "org.slf4j:slf4j-api:1.7.18"
-    testImplementation "junit:junit:4.11"
+
+    implementation "org.junit.jupiter:junit-jupiter:5.13.4"
 }
 
 test {
     forkEvery 1
+    useJUnitPlatform()
 }

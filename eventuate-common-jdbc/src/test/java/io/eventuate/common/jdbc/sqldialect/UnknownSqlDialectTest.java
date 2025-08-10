@@ -1,7 +1,7 @@
 package io.eventuate.common.jdbc.sqldialect;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
@@ -17,11 +17,11 @@ public class UnknownSqlDialectTest {
       exception = e;
     }
 
-    Assert.assertNotNull(exception);
+    Assertions.assertNotNull(exception);
 
     String expectedMessage = "Sql Dialect not found (unknown.UnknownDriver), " +
             "you can specify environment variable 'EVENTUATE_CURRENT_TIME_IN_MILLISECONDS_SQL' to solve the issue";
 
-    Assert.assertEquals(expectedMessage, exception.getMessage());
+    Assertions.assertEquals(expectedMessage, exception.getMessage());
   }
 }

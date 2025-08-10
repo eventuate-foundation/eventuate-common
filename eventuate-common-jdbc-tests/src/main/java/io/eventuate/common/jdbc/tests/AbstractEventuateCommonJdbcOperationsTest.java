@@ -7,8 +7,8 @@ import io.eventuate.common.jdbc.EventuateTransactionTemplate;
 import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
 import io.eventuate.common.jdbc.sqldialect.MySqlDialect;
 import io.eventuate.common.json.mapper.JSonMapper;
-import org.apache.commons.lang.StringUtils;
-import org.junit.Assert;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Assertions;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -69,23 +69,23 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
 
     List<Map<String, Object>> events = getEvents(eventIdToRowId(eventId));
 
-    Assert.assertEquals(1, events.size());
+    Assertions.assertEquals(1, events.size());
 
     Map<String, Object> event = events.get(0);
 
     boolean eventIdIsEmpty = StringUtils.isEmpty((String) event.get("event_id"));
     if (getIdGenerator().databaseIdRequired()) {
-      Assert.assertTrue(eventIdIsEmpty);
+      Assertions.assertTrue(eventIdIsEmpty);
     } else {
-      Assert.assertFalse(eventIdIsEmpty);
+      Assertions.assertFalse(eventIdIsEmpty);
     }
 
-    Assert.assertEquals(eventType, event.get("event_type"));
-    Assert.assertEquals(eventData, event.get("event_data"));
-    Assert.assertEquals(entityType, event.get("entity_type"));
-    Assert.assertEquals(entityId, event.get("entity_id"));
-    Assert.assertEquals(triggeringEvent, event.get("triggering_event"));
-    Assert.assertEquals(metadata, event.get("metadata"));
+    Assertions.assertEquals(eventType, event.get("event_type"));
+    Assertions.assertEquals(eventData, event.get("event_data"));
+    Assertions.assertEquals(entityType, event.get("entity_type"));
+    Assertions.assertEquals(entityId, event.get("entity_id"));
+    Assertions.assertEquals(triggeringEvent, event.get("triggering_event"));
+    Assertions.assertEquals(metadata, event.get("metadata"));
   }
 
   public void testInsertIntoMessageTable() throws SQLException {
@@ -99,23 +99,23 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
 
     List<Map<String, Object>> messages = getMessages(messageIdToRowId(messageId));
 
-    Assert.assertEquals(1, messages.size());
+    Assertions.assertEquals(1, messages.size());
 
     Map<String, Object> event = messages.get(0);
 
     Map<String, String> actualHeaders = JSonMapper.fromJson(event.get("headers").toString(), Map.class);
 
     if (!getIdGenerator().databaseIdRequired()) {
-      Assert.assertTrue(actualHeaders.containsKey("ID"));
-      Assert.assertEquals(messageId, actualHeaders.get("ID"));
+      Assertions.assertTrue(actualHeaders.containsKey("ID"));
+      Assertions.assertEquals(messageId, actualHeaders.get("ID"));
       actualHeaders.remove("ID");
     }
 
-    Assert.assertEquals(destination, event.get("destination"));
-    Assert.assertEquals(payload, event.get("payload"));
+    Assertions.assertEquals(destination, event.get("destination"));
+    Assertions.assertEquals(payload, event.get("payload"));
     //since time is generated automatically now, it is hard to predict accurate time. So there is estimated time is used (5 min accuracy)
-    Assert.assertTrue(System.currentTimeMillis() - (long) event.get("creation_time") < 5 * 60 * 1000);
-    Assert.assertEquals(expectedHeaders, actualHeaders);
+    Assertions.assertTrue(System.currentTimeMillis() - (long) event.get("creation_time") < 5 * 60 * 1000);
+    Assertions.assertEquals(expectedHeaders, actualHeaders);
   }
 
   protected void testGeneratedIdOfEventsTableRow() {
@@ -139,11 +139,11 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
 
     getEventuateTransactionTemplate().executeInTransaction(() -> {
       String table = eventuateSchema.qualifyTable("events");
-      String sql = String.format("select * from %s where event_type = 'CDC-IGNORED'", table);
+      String sql = "select * from %s where event_type = 'CDC-IGNORED'".formatted(table);
       try (Connection connection = getDataSource().getConnection();
            PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
         try(ResultSet rs = preparedStatement.executeQuery()) {
-          Assert.assertTrue(rs.next());
+          Assertions.assertTrue(rs.next());
         }
       } catch (SQLException e) {
         throw new RuntimeException(e);
@@ -171,11 +171,11 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
 
     getEventuateTransactionTemplate().executeInTransaction(() -> {
       String table = eventuateSchema.qualifyTable("message");
-      String sql = String.format("select * from %s where destination = 'CDC-IGNORED'", table);
+      String sql = "select * from %s where destination = 'CDC-IGNORED'".formatted(table);
       try (Connection connection = getDataSource().getConnection();
            PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
         try(ResultSet rs = preparedStatement.executeQuery()) {
-          Assert.assertTrue(rs.next());
+          Assertions.assertTrue(rs.next());
         }
       } catch (SQLException e) {
         throw new RuntimeException(e);
@@ -202,7 +202,7 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
   protected List<Map<String, Object>> getEvents(IdColumnAndValue idColumnAndValue) {
     return getEventuateTransactionTemplate().executeInTransaction(() -> {
       String table = eventuateSchema.qualifyTable("events");
-      String sql = String.format("select event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata from %s where %s = ?",
+      String sql = "select event_id, event_type, event_data, entity_type, entity_id, triggering_event, metadata from %s where %s = ?".formatted(
               table, idColumnAndValue.getColumn());
 
       try (Connection connection = getDataSource().getConnection();
@@ -240,7 +240,7 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
   protected List<Map<String, Object>> getMessages(IdColumnAndValue idColumnAndValue) {
     return getEventuateTransactionTemplate().executeInTransaction(() -> {
       String table = eventuateSchema.qualifyTable("message");
-      String sql = String.format("select %s, destination, headers, payload, creation_time from %s where %s = ?",
+      String sql = "select %s, destination, headers, payload, creation_time from %s where %s = ?".formatted(
               idColumnAndValue.getColumn(), table, idColumnAndValue.getColumn());
 
       try (Connection connection = getDataSource().getConnection();
@@ -299,8 +299,8 @@ public abstract class AbstractEventuateCommonJdbcOperationsTest {
 
     long currentTime = System.currentTimeMillis();
 
-    Assert.assertTrue(String.format("Row id should start from current time in milliseconds after migration (current time: %s, id: %s)", currentTime, id),
-            currentTime - id < precision);
+    Assertions.assertTrue(currentTime - id < precision,
+            "Row id should start from current time in milliseconds after migration (current time: %s, id: %s)".formatted(currentTime, id));
   }
 
   protected static class IdColumnAndValue {

@@ -11,7 +11,7 @@ public class Int128 {
   }
 
   public String asString() {
-    return String.format("%016x-%016x", hi, lo);
+    return "%016x-%016x".formatted(hi, lo);
   }
 
   @Override

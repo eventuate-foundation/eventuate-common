@@ -1,6 +1,6 @@
 package io.eventuate.common.jdbc;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class EventuateSchema {
   public static final String DEFAULT_SCHEMA = "eventuate";
@@ -33,6 +33,6 @@ public class EventuateSchema {
 
     String schema = isDefault() ? DEFAULT_SCHEMA : eventuateDatabaseSchema;
 
-    return String.format("%s.%s", schema, table);
+    return "%s.%s".formatted(schema, table);
   }
 }

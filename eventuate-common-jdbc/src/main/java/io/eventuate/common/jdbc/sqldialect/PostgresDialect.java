@@ -39,7 +39,7 @@ public class PostgresDialect extends AbstractEventuateSqlDialect {
 
     String columnType = getColumnType(eventuateSchema, unqualifiedTable, column, selectCallback);
 
-    return String.format("%s::%s", sqlPart, columnType);
+    return "%s::%s".formatted(sqlPart, columnType);
   }
 
   @Override
@@ -49,19 +49,18 @@ public class PostgresDialect extends AbstractEventuateSqlDialect {
                                    String column,
                                    EventuateJdbcStatementExecutor eventuateJdbcStatementExecutor) {
 
-    if (object instanceof String) return (String) object;
+    if (object instanceof String string) return string;
 
-    if (object instanceof PGobject) {
-      PGobject pGobject = (PGobject) object;
+    if (object instanceof PGobject pGobject) {
 
       if ("json".equals(pGobject.getType())) {
         return pGobject.getValue();
       }
 
-      throw new IllegalArgumentException(String.format("Unsupported postgres type %s of column %s", pGobject.getType(), column));
+      throw new IllegalArgumentException("Unsupported postgres type %s of column %s".formatted(pGobject.getType(), column));
     }
 
-    throw new IllegalArgumentException(String.format("Unsupported java type %s for column %s", object.getClass(), column));
+    throw new IllegalArgumentException("Unsupported java type %s for column %s".formatted(object.getClass(), column));
   }
 
   public String getColumnType(EventuateSchema eventuateSchema,
@@ -87,6 +86,6 @@ public class PostgresDialect extends AbstractEventuateSqlDialect {
 
   @Override
   public String addReturningOfGeneratedIdToSql(String sql, String idColumn) {
-    return String.format("%s RETURNING %s", sql, idColumn);
+    return "%s RETURNING %s".formatted(sql, idColumn);
   }
 }

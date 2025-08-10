@@ -19,11 +19,14 @@ dependencies {
     annotationProcessor "io.micronaut.configuration:micronaut-openapi"
     api "io.micronaut:micronaut-inject"
     api "io.micronaut:micronaut-validation"
+    compileOnly "jakarta.annotation:jakarta.annotation-api:2.1.1"
+    implementation "jakarta.inject:jakarta.inject-api:2.0.1"
     api "io.micronaut:micronaut-runtime"
 }
 
 test {
     systemProperty 'db.id.used', dbIdUsed
     if (project.hasProperty("eventuateOutboxId"))
-      systemProperty 'eventuate.outbox.id', eventuateOutboxId
+        systemProperty 'eventuate.outbox.id', eventuateOutboxId
+    useJUnitPlatform()
 }

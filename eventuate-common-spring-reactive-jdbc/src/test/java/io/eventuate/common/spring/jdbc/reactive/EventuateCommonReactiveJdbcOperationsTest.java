@@ -8,9 +8,8 @@ import io.eventuate.common.jdbc.EventuateSchema;
 import io.eventuate.common.jdbc.EventuateTransactionTemplate;
 import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
 import io.eventuate.common.jdbc.tests.AbstractEventuateCommonJdbcOperationsTest;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -20,7 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import org.springframework.transaction.support.TransactionTemplate;
 import reactor.core.publisher.Mono;
@@ -35,9 +33,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.MESSAGE_APPLICATION_GENERATED_ID_COLUMN;
 import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.MESSAGE_AUTO_GENERATED_ID_COLUMN;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(classes = EventuateCommonReactiveJdbcOperationsTest.Config.class)
-@RunWith(SpringJUnit4ClassRunner.class)
 public class EventuateCommonReactiveJdbcOperationsTest extends AbstractEventuateCommonJdbcOperationsTest {
 
   @Configuration
@@ -87,13 +85,14 @@ public class EventuateCommonReactiveJdbcOperationsTest extends AbstractEventuate
       //does not need special actions
     }
 
-    Assert.assertTrue(getMessages(idAndColumn.get()).isEmpty());
+    Assertions.assertTrue(getMessages(idAndColumn.get()).isEmpty());
   }
 
   @Override
-  @Test(expected = EventuateDuplicateKeyException.class)
+  @Test
   public void testEventuateDuplicateKeyException() {
-    super.testEventuateDuplicateKeyException();
+    assertThrows(EventuateDuplicateKeyException.class, () ->
+      super.testEventuateDuplicateKeyException());
   }
 
   @Override
@@ -166,7 +165,7 @@ public class EventuateCommonReactiveJdbcOperationsTest extends AbstractEventuate
   @Override
   protected void insertIntoEntitiesTable(String entityId, String entityType, EventuateSchema eventuateSchema) {
     String table = eventuateSchema.qualifyTable("entities");
-    String sql = String.format("insert into %s values (?, ?, ?)", table);
+    String sql = "insert into %s values (?, ?, ?)".formatted(table);
 
     eventuateSpringReactiveJdbcStatementExecutor.update(sql, entityId, entityType, System.nanoTime()).block();
   }

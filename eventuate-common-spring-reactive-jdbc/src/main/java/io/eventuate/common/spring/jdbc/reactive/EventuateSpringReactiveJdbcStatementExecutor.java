@@ -22,7 +22,7 @@ public class EventuateSpringReactiveJdbcStatementExecutor implements EventuateRe
     this.sqlDialect = sqlDialect;
   }
 
-  public Mono<Integer> update(String sql, Object... params) {
+  public Mono<Long> update(String sql, Object... params) {
     sql = reformatInsertParameters(sql, params, params);
 
     DatabaseClient.GenericExecuteSpec genericExecuteSpec = bindParameters(databaseClient.sql(sql), params);
@@ -42,8 +42,8 @@ public class EventuateSpringReactiveJdbcStatementExecutor implements EventuateRe
             .map(m -> {
               Object value = m.values().stream().findFirst().get();
 
-              if (value instanceof Long) return (Long)value;
-              if (value instanceof BigInteger) return ((BigInteger)value).longValue();
+              if (value instanceof Long long1) return long1;
+              if (value instanceof BigInteger integer) return integer.longValue();
 
               throw new IllegalStateException();
             });
@@ -65,7 +65,7 @@ public class EventuateSpringReactiveJdbcStatementExecutor implements EventuateRe
     return queryForList(sql, (row, rowMetadata) -> {
       Map<String, Object> result = new HashMap<>();
 
-      rowMetadata.getColumnNames().forEach(name -> result.put(name, row.get(name)));
+      rowMetadata.getColumnMetadatas().forEach(metadata -> result.put(metadata.getName(), row.get(metadata.getName())));
 
       return result;
     }, params);

@@ -18,7 +18,7 @@ public class DatabaseIdGenerator implements IdGenerator {
     this.serviceId = serviceId;
 
     if (serviceId < 0 || serviceId > SERVICE_ID_MAX_VALUE) {
-      throw new IllegalArgumentException(String.format("service id should be between 0 and %s", SERVICE_ID_MAX_VALUE));
+      throw new IllegalArgumentException("service id should be between 0 and %s".formatted(SERVICE_ID_MAX_VALUE));
     }
   }
 

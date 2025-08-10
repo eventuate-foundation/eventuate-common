@@ -3,9 +3,9 @@ package io.eventuate.common.micronaut.jdbc;
 import io.eventuate.common.jdbc.EventuateSchema;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Value;
+import jakarta.annotation.Nullable;
 
-import javax.annotation.Nullable;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Factory
 public class EventuateSchemaFactory {

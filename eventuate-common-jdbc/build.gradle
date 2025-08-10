@@ -2,10 +2,11 @@
 dependencies {
     api project (":eventuate-common-json-mapper")
 
-    api 'mysql:mysql-connector-java:8.0.21'
+    api 'com.mysql:mysql-connector-j:8.0.33'
     api ('org.postgresql:postgresql:42.1.4') {
         exclude group: "org.slf4j", module: "slf4j-simple"
     }
+    implementation "org.junit.jupiter:junit-jupiter:5.13.4"
     runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc:7.2.1.jre8'
 
     testImplementation 'com.zaxxer:HikariCP:3.2.0'
@@ -15,4 +16,5 @@ dependencies {
 
 test {
     forkEvery 1
+    useJUnitPlatform()
 }

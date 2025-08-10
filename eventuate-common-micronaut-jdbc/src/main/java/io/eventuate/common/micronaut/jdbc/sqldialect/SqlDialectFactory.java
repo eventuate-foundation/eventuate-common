@@ -3,9 +3,9 @@ package io.eventuate.common.micronaut.jdbc.sqldialect;
 import io.eventuate.common.jdbc.sqldialect.*;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Value;
+import jakarta.annotation.Nullable;
 
-import javax.annotation.Nullable;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import java.util.Collection;
 
 @Factory

@@ -1,8 +1,7 @@
 package io.eventuate.common.testcontainers;
 
 import io.eventuate.common.spring.jdbc.EventuateCommonJdbcOperationsConfiguration;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +12,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 
 @SpringBootTest
-@RunWith(SpringJUnit4ClassRunner.class)
 public class EventuateVanillaMsSqlContainerTest {
 
     protected static Logger logger = LoggerFactory.getLogger(EventuateVanillaMsSqlContainerTest.class);

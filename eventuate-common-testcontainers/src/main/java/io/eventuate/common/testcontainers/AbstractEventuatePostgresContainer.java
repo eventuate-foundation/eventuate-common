@@ -48,12 +48,12 @@ public abstract class AbstractEventuatePostgresContainer<T extends AbstractEvent
 
     @Override
     public String getLocalJdbcUrl() {
-        return String.format("jdbc:postgresql://localhost:%s/eventuate", getFirstMappedPort());
+        return "jdbc:postgresql://localhost:%s/eventuate".formatted(getFirstMappedPort());
     }
 
     @Override
     public String getJdbcUrl() {
-        return String.format("jdbc:postgresql://%s:5432/eventuate", getFirstNetworkAlias());
+        return "jdbc:postgresql://%s:5432/eventuate".formatted(getFirstNetworkAlias());
     }
 
     @Override

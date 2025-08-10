@@ -12,7 +12,7 @@ import io.micronaut.test.annotation.MicronautTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.Map;
@@ -101,7 +101,7 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
   @Override
   protected void insertIntoEntitiesTable(String entityId, String entityType, EventuateSchema eventuateSchema) {
     String table = eventuateSchema.qualifyTable("entities");
-    String sql = String.format("insert into %s values (?, ?, ?);", table);
+    String sql = "insert into %s values (?, ?, ?);".formatted(table);
 
     eventuateTransactionTemplate.executeInTransaction(() ->
             eventuateCommonJdbcStatementExecutor.update(sql, entityId, entityType, System.nanoTime()));

@@ -3,11 +3,13 @@ dependencies {
     api project(":eventuate-common-coordination-leadership")
 
     api "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
-    api "junit:junit:4.11"
-    api "org.mockito:mockito-core:4.7.0"
+    api "org.mockito:mockito-core:4.11.0"
+
+    implementation "org.junit.jupiter:junit-jupiter:5.13.4"
 
 }
 
 test {
     forkEvery 1
+    useJUnitPlatform()
 }

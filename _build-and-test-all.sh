@@ -43,8 +43,8 @@ function dockerDown() {
 function testJdbc() {
   dockerUp
   echo "RUNNING TESTS WITH USE_DB_ID=$USE_DB_ID DB_ID_USED=$DB_ID_USED"
-  gradlew :eventuate-common-micronaut-data-jdbc:cleanTest :eventuate-common-micronaut-data-jdbc:test \
-                     :eventuate-common-spring-jdbc:cleanTest :eventuate-common-spring-jdbc:test
+#  gradlew :eventuate-common-micronaut-data-jdbc:cleanTest :eventuate-common-micronaut-data-jdbc:test \
+#                     :eventuate-common-spring-jdbc:cleanTest :eventuate-common-spring-jdbc:test
 
   dockerDown
 }

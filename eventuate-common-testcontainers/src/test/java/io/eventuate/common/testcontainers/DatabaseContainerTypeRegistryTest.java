@@ -1,6 +1,6 @@
 package io.eventuate.common.testcontainers;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static io.eventuate.common.testcontainers.DatabaseContainerTypeRegistry.findDatabaseContainerType;
 import static org.assertj.core.api.Assertions.assertThat;

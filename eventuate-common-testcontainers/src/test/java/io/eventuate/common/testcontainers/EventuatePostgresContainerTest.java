@@ -2,8 +2,7 @@ package io.eventuate.common.testcontainers;
 
 import io.eventuate.common.jdbc.EventuateSchema;
 import io.eventuate.common.spring.jdbc.EventuateCommonJdbcOperationsConfiguration;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,10 +11,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @SpringBootTest(classes = EventuatePostgresContainerTest.Config.class)
-@RunWith(SpringJUnit4ClassRunner.class)
 public class EventuatePostgresContainerTest {
 
     public static EventuateDatabaseContainer<?> database = EventuatePostgresContainer.makeFromDockerfile();
@@ -41,12 +38,12 @@ public class EventuatePostgresContainerTest {
 
     @Test
     public void shouldSpecifyEventuateSchema() {
-        jdbcTemplate.queryForList(String.format("select * from %s", eventuateSchema.qualifyTable("message")));
+        jdbcTemplate.queryForList("select * from %s".formatted(eventuateSchema.qualifyTable("message")));
     }
 
     @Test
     public void shouldSpecifyMonitoringSchema() {
-        jdbcTemplate.queryForList(String.format("select * from %s.cdc_monitoring", database.getMonitoringSchema()));
+        jdbcTemplate.queryForList("select * from %s.cdc_monitoring".formatted(database.getMonitoringSchema()));
     }
 
 }

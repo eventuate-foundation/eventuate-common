@@ -2,10 +2,11 @@
 dependencies {
     api project (":eventuate-common-jdbc")
 
-    api "dev.miku:r2dbc-mysql:$r2dbcMysqlVersion"
-    api "org.postgresql:r2dbc-postgresql:$r2dbcPostgresVersion"
+    api "io.asyncer:r2dbc-mysql:1.4.1"
+    api "org.postgresql:r2dbc-postgresql:1.0.7.RELEASE"
 }
 
 test {
     forkEvery 1
+    useJUnitPlatform()
 }

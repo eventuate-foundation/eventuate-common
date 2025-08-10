@@ -49,11 +49,11 @@ public abstract class AbstractEventuateMySqlContainer<T extends AbstractEventuat
 
     @Override
     public String getLocalJdbcUrl() {
-        return String.format("jdbc:mysql://localhost:%s/eventuate", getFirstMappedPort());
+        return "jdbc:mysql://localhost:%s/eventuate".formatted(getFirstMappedPort());
     }
 
     public String getJdbcUrl() {
-        return String.format("jdbc:mysql://%s:3306/eventuate", getFirstNetworkAlias());
+        return "jdbc:mysql://%s:3306/eventuate".formatted(getFirstNetworkAlias());
     }
 
     @Override

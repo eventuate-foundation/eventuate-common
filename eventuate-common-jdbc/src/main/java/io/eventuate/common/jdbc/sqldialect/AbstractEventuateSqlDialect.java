@@ -1,7 +1,7 @@
 package io.eventuate.common.jdbc.sqldialect;
 
 import io.eventuate.common.jdbc.SchemaAndTable;
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -35,7 +35,7 @@ public abstract class AbstractEventuateSqlDialect implements EventuateSqlDialect
 
   @Override
   public String addLimitToSql(String sql, String limitExpression) {
-    return String.format("%s limit %s", sql, limitExpression);
+    return "%s limit %s".formatted(sql, limitExpression);
   }
 
   @Override

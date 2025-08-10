@@ -6,9 +6,8 @@ import io.eventuate.common.jdbc.sqldialect.EventuateSqlDialect;
 import io.eventuate.common.jdbc.sqldialect.SqlDialectSelector;
 import io.eventuate.common.jdbc.tests.AbstractEventuateCommonJdbcOperationsTest;
 import io.eventuate.common.spring.id.IdGeneratorConfiguration;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -17,7 +16,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -25,8 +23,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 @SpringBootTest(classes = EventuateCommonJdbcOperationsTest.Config.class)
-@RunWith(SpringJUnit4ClassRunner.class)
 public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJdbcOperationsTest {
 
   @Configuration
@@ -59,10 +58,11 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
   @Autowired
   private IdGenerator idGenerator;
 
-  @Test(expected = EventuateDuplicateKeyException.class)
+  @Test
   @Override
   public void testEventuateDuplicateKeyException() {
-    super.testEventuateDuplicateKeyException();
+    assertThrows(EventuateDuplicateKeyException.class, () ->
+      super.testEventuateDuplicateKeyException());
   }
 
   @Test
@@ -102,8 +102,8 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
     IdColumnAndValue idColumnAndValue = messageIdToRowId(messageId);
 
     SqlRowSet sqlRowSet = jdbcTemplate
-            .queryForRowSet(String.format("select payload from %s where %s = ?",
-                    eventuateSchema.qualifyTable("message"), idColumnAndValue.getColumn()), idColumnAndValue.getValue());
+            .queryForRowSet("select payload from %s where %s = ?".formatted(
+            eventuateSchema.qualifyTable("message"), idColumnAndValue.getColumn()), idColumnAndValue.getValue());
 
     sqlRowSet.next();
 
@@ -114,7 +114,7 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
     String payloadString = eventuateSqlDialect.jsonColumnToString(payload,
             eventuateSchema, "message", "payload", eventuateJdbcStatementExecutor);
 
-    Assert.assertTrue(payloadString.contains(payloadData));
+    Assertions.assertTrue(payloadString.contains(payloadData));
   }
 
   @Override
@@ -147,7 +147,7 @@ public class EventuateCommonJdbcOperationsTest extends AbstractEventuateCommonJd
   @Override
   protected void insertIntoEntitiesTable(String entityId, String entityType, EventuateSchema eventuateSchema) {
     String table = eventuateSchema.qualifyTable("entities");
-    String sql = String.format("insert into %s values (?, ?, ?);", table);
+    String sql = "insert into %s values (?, ?, ?);".formatted(table);
 
     eventuateTransactionTemplate.executeInTransaction(() ->
             eventuateJdbcStatementExecutor.update(sql, entityId, entityType, System.nanoTime()));

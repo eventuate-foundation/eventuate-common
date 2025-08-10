@@ -4,8 +4,8 @@ import io.eventuate.coordination.leadership.EventuateLeaderSelector;
 import io.eventuate.coordination.leadership.LeaderSelectedCallback;
 import io.eventuate.coordination.leadership.LeadershipController;
 import io.eventuate.util.test.async.Eventually;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractLeadershipTest <SELECTOR extends EventuateLeaderSelector> {
 
@@ -70,7 +70,7 @@ public abstract class AbstractLeadershipTest <SELECTOR extends EventuateLeaderSe
     Eventually.eventually(() -> {
       boolean leader1Condition = selector1.isLeader() && !selector2.isLeader();
       boolean leader2Condition = selector2.isLeader() && !selector1.isLeader();
-      Assert.assertTrue(leader1Condition || leader2Condition);
+      Assertions.assertTrue(leader1Condition || leader2Condition);
     });
   }
 

@@ -3,3 +3,6 @@ dependencies {
     api project (":eventuate-common-jdbc")
     api "org.springframework.boot:spring-boot-starter:$springBootVersion"
 }
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}

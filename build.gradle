@@ -34,7 +34,7 @@ subprojects {
             }
         } else {
             toolchain {
-                languageVersion.set(JavaLanguageVersion.of(8));
+                languageVersion.set(JavaLanguageVersion.of(17));
             }
         }
     }
@@ -46,8 +46,9 @@ subprojects {
 
     if (!project.name.endsWith("-bom"))
         dependencies {
-            testImplementation "junit:junit:4.12"
             testImplementation "org.assertj:assertj-core:$assertjVersion"
+            testImplementation "org.junit.jupiter:junit-jupiter:$junitVersion"
+            testRuntimeOnly "org.junit.platform:junit-platform-launcher:$junitPlatformLauncherVersion"
         }
 }
 
@@ -139,4 +140,7 @@ task preCommitCheck {
             commandLine 'circleci', 'config', 'validate'
         }
     }
+}
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
 }

@@ -1,14 +1,15 @@
 package io.eventuate.common.json.mapper;
 
 import io.eventuate.common.id.Int128;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.junit.Test;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class JSonMapperTest {

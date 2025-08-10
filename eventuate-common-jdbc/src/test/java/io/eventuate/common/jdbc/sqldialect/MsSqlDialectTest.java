@@ -1,10 +1,11 @@
 package io.eventuate.common.jdbc.sqldialect;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.Optional;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MsSqlDialectTest extends AbstractDialectTest {
 
@@ -21,8 +22,9 @@ public class MsSqlDialectTest extends AbstractDialectTest {
     assertEquals("select top (:limit) * FROM FOO", getDialectByDriver().addLimitToSql("sELeCt * FROM FOO", ":limit"));
   }
 
-  @Test(expected=IllegalArgumentException.class)
+  @Test
   public void shouldFailIfNotReplace() {
-    getDialectByDriver().addLimitToSql("UPDATE FOO ...", ":limit");
+    assertThrows(IllegalArgumentException.class, () ->
+      getDialectByDriver().addLimitToSql("UPDATE FOO ...", ":limit"));
   }
 }

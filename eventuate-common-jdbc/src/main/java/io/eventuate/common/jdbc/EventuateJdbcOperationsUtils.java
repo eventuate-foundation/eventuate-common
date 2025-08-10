@@ -40,7 +40,7 @@ public class EventuateJdbcOperationsUtils {
   }
 
   public String insertIntoMessageTable(EventuateSchema eventuateSchema, String sql, SqlJsonConverter jsonConverter, String outboxTableSuffix) {
-    return String.format(sql,
+    return sql.formatted(
             eventuateSchema.qualifyTable("message"),
             outboxTableSuffix,
             jsonConverter.convert(eventuateSchema, "headers"),

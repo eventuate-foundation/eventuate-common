@@ -9,8 +9,7 @@ import io.eventuate.common.jdbc.sqldialect.PostgresDialect;
 import io.eventuate.common.jdbc.sqldialect.SqlDialectSelector;
 import io.eventuate.common.spring.id.IdGeneratorConfiguration;
 import io.eventuate.common.spring.jdbc.sqldialect.SqlDialectConfiguration;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -18,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -28,15 +26,13 @@ import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.EVENT_APPLIC
 import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.EVENT_AUTO_GENERATED_ID_COLUMN;
 import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.MESSAGE_APPLICATION_GENERATED_ID_COLUMN;
 import static io.eventuate.common.jdbc.EventuateJdbcOperationsUtils.MESSAGE_AUTO_GENERATED_ID_COLUMN;
-import static java.lang.String.format;
 import static java.lang.System.nanoTime;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(classes = SqlDialectIntegrationTest.Config.class)
-@RunWith(SpringRunner.class)
 public class SqlDialectIntegrationTest {
   @Configuration
   @EnableAutoConfiguration
@@ -85,11 +81,11 @@ public class SqlDialectIntegrationTest {
 
     String schema = "column_type_test_schema_" + nanoTime();
 
-    jdbcTemplate.update(format("create schema %s", schema));
+    jdbcTemplate.update("create schema %s".formatted(schema));
 
     String sampleTable = "column_type_test_table_" + nanoTime();
 
-    jdbcTemplate.update(String.format("create table %s.%s(id text primary key)", schema, sampleTable));
+    jdbcTemplate.update("create table %s.%s(id text primary key)".formatted(schema, sampleTable));
 
     PostgresDialect postgresDialect = (PostgresDialect) getDialect();
 
@@ -111,7 +107,7 @@ public class SqlDialectIntegrationTest {
 
     prepareRandomData();
 
-    String sqlWithoutLimit = String.format("select * from %s", DEFAULT_EVENTUATE_SCHEMA.qualifyTable("events"));
+    String sqlWithoutLimit = "select * from %s".formatted(DEFAULT_EVENTUATE_SCHEMA.qualifyTable("events"));
     String sqlWithLimit = getDialect().addLimitToSql(sqlWithoutLimit, String.valueOf(LIMIT));
 
     List<Map<String, Object>> resultWithLimit = jdbcTemplate.queryForList(sqlWithLimit);
@@ -142,7 +138,7 @@ public class SqlDialectIntegrationTest {
               DEFAULT_EVENTUATE_SCHEMA);
     }
 
-    String sqlWithoutLimit = String.format("select * from %s where event_type = ?", DEFAULT_EVENTUATE_SCHEMA.qualifyTable("events"));
+    String sqlWithoutLimit = "select * from %s where event_type = ?".formatted(DEFAULT_EVENTUATE_SCHEMA.qualifyTable("events"));
     String sqlWithLimit = getDialect().addLimitToSql(sqlWithoutLimit, String.valueOf(LIMIT));
 
     List<Map<String, Object>> resultWithLimit = jdbcTemplate.queryForList(sqlWithLimit, eventType);

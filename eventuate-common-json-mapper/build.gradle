@@ -2,11 +2,14 @@
 dependencies {
     api project (":eventuate-common-id")
 
-    api "commons-lang:commons-lang:2.6"
+    api "org.apache.commons:commons-lang3:3.18.0"
+    implementation "org.junit.jupiter:junit-jupiter:5.13.4"
+    testImplementation "org.hamcrest:hamcrest:2.2"
     api "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
     api "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jacksonVersion"
 }
 
 test {
     forkEvery 1
+    useJUnitPlatform()
 }

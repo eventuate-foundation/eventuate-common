@@ -2,3 +2,6 @@
 dependencies {
     api project (":eventuate-common-common-spring-in-memory-database")
 }
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}

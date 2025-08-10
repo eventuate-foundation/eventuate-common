@@ -11,3 +11,6 @@ dependencies {
     testImplementation "org.testcontainers:testcontainers:$testContainersVersion"
 
 }
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}
