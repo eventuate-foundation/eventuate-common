@@ -114,7 +114,7 @@ dockerCompose {
 
 configurations.all {
     resolutionStrategy.cacheDynamicVersionsFor 10, 'minutes'
-    resolutionStrategy.cacheChangingVersionsFor 10, 'minutes'
+    resolutionStrategy.cacheChangingModulesFor 10, 'seconds'
 }
 
 publishMultiArch {
@@ -123,4 +123,17 @@ publishMultiArch {
     image "eventuateio/eventuate-vanilla-mysql8"
     image "eventuateio/eventuate-zookeeper"
     image "eventuateio/eventuate-vanilla-postgres"
+}
+
+task compileAll {
+    dependsOn subprojects.collect { it.tasks.withType(JavaCompile) }.flatten()
+}
+
+task preCommitCheck {
+    dependsOn compileAll
+    doLast {
+        exec {
+            commandLine 'circleci', 'config', 'validate'
+        }
+    }
 }
