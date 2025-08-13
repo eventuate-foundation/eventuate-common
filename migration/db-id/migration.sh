@@ -53,8 +53,12 @@ elif [ "${DATABASE}" == "mssql" ]; then
 
   curl ${db_id_migration_path}/mssql/4.setup-db-id.sql --output ${migration_file} --create-dirs
   curl ${db_id_migration_path}/migration/db-id/mssql/${migration_tool} --output ${migration_tool}
-  curl ${db_id_migration_path}/migration/db-id/mssql/entrypoint.sh --output ${migration_entrypoint}
-  docker compose -f ${migration_tool} run --no-deps mssql-migration
+  if [ -z "$LOCAL" ]; then
+    curl ${db_id_migration_path}/migration/db-id/mssql/entrypoint.sh --output ${migration_entrypoint}
+  else
+    cp ./migration/db-id/mssql/entrypoint.sh ${migration_entrypoint}
+  fi
+  docker compose -f ${migration_tool} run --no-deps --build mssql-migration
 
   rm -rf ${DB_ID_MIGRATION_DIR}
   rm -rf ${migration_tool}
