@@ -1,6 +1,6 @@
 #run the setup scripts to create the DB and the schema in the DB
 
-until (echo select 1 from dual | /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Eventuate123! -d master > /dev/null)
+until (echo select 1 from dual | /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P Eventuate123! -d master > /dev/null)
 do
  echo sleeping for mssql
  sleep 5
@@ -23,7 +23,7 @@ for i in `ls *.sql | sort -V`; do
  echo ""
  echo "RUNNING $i"
  echo ""
- /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Eventuate123! -d master -i "$i"
+ /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P Eventuate123! -d master -i "$i"
 done;
 
 sh /usr/src/app/additional-scripts/9.initialization-completed.sh

@@ -9,5 +9,5 @@ docker run $* \
    --network=${PWD##*/}_default \
    -e MSSQL_HOST=${DATABASE} \
    mcr.microsoft.com/mssql/server:2017-latest  \
-   sh -c 'exec /opt/mssql-tools/bin/sqlcmd -S "$MSSQL_HOST" -U SA -P "Eventuate123!"'
+   sh -c 'exec /opt/mssql-tools18/bin/sqlcmd -C -S "$MSSQL_HOST" -U SA -P "Eventuate123!"'
 
