@@ -33,3 +33,5 @@ tmp-migration
 
 eventuate-local-console/eventuate-local-console-server/test/res
 eventuate-local-console/eventuate-local-console-server/reports
+.hitl
+test-reports

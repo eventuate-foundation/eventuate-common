@@ -4,11 +4,11 @@ dependencies {
     api project (":eventuate-common-common-spring-jdbc")
     api project (":eventuate-common-spring-id")
 
-    api "org.springframework.boot:spring-boot-starter-data-r2dbc:$springBoot3Version"
+    api "org.springframework.boot:spring-boot-starter-data-r2dbc:$springBootVersion"
 
     testImplementation project (":eventuate-common-spring-jdbc")
     testImplementation project (":eventuate-common-jdbc-tests")
-    testImplementation "org.springframework.boot:spring-boot-starter-test:$springBoot3Version"
+    testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
 
     testImplementation project(":eventuate-common-testcontainers")
     testImplementation "org.testcontainers:testcontainers:$testContainersVersion"
