@@ -1,7 +1,7 @@
 package io.eventuate.common.spring.jdbc.reactive;
 
 import io.eventuate.common.jdbc.EventuateDuplicateKeyException;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

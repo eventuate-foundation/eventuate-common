@@ -1,6 +1,6 @@
 package io.eventuate.common.testcontainers;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.nio.file.FileSystems;
@@ -19,7 +19,7 @@ public class EventuatePostgresContainer extends AbstractEventuatePostgresContain
         ;
     }
 
-    @NotNull
+    @NonNull
     static EventuatePostgresContainer makeFromDockerfile() {
         return new EventuatePostgresContainer(FileSystems.getDefault().getPath("../postgres/Dockerfile"));
     }

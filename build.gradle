@@ -29,14 +29,8 @@ allprojects {
 
 subprojects {
     java {
-        if (project.name.endsWith("-spring-boot-3")) {
-            toolchain {
-                languageVersion.set(JavaLanguageVersion.of(17));
-            }
-        } else {
-            toolchain {
-                languageVersion.set(JavaLanguageVersion.of(17));
-            }
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(17));
         }
     }
 

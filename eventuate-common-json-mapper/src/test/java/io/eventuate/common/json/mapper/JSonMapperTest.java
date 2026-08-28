@@ -5,6 +5,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
@@ -88,6 +89,36 @@ public class JSonMapperTest {
   }
 
 
+  static class EventWithOptional {
+    private String id;
+    private Optional<String> metadata = Optional.empty();
+
+    public EventWithOptional() {
+    }
+
+    public EventWithOptional(String id, Optional<String> metadata) {
+      this.id = id;
+      this.metadata = metadata;
+    }
+
+    public String getId() {
+      return id;
+    }
+
+    public void setId(String id) {
+      this.id = id;
+    }
+
+    public Optional<String> getMetadata() {
+      return metadata;
+    }
+
+    public void setMetadata(Optional<String> metadata) {
+      this.metadata = metadata;
+    }
+  }
+
+
   private final String amountAsString = "1345.13";
   private SomeEvent original = new SomeEvent(new Int128(5, 7), new BigDecimal(amountAsString), "foo");
 
@@ -113,6 +144,33 @@ public class JSonMapperTest {
     assertEquals(original.getNullProperty(), x.getNullProperty());
   }
 
+
+  @Test
+  public void shouldOmitEmptyOptional() {
+    String s = JSonMapper.toJson(new EventWithOptional("x", Optional.empty()));
+
+    assertThat(s, not(containsString("metadata")));
+
+    EventWithOptional x = JSonMapper.fromJson(s, EventWithOptional.class);
+    assertEquals(Optional.empty(), x.getMetadata());
+  }
+
+  @Test
+  public void shouldSerdePresentOptional() {
+    String s = JSonMapper.toJson(new EventWithOptional("x", Optional.of("bar")));
+
+    assertThat(s, containsString("metadata"));
+    assertThat(s, not(containsString("present")));
+
+    EventWithOptional x = JSonMapper.fromJson(s, EventWithOptional.class);
+    assertEquals(Optional.of("bar"), x.getMetadata());
+  }
+
+  @Test
+  public void shouldDeserNullIntoEmptyOptional() {
+    EventWithOptional x = JSonMapper.fromJson("{\"id\":\"x\",\"metadata\":null}", EventWithOptional.class);
+    assertEquals(Optional.empty(), x.getMetadata());
+  }
 
   @Test
   public void shouldDeserIgnoringUnknowns() {

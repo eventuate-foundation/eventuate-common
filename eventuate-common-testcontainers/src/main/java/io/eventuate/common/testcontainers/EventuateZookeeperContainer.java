@@ -1,6 +1,6 @@
 package io.eventuate.common.testcontainers;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
@@ -26,7 +26,7 @@ public class EventuateZookeeperContainer extends EventuateGenericContainer<Event
         withConfiguration();
     }
 
-    @NotNull
+    @NonNull
     static EventuateZookeeperContainer makeFromDockerfile() {
         return new EventuateZookeeperContainer(FileSystems.getDefault().getPath("../zookeeper/Dockerfile"));
     }

@@ -1,6 +1,6 @@
 
 dependencies {
-    api 'org.apache.curator:curator-recipes:2.11.0'
+    api "org.apache.curator:curator-recipes:$curatorVersion"
     api project(":eventuate-common-coordination-leadership")
     api "org.slf4j:slf4j-api:$slf4jVersion"
 

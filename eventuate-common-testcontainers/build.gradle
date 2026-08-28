@@ -1,7 +1,9 @@
 dependencies {
     api "org.testcontainers:testcontainers:$testContainersVersion"
-    implementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+    api "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+
     testImplementation project(":eventuate-common-spring-jdbc")
+    testImplementation "org.springframework.boot:spring-boot-starter-jdbc-test:$springBootVersion"
 }
 
 

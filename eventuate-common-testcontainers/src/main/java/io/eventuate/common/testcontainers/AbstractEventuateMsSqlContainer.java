@@ -1,7 +1,7 @@
 package io.eventuate.common.testcontainers;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.images.builder.ImageFromDockerfile;
@@ -74,7 +74,7 @@ spring.datasource.driver-class-name=
     return getLocalJdbcUrlWithoutDatabase() + ";databaseName=eventuate";
   }
 
-  private @NotNull String getLocalJdbcUrlWithoutDatabase() {
+  private @NonNull String getLocalJdbcUrlWithoutDatabase() {
     return "jdbc:sqlserver://localhost:%s;encrypt=true;trustServerCertificate=true".formatted(getFirstMappedPort());
   }
 

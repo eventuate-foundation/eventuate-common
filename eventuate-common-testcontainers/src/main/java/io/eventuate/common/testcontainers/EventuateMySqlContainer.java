@@ -1,6 +1,6 @@
 package io.eventuate.common.testcontainers;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.nio.file.Path;
@@ -21,7 +21,7 @@ public class EventuateMySqlContainer extends AbstractEventuateMySqlContainer<Eve
     return new EventuateMySqlContainer();
   }
 
-  static @NotNull EventuateMySqlContainer makeFromDockerfile() {
+  static @NonNull EventuateMySqlContainer makeFromDockerfile() {
     return new EventuateMySqlContainer(ContainerUtil.asPath("../mysql/Dockerfile-mysql8"));
   }
 }

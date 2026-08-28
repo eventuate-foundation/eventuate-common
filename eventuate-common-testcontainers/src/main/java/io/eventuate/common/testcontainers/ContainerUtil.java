@@ -1,6 +1,6 @@
 package io.eventuate.common.testcontainers;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.testcontainers.containers.GenericContainer;
 
 import java.io.IOException;
@@ -26,7 +26,7 @@ public class ContainerUtil {
                 () -> "localhost:%s".formatted(container.getFirstMappedPort()));
     }
 
-    @NotNull
+    @NonNull
     static Path asPath(String first) {
       return FileSystems.getDefault().getPath(first);
     }
