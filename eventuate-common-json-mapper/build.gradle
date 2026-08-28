@@ -2,11 +2,10 @@
 dependencies {
     api project (":eventuate-common-id")
 
-    api "org.apache.commons:commons-lang3:3.18.0"
+    api "org.apache.commons:commons-lang3:$commonsLang3Version"
     implementation "org.junit.jupiter:junit-jupiter:$junitVersion"
-    testImplementation "org.hamcrest:hamcrest:2.2"
-    api "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
-    api "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jacksonVersion"
+    testImplementation "org.hamcrest:hamcrest:$hamcrestVersion"
+    api "tools.jackson.core:jackson-databind:$jacksonVersion"
 }
 
 test {

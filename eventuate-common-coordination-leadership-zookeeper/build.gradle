@@ -2,7 +2,7 @@
 dependencies {
     api 'org.apache.curator:curator-recipes:2.11.0'
     api project(":eventuate-common-coordination-leadership")
-    api "org.slf4j:slf4j-api:1.7.18"
+    api "org.slf4j:slf4j-api:$slf4jVersion"
 
     testImplementation project(":eventuate-common-coordination-leadership-tests")
     testImplementation "org.testcontainers:testcontainers:$testContainersVersion"

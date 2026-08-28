@@ -1,19 +1,14 @@
 package io.eventuate.common.json.mapper;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.deser.std.StdScalarDeserializer;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.StdScalarSerializer;
 import io.eventuate.common.id.Int128;
-
-import java.io.IOException;
-import java.lang.reflect.Type;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.deser.std.StdScalarDeserializer;
+import tools.jackson.databind.module.SimpleModule;
+import tools.jackson.databind.ser.std.StdScalarSerializer;
 
 public class Int128Module extends SimpleModule {
 
@@ -23,16 +18,16 @@ public class Int128Module extends SimpleModule {
       super(Int128.class);
     }
 
-    public Int128 deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
-      JsonToken token = jp.getCurrentToken();
+    public Int128 deserialize(JsonParser jp, DeserializationContext ctxt) {
+      JsonToken token = jp.currentToken();
       if (token == JsonToken.VALUE_STRING) {
-        String str = jp.getText().trim();
+        String str = jp.getString().trim();
         if (str.isEmpty())
           return null;
         else
           return Int128.fromString(str);
       } else
-        throw ctxt.mappingException(getValueClass());
+        return (Int128) ctxt.handleUnexpectedToken(getValueType(), jp);
     }
   }
 
@@ -41,13 +36,8 @@ public class Int128Module extends SimpleModule {
       super(Int128.class);
     }
 
-    public void serialize(Int128 value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+    public void serialize(Int128 value, JsonGenerator jgen, SerializationContext provider) {
       jgen.writeString(value.asString());
-    }
-
-    @Override
-    public JsonNode getSchema(SerializerProvider provider, Type typeHint, boolean isOptional) throws JsonMappingException {
-      return createSchemaNode("string", true);
     }
   }
 
