@@ -3,7 +3,7 @@ dependencies {
     api project (":eventuate-common-id")
 
     api "org.apache.commons:commons-lang3:3.18.0"
-    implementation "org.junit.jupiter:junit-jupiter:5.13.4"
+    implementation "org.junit.jupiter:junit-jupiter:$junitVersion"
     testImplementation "org.hamcrest:hamcrest:2.2"
     api "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
     api "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jacksonVersion"

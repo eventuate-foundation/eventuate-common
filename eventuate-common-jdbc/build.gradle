@@ -6,7 +6,7 @@ dependencies {
     api ('org.postgresql:postgresql:42.1.4') {
         exclude group: "org.slf4j", module: "slf4j-simple"
     }
-    implementation "org.junit.jupiter:junit-jupiter:5.13.4"
+    implementation "org.junit.jupiter:junit-jupiter:$junitVersion"
     runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc:7.2.1.jre8'
 
     testImplementation 'com.zaxxer:HikariCP:3.2.0'
