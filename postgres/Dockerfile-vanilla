@@ -1,4 +1,4 @@
-FROM postgres:13.13-bullseye
+FROM postgres:13.23-bookworm
 
 RUN  apt-get update \
     && apt-get install -y postgresql-13-wal2json \
