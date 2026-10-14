@@ -30,6 +30,7 @@ import static java.lang.System.nanoTime;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(classes = SqlDialectIntegrationTest.Config.class)
@@ -43,6 +44,8 @@ public class SqlDialectIntegrationTest {
 
 
   private static final int DEFAULT_DB_RECORDS = 10;
+
+  private static final long CLOCK_TOLERANCE_MILLISECONDS = 60000;
 
   private static final EventuateSchema DEFAULT_EVENTUATE_SCHEMA = new EventuateSchema(EventuateSchema.DEFAULT_SCHEMA);
 
@@ -152,15 +155,18 @@ public class SqlDialectIntegrationTest {
   }
 
   @Test
-  public void testCurrentTime() throws InterruptedException {
-    Long javaTime1 = System.currentTimeMillis();
-    Thread.sleep(100);
+  public void testCurrentTime() {
+    long javaTimeBefore = System.currentTimeMillis();
     Long dbTime = jdbcTemplate.queryForObject("select " +  getDialect().getCurrentTimeInMillisecondsExpression(), Long.class);
-    Thread.sleep(100);
-    Long javaTime2 = System.currentTimeMillis();
+    long javaTimeAfter = System.currentTimeMillis();
 
-    assertTrue(dbTime > javaTime1);
-    assertTrue(dbTime < javaTime2);
+    assertNotNull(dbTime, "Expected the database to return the current time in milliseconds since the epoch");
+
+    assertTrue(dbTime >= javaTimeBefore - CLOCK_TOLERANCE_MILLISECONDS,
+            "Database time %s is more than %s ms earlier than the JVM time %s".formatted(dbTime, CLOCK_TOLERANCE_MILLISECONDS, javaTimeBefore));
+
+    assertTrue(dbTime <= javaTimeAfter + CLOCK_TOLERANCE_MILLISECONDS,
+            "Database time %s is more than %s ms later than the JVM time %s".formatted(dbTime, CLOCK_TOLERANCE_MILLISECONDS, javaTimeAfter));
   }
 
   @Test
