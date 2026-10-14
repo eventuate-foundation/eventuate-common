@@ -8,3 +8,4 @@ shared_preload_libraries = 'wal2json'
 wal_level = logical             # minimal, archive, hot_standby, or logical (change requires restart)
 max_wal_senders = 10           # max number of walsender processes (change requires restart)
 max_replication_slots = 10    # max number of replication slots (change requires restart)
+output_plugin_libraries = 'pgoutput, test_decoding, wal2json'    # trusted logical decoding output plugins (Postgres 18+)

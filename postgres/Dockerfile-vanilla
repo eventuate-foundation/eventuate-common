@@ -1,7 +1,7 @@
-FROM postgres:13.23-bookworm
+FROM postgres:18-bookworm
 
 RUN  apt-get update \
-    && apt-get install -y postgresql-13-wal2json \
+    && apt-get install -y postgresql-18-wal2json \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the custom configuration which will be passed down to the server (using a .sample file is the preferred way of doing it by
