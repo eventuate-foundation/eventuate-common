@@ -167,7 +167,7 @@ workflows:
           script: ./build-and-test-all-postgres.sh
       - native-image/build:
           name: build-native-image-zookeeper-intel
-          script: ./zookeeper/build-docker-zookeeper-native.sh
+          script: ./build-docker-image-native.sh $ZOOKEEPER_MULTI_ARCH_IMAGE zookeeper/Dockerfile zookeeper
           resource_class: medium
           context:
             - publish
@@ -180,7 +180,7 @@ workflows:
             - build-and-test-postgres
       - native-image/build:
           name: build-native-image-zookeeper-arm
-          script: ./zookeeper/build-docker-zookeeper-native.sh
+          script: ./build-docker-image-native.sh $ZOOKEEPER_MULTI_ARCH_IMAGE zookeeper/Dockerfile zookeeper
           resource_class: arm.medium
           context:
             - publish
@@ -193,15 +193,16 @@ workflows:
             - build-and-test-postgres
       - native-image/merge:
           name: build-multi-arch-image-zookeeper
-          script: ./zookeeper/merge-docker-zookeeper-multi-arch.sh
+          script: ./merge-docker-image-multi-arch.sh $ZOOKEEPER_MULTI_ARCH_IMAGE
           context:
             - publish
           requires:
             - build-native-image-zookeeper-intel
             - build-native-image-zookeeper-arm
-      - build-multi-arch-image/build:
-          name: build-multi-arch-image-mysql8
-          script: ./mysql/build-docker-mysql-8-multi-arch.sh
+      - native-image/build:
+          name: build-native-image-mysql8-intel
+          script: ./build-docker-image-native.sh $MYSQL8_MULTI_ARCH_IMAGE mysql/Dockerfile-mysql8 mysql
+          resource_class: medium
           context:
             - publish
           requires:
@@ -211,6 +212,27 @@ workflows:
             - build-and-test-postgres-arm
             - build-and-test-mssql
             - build-and-test-postgres
+      - native-image/build:
+          name: build-native-image-mysql8-arm
+          script: ./build-docker-image-native.sh $MYSQL8_MULTI_ARCH_IMAGE mysql/Dockerfile-mysql8 mysql
+          resource_class: arm.medium
+          context:
+            - publish
+          requires:
+            - build-and-test-mysql8-intel
+            - build-and-test-mysql8-arm
+            - build-and-test-postgres-intel
+            - build-and-test-postgres-arm
+            - build-and-test-mssql
+            - build-and-test-postgres
+      - native-image/merge:
+          name: build-multi-arch-image-mysql8
+          script: ./merge-docker-image-multi-arch.sh $MYSQL8_MULTI_ARCH_IMAGE
+          context:
+            - publish
+          requires:
+            - build-native-image-mysql8-intel
+            - build-native-image-mysql8-arm
       - build-multi-arch-image/build:
           name: build-multi-arch-image-vanilla-mysql8
           script: ./mysql/build-docker-vanilla-mysql-8-multi-arch.sh
