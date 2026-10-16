@@ -171,26 +171,12 @@ workflows:
           resource_class: medium
           context:
             - publish
-          requires:
-            - build-and-test-mysql8-intel
-            - build-and-test-mysql8-arm
-            - build-and-test-postgres-intel
-            - build-and-test-postgres-arm
-            - build-and-test-mssql
-            - build-and-test-postgres
       - native-image/build:
           name: build-native-image-zookeeper-arm64
           script: ./zookeeper/build-docker-zookeeper-native.sh
           resource_class: arm.medium
           context:
             - publish
-          requires:
-            - build-and-test-mysql8-intel
-            - build-and-test-mysql8-arm
-            - build-and-test-postgres-intel
-            - build-and-test-postgres-arm
-            - build-and-test-mssql
-            - build-and-test-postgres
       - native-image/merge:
           name: build-multi-arch-image-zookeeper
           script: ./zookeeper/merge-docker-zookeeper-multi-arch.sh
