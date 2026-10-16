@@ -129,8 +129,6 @@ workflows:
             export BUILDX_TARGET_PLATFORMS=linux/amd64
             ./build-and-test-all-mysql8-multi-arch-locally.sh
           skip_multi_arch_env_vars: "true"
-          requires:
-            - build-multi-arch-image-mysql8
       - build-and-test/build-and-test:
           name: build-and-test-postgres-intel
           script: |
@@ -140,8 +138,6 @@ workflows:
             export BUILDX_TARGET_PLATFORMS=linux/amd64
             ./build-and-test-all-postgres-multi-arch-locally.sh
           skip_multi_arch_env_vars: "true"
-          requires:
-            - build-multi-arch-image-mysql8
       - build-and-test/build-and-test:
           name: build-and-test-mysql8-arm
           resource_class: arm.medium
@@ -153,8 +149,6 @@ workflows:
             export BUILDX_TARGET_PLATFORMS=linux/arm64
             ./build-and-test-all-mysql8-multi-arch-locally.sh
           skip_multi_arch_env_vars: "true"
-          requires:
-            - build-multi-arch-image-mysql8
       - build-and-test/build-and-test:
           name: build-and-test-postgres-arm
           resource_class: arm.medium
@@ -165,30 +159,38 @@ workflows:
             export BUILDX_TARGET_PLATFORMS=linux/arm64
             ./build-and-test-all-postgres-multi-arch-locally.sh
           skip_multi_arch_env_vars: "true"
-          requires:
-            - build-multi-arch-image-mysql8
       - build-and-test/build-and-test:
           name: build-and-test-mssql
           script: ./build-and-test-all-mssql.sh
-          requires:
-            - build-multi-arch-image-mysql8
       - build-and-test/build-and-test:
           name: build-and-test-postgres
           script: ./build-and-test-all-postgres.sh
-          requires:
-            - build-multi-arch-image-mysql8
       - native-image/build:
           name: build-native-image-zookeeper-intel
           script: ./build-docker-image-native.sh $ZOOKEEPER_MULTI_ARCH_IMAGE zookeeper/Dockerfile zookeeper
           resource_class: medium
           context:
             - publish
+          requires:
+            - build-and-test-mysql8-intel
+            - build-and-test-mysql8-arm
+            - build-and-test-postgres-intel
+            - build-and-test-postgres-arm
+            - build-and-test-mssql
+            - build-and-test-postgres
       - native-image/build:
           name: build-native-image-zookeeper-arm
           script: ./build-docker-image-native.sh $ZOOKEEPER_MULTI_ARCH_IMAGE zookeeper/Dockerfile zookeeper
           resource_class: arm.medium
           context:
             - publish
+          requires:
+            - build-and-test-mysql8-intel
+            - build-and-test-mysql8-arm
+            - build-and-test-postgres-intel
+            - build-and-test-postgres-arm
+            - build-and-test-mssql
+            - build-and-test-postgres
       - native-image/merge:
           name: build-multi-arch-image-zookeeper
           script: ./merge-docker-image-multi-arch.sh $ZOOKEEPER_MULTI_ARCH_IMAGE
@@ -203,12 +205,26 @@ workflows:
           resource_class: medium
           context:
             - publish
+          requires:
+            - build-and-test-mysql8-intel
+            - build-and-test-mysql8-arm
+            - build-and-test-postgres-intel
+            - build-and-test-postgres-arm
+            - build-and-test-mssql
+            - build-and-test-postgres
       - native-image/build:
           name: build-native-image-mysql8-arm
           script: ./build-docker-image-native.sh $MYSQL8_MULTI_ARCH_IMAGE mysql/Dockerfile-mysql8 mysql
           resource_class: arm.medium
           context:
             - publish
+          requires:
+            - build-and-test-mysql8-intel
+            - build-and-test-mysql8-arm
+            - build-and-test-postgres-intel
+            - build-and-test-postgres-arm
+            - build-and-test-mssql
+            - build-and-test-postgres
       - native-image/merge:
           name: build-multi-arch-image-mysql8
           script: ./merge-docker-image-multi-arch.sh $MYSQL8_MULTI_ARCH_IMAGE
@@ -222,6 +238,13 @@ workflows:
           script: ./mysql/build-docker-vanilla-mysql-8-multi-arch.sh
           context:
             - publish
+          requires:
+            - build-and-test-mysql8-intel
+            - build-and-test-mysql8-arm
+            - build-and-test-postgres-intel
+            - build-and-test-postgres-arm
+            - build-and-test-mssql
+            - build-and-test-postgres
       - build-multi-arch-image/build:
           name: build-multi-arch-image-postgres
           script: ./postgres/build-docker-postgres-multi-arch.sh
