@@ -77,6 +77,45 @@ orbs:
                 docker login -u ${DOCKER_USER_ID?} -p ${DOCKER_PASSWORD?}
                 
                 <<parameters.script>>
+  native-image:
+    jobs:
+      build:
+        parameters:
+          script:
+            description: the script to execute
+            type: string
+          resource_class:
+            description: the resource class, which determines the platform
+            type: string
+        machine:
+          image: ubuntu-2404:2024.11.1
+        resource_class: <<parameters.resource_class>>
+        working_directory: ~/eventuate-common
+        steps:
+          - checkout
+          - run:
+              name: docker build
+              command: |
+                . set-multi-arch-image-env-vars.sh
+                echo ${DOCKER_PASSWORD?} | docker login -u ${DOCKER_USER_ID?} --password-stdin
+                <<parameters.script>>
+      merge:
+        parameters:
+          script:
+            description: the script to execute
+            type: string
+        docker:
+          - image: cimg/base:stable
+        working_directory: ~/eventuate-common
+        steps:
+          - checkout
+          - setup_remote_docker
+          - run:
+              name: docker buildx imagetools create
+              command: |
+                . set-multi-arch-image-env-vars.sh
+                echo ${DOCKER_PASSWORD?} | docker login -u ${DOCKER_USER_ID?} --password-stdin
+                <<parameters.script>>
 workflows:
   version: 2.1
   build-test-and-deploy:
@@ -126,9 +165,10 @@ workflows:
       - build-and-test/build-and-test:
           name: build-and-test-postgres
           script: ./build-and-test-all-postgres.sh
-      - build-multi-arch-image/build:
-          name: build-multi-arch-image-zookeeper
-          script: ./zookeeper/build-docker-zookeeper-multi-arch.sh
+      - native-image/build:
+          name: build-native-image-zookeeper-amd64
+          script: ./zookeeper/build-docker-zookeeper-native.sh
+          resource_class: medium
           context:
             - publish
           requires:
@@ -138,6 +178,27 @@ workflows:
             - build-and-test-postgres-arm
             - build-and-test-mssql
             - build-and-test-postgres
+      - native-image/build:
+          name: build-native-image-zookeeper-arm64
+          script: ./zookeeper/build-docker-zookeeper-native.sh
+          resource_class: arm.medium
+          context:
+            - publish
+          requires:
+            - build-and-test-mysql8-intel
+            - build-and-test-mysql8-arm
+            - build-and-test-postgres-intel
+            - build-and-test-postgres-arm
+            - build-and-test-mssql
+            - build-and-test-postgres
+      - native-image/merge:
+          name: build-multi-arch-image-zookeeper
+          script: ./zookeeper/merge-docker-zookeeper-multi-arch.sh
+          context:
+            - publish
+          requires:
+            - build-native-image-zookeeper-amd64
+            - build-native-image-zookeeper-arm64
       - build-multi-arch-image/build:
           name: build-multi-arch-image-mysql8
           script: ./mysql/build-docker-mysql-8-multi-arch.sh
